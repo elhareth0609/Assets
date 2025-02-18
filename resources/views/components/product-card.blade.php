@@ -1,4 +1,4 @@
-<div class="product-card col-lg-4 col-md-6 col-sm-6 col-12 mb-4">
+<div class="product-card col-lg-3 col-md-6 col-sm-6 col-12 mb-4">
     <div class="card p-2 position-relative">
         <div class="position-absolute fs-6 bg-danger text-white rounded" style="padding: 2px 8px;">15% Off</div>
         <button class="btn btn-white position-absolute my-w-fit-content border-0" style="right: 10px;position: absolute!important;">

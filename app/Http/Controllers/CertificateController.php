@@ -66,7 +66,7 @@ class CertificateController extends Controller {
 
             // Enable Arabic text support
             $pdf->setRTL(true);
-            
+
             // Set font for Arabic text
             // Make sure the Amiri font files are in the correct TCPDF fonts directory
             $pdf->SetFont('amiri', '', 24);
@@ -117,7 +117,7 @@ class CertificateController extends Controller {
             }
 
             $pdf = new Fpdi('L', 'mm', 'A4', true, 'UTF-8', false);
-    
+
             try {
                 $pdf->setSourceFile($pdfPath);
                 $tplIdx = $pdf->importPage(1);
@@ -135,7 +135,7 @@ class CertificateController extends Controller {
             }
 
             $pdf->setRTL(true);
-            
+
             $pdf->SetFont('amiri', '', 24);
 
             $pdf->SetXY($request->name_x, $request->name_y);
@@ -169,11 +169,11 @@ class CertificateController extends Controller {
 
             function writeMultiLineText($pdf, $x, $y, $text, $maxY = 270) {
                 $pdf->SetFont('amiri', '', 17); // Set the font and size (adjust as needed)
-            
+        
                 $maxWidth1 = 20; // Maximum width for each line (adjust as needed)
                 $maxWidth2 = 130; // Maximum width for each line (adjust as needed)
                 $lineHeight = 10; // Height of each line
-            
+
                 // Split the text into lines
                 $lines1 = explode("\n", wordwrap($text, $maxWidth1, "\n")); // Break text into lines
                 $firstLine = $lines1[0];
@@ -192,7 +192,7 @@ class CertificateController extends Controller {
                     if ($y + $lineHeight > $maxY) {
                         break; // Stop writing if the next line exceeds the maximum Y position
                     }
-            
+
                     $y += $lineHeight + 4; // Move Y position down for the next line
                     $pdf->SetXY(17, $y); // Set the position for subsequent lines (X=10)
                     $pdf->Cell(0, $lineHeight, $line, 0, 1, 'R'); // Write the line
@@ -207,7 +207,7 @@ class CertificateController extends Controller {
             $day = $now->day;   // Day
             $month = $now->month; // Month
             $year = $now->year;  // Year
-            
+
             $pdf->SetXY(98, 176); // Set the position (X=0 to start from the left edge)
             $pdf->SetFont('amiri', '', 17); // Set Amiri font with size 17
             $pdf->Cell(0, 10, $year . '    ' . $month . '   ' . $day, 0, 1, 'R', 0, '', 0, false, 'T', 'M');
