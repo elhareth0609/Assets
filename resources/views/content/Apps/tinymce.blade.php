@@ -78,3 +78,7 @@
 </script>
 
 @endsection
+
+@push('page_scripts')
+    <script src="https://cdn.tiny.cloud/1/7gjdmwd28tv3zgd10agg1omfs4akvf56ukwbb85qqzlzgxd1/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+@endpush

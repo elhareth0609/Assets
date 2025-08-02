@@ -10,7 +10,6 @@
 {{-- <script type="module" src="{{ asset('assets/vendor/chart.js/Chart.min.js') }}"></script> --}}
 
 
-<script src="https://cdn.tiny.cloud/1/7gjdmwd28tv3zgd10agg1omfs4akvf56ukwbb85qqzlzgxd1/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 {{-- <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script> --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -19,28 +18,26 @@
 <script src="{{ asset('assets/js/fullcalendar.min.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('assets/js/jquery.dataTables.min.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('assets/js/sweetalert.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('assets/js/tagify.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('assets/js/tagify.polyfills.min.js') }}?v={{ time() }}"></script>
+{{-- <script src="{{ asset('assets/js/tagify.js') }}?v={{ time() }}"></script> --}}
+{{-- <script src="{{ asset('assets/js/tagify.polyfills.min.js') }}?v={{ time() }}"></script> --}}
 <script src="{{ asset('assets/js/clipboard.min.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('assets/js/pusher.min.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('assets/js/lottie.min.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('assets/js/dropzone-min.js') }}?v={{ time() }}"></script>
 
-<link href="{{ asset('assets/css/select2.min.css') }}?v={{ time() }}"/>
-<script src="{{ asset('assets/js/select2.min.js') }}?v={{ time() }}"></script>
+{{-- <link href="{{ asset('assets/css/select2.min.css') }}?v={{ time() }}"/>
+<script src="{{ asset('assets/js/select2.min.js') }}?v={{ time() }}"></script> --}}
 
 <script src="{{ asset('assets/js/myCounter.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('assets/js/myValidate.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('assets/js/myLang.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('assets/js/myIcons.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('assets/js/mySelect.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('assets/js/myTag.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('assets/js/myAnime.js') }}?v={{ time() }}"></script>
 
 <link rel="stylesheet" href="{{ asset('assets/vendor/materialdesignicons/css/materialdesignicons.min.css') }}?v={{ time() }}" />
 
 <link rel="stylesheet" href="{{ asset('assets/css/dropzone.css') }}?v={{ time() }}" />
-<link rel="stylesheet" href="{{ asset('assets/css/tagify.css') }}?v={{ time() }}" />
+{{-- <link rel="stylesheet" href="{{ asset('assets/css/tagify.css') }}?v={{ time() }}" /> --}}
 
 <!-- Custom styles for this template-->
 <link href="{{ asset('assets/css/sb-admin-2.css') }}?v={{ time() }}" rel="stylesheet">

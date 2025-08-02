@@ -15,11 +15,12 @@
 <script src="{{ asset('assets/js/select2.min.js') }}?v={{ time() }}"></script>
 
 <script src="{{ asset('assets/js/myCounter.js') }}?v={{ time() }}"></script>
+{{-- <script src="{{ asset('assets/js/myCodeDisplay.js') }}?v={{ time() }}"></script> --}}
 <script src="{{ asset('assets/js/myValidate.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('assets/js/myLang.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('assets/js/myIcons.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('assets/js/mySelect.js') }}?v={{ time() }}"></script>
-<script src="{{ asset('assets/js/myTag.js') }}?v={{ time() }}"></script>
+{{-- <script src="{{ asset('assets/js/mySelect.js') }}?v={{ time() }}"></script> --}}
+{{-- <script src="{{ asset('assets/js/myTag.js') }}?v={{ time() }}"></script> --}}
 <script src="{{ asset('assets/js/myAnime.js') }}?v={{ time() }}"></script>
 
 <link rel="stylesheet" href="{{ asset('assets/vendor/materialdesignicons/css/materialdesignicons.min.css') }}?v={{ time() }}" />

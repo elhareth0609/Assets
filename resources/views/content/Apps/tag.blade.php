@@ -10,14 +10,12 @@
     <div class="col-md-6 ">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title">{{ __('Basic usage with existing select options:') }}</h5>
+                <h5 class="card-title">{{ __('Basic usage:') }}</h5>
             </div>
             <div class="card-body">
-                <code>
-                    new MyTag({
-                        inputId: 'tagInput'
-                    });
-                </code>
+                <code class="highlight language-js">new Tager({
+    inputId: 'tagInput'
+});</code>
             </div>
         </div>
     </div>
@@ -29,7 +27,7 @@
                     <label for="item_id0" class="form-label">{{ __('Select Item') }}</label>
                 </div>
                 <script>
-                    new MyTag({
+                    new Tager({
                         inputId: 'item_id0'
                     });
                 </script>
@@ -46,11 +44,41 @@
                 <h5 class="card-title">{{ __('Basic usage with existing select options:') }}</h5>
             </div>
             <div class="card-body">
-                <code>
-                    new MyTag({
-                        inputId: 'tagInput'
+                <code class="highlight language-js">new Tager({
+    inputId: 'tagSelect',
+});</code>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group form-group-floating {{ app()->getLocale() == "ar" ? "input-rtl" : "" }}">
+                    <input type="text" class="form-control" id="item_id0" placeholder="Select Item">
+                    <label for="item_id0" class="form-label">{{ __('Select Item') }}</label>
+                </div>
+                <script>
+                    new Tager({
+                        inputId: 'tagSelect'
                     });
-                </code>
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row mb-4">
+    <div class="col-md-6 ">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">{{ __('Basic usage with inside:') }}</h5>
+            </div>
+            <div class="card-body">
+                <code class="highlight language-js">new Tager({
+    inputId: 'tagInput',
+    tagsPosition: 'inside'
+});</code>
             </div>
         </div>
     </div>
@@ -62,7 +90,7 @@
                     <label for="item_id1" class="form-label">{{ __('Select Item') }}</label>
                 </div>
                 <script>
-                    new MyTag({
+                    new Tager({
                         inputId: 'item_id1',
                         tagsPosition: 'inside'
                     });
@@ -80,12 +108,10 @@
                 <h5 class="card-title">{{ __('With Max Tags:') }}</h5>
             </div>
             <div class="card-body">
-                <code>
-                    new MyTag({
-                        inputId: 'tagInput',
-                        maxTags: 5
-                    });
-                </code>
+                <code class="highlight language-js">new Tager({
+    inputId: 'tagInput',
+    maxTags: 5
+});</code>
             </div>
         </div>
     </div>
@@ -97,7 +123,7 @@
                     <label for="item_id1" class="form-label">{{ __('Select Item') }}</label>
                 </div>
                 <script>
-                    new MyTag({
+                    new Tager({
                         inputId: 'item_id2',
                         maxTags: 5
                     });
@@ -114,17 +140,15 @@
                 <h5 class="card-title">{{ __('With Callbacks:') }}</h5>
             </div>
             <div class="card-body">
-                <code>
-                    new MyTag({
-                        inputId: 'tagInput',
-                        onAddTag: (tag) => {
-                            console.log(`Tag added: ${tag}`);
-                        },
-                        onRemoveTag: (tag) => {
-                            console.log(`Tag removed: ${tag}`);
-                        }
-                    });
-                </code>
+                <code class="highlight language-js">new Tager({
+    inputId: 'tagInput',
+    onAddTag: (tag) => {
+        console.log(`Tag added: ${tag}`);
+    },
+    onRemoveTag: (tag) => {
+        console.log(`Tag removed: ${tag}`);
+    }
+});</code>
             </div>
         </div>
     </div>
@@ -136,7 +160,7 @@
                     <label for="item_id1" class="form-label">{{ __('Select Item') }}</label>
                 </div>
                 <script>
-                    new MyTag({
+                    new Tager({
                         inputId: 'item_id3',
                         onAddTag: (tag) => {
                             console.log(`Tag added: ${tag}`);
@@ -158,12 +182,10 @@
                 <h5 class="card-title">{{ __('With Custom Placeholder:') }}</h5>
             </div>
             <div class="card-body">
-                <code>
-                    new MyTag({
-                        inputId: 'tagInput',
-                        placeholderText: 'Type and press enter...'
-                    });
-                </code>
+                <code class="highlight language-js">new Tager({
+    inputId: 'tagInput',
+    placeholderText: 'Type and press enter...'
+});</code>
             </div>
         </div>
     </div>
@@ -175,7 +197,7 @@
                     <label for="item_id1" class="form-label">{{ __('Select Item') }}</label>
                 </div>
                 <script>
-                    new MyTag({
+                    new Tager({
                         inputId: 'item_id4',
                         placeholderText: 'Type and press enter...'
                     });
@@ -193,14 +215,12 @@
                 <h5 class="card-title">{{ __('With URL fetch:') }}</h5>
             </div>
             <div class="card-body">
-                <code>
-                    new MyTag({
-                        inputId: 'tagInput',
-                        fetchUrl: '/api/tags',
-                        fetchMethod: 'GET',
-                        csrfToken: document.querySelector('meta[name="csrf-token"]').content
-                    });
-                </code>
+                <code class="highlight language-js">new Tager({
+    inputId: 'tagInput',
+    fetchUrl: '/api/demo/tags',
+    fetchMethod: 'GET',
+    csrfToken: document.querySelector('meta[name="csrf-token"]').content
+});</code>
             </div>
         </div>
     </div>
@@ -214,9 +234,9 @@
                     </div>
                 </div>
                 <script>
-                    new MyTag({
+                    new Tager({
                         inputId: 'item_id5',
-                        fetchUrl: '/categories/all',
+                        fetchUrl: '/tags',
                         fetchMethod: 'GET',
                         csrfToken: csrfToken
                     });
@@ -275,3 +295,8 @@
 
 
 @endsection
+
+@push('header_scripts')
+    <script src="{{ asset('assets/js/myTager.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('assets/js/myCodeDisplay.js') }}?v={{ time() }}"></script>
+@endpush

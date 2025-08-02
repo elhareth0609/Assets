@@ -259,6 +259,11 @@
                     "link": "/apps/select"
                 },
                 {
+                    "title": "Repeater",
+                    "name": "apps.repeater",
+                    "link": "/apps/repeater"
+                },
+                {
                     "title": "Tag",
                     "name": "apps.tag",
                     "link": "/apps/tag"

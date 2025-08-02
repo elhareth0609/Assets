@@ -13,11 +13,12 @@
                 <h5 class="card-title">{{ __('Basic usage with existing select options:') }}</h5>
             </div>
             <div class="card-body">
-                <code>
-                    new SearchableSelect({
-                        selectId: 'edit_category_id'
-                    });
-                </code>
+                <code class="highlight language-js">new MySelecter({
+    selectId: 'edit_category_id',
+    clearText: '&lt;i class="mdi mdi-close"&gt;&lt;/i&gt;',
+    allowClear: true
+
+});</code>
             </div>
         </div>
     </div>
@@ -26,13 +27,19 @@
             <div class="card-body">
                 <div class="form-group form-group-floating {{ app()->getLocale() == "ar" ? "input-rtl" : "" }}">
                     <select class="form-select" id="item_id1">
-                        <option value="">{{ __('Select Item') }}</option>
+                        <option value="">Select Item</option>
+                        <option value="1">Item 1</option>
+                        <option value="2" selected>Item 2</option>
+                        <option value="3">Item 3</option>
                     </select>
                 </div>
                 <script>
-                    new SearchableSelect({
-                        selectId: 'item_id1'
-                    })
+                    new MySelecter({
+                        selectId: 'item_id1',
+                        clearText: '<i class="mdi mdi-close"></i>', // Custom clear icon
+                        allowClear: true
+                    });
+
                 </script>
             </div>
         </div>
@@ -47,14 +54,15 @@
                 <h5 class="card-title">{{ __('With URL fetch:') }}</h5>
             </div>
             <div class="card-body">
-                <code>
-                    new SearchableSelect({
-                        selectId: 'item_id2',
-                        url: '/items',
-                        method: 'GET',
-                        csrfToken: '...'
-                    });
-                </code>
+                <code class="highlight language-js">new MySelecter({
+    selectId: 'item_id2',
+    url: '/categories/all',
+    method: 'GET',
+    csrfToken: csrfToken,
+    valueField: 'category_id', // Custom value field
+    contentField: 'category_name', // Custom content field
+    selectedValue: 5 // Pre-select category with ID 5
+});</code>
             </div>
         </div>
     </div>
@@ -67,12 +75,15 @@
                     </select>
                 </div>
                 <script>
-                    new SearchableSelect({
+                    new MySelecter({
                         selectId: 'item_id2',
                         url: '/categories/all',
                         method: 'GET',
-                        csrfToken: csrfToken
-                    })
+                        csrfToken: csrfToken,
+                        valueField: 'category_id', // Custom value field
+                        contentField: 'category_name', // Custom content field
+                        selectedValue: 5 // Pre-select category with ID 5
+                    });
                 </script>
             </div>
         </div>
@@ -87,17 +98,16 @@
                 <h5 class="card-title">{{ __('With custom option rendering:') }}</h5>
             </div>
             <div class="card-body">
-                <code>
-                    new SearchableSelect({
-                        selectId: 'item_id3',
-                        renderOption: (option) => `
-                            <div class="d-flex align-items-center">
-                                <img src="${option.image}" class="me-2" width="20" height="20">
-                                <span>${option.name}</span>
-                            </div>
-                        `
-                    });
-                </code>
+                <code class="highlight language-js">new MySelecter({
+    selectId: 'item_id3',
+    allowClear: false, // Disable clearing
+    renderOption: (option) => `
+        &lt;div class=&quot;d-flex align-items-center&quot;&gt;
+            &lt;img src=&quot;${option.image}&quot; class=&quot;me-2&quot; width=&quot;20&quot; height=&quot;20&quot;&gt;
+            &lt;span&gt;${option.name}&lt;/span&gt;
+        &lt;/div&gt;
+    `
+});</code>
             </div>
         </div>
     </div>
@@ -111,8 +121,9 @@
                     </select>
                 </div>
                 <script>
-                    new SearchableSelect({
+                    new MySelecter({
                         selectId: 'item_id3',
+                        allowClear: false, // Disable clearing
                         renderOption: (option) => `
                             <div class="d-flex align-items-center">
                                 <img src="${option.image}" class="me-2" width="20" height="20">
@@ -126,61 +137,69 @@
     </div>
 </div>
 
-
-<script>
-    $(document).ready(function() {
-
-        tinymce.init({
-            selector: 'textarea[name="content"]',
-            plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount linkchecker',
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat | Save',
-            setup: function (editor) {
-                editor.ui.registry.addButton('save', {
-                    text: 'Save',
-                    onAction: function () {
-                    $('textarea[name="content"]').val(editor.getContent());
-                    $('#contentForm').submit();
-                    }
-                });
-            }
-        });
-
-        $('#contentForm').submit(function(event) {
-            event.preventDefault();
-
-            $('#loading').show();
-            var formData = new FormData(this);
-
-            $.ajax({
-                url: $(this).attr('action'),
-                type: $(this).attr('method'),
-                data: formData,
-                dataType: "json",
-                contentType: false, // Don't set content type (let browser handle it)
-                processData: false, // Don't process data (let browser handle it)
-                success: function(response) {
-                    $('#loading').hide();
-                    Swal.fire({
-                        icon: response.icon,
-                        title: response.state,
-                        text: response.message,
-                        confirmButtonText: __("Ok",lang)
+<div class="row mb-4">
+    <div class="col-md-6 ">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">{{ __('Fully featured example:') }}</h5>
+            </div>
+            <div class="card-body">
+                <code class="highlight language-js">new MySelecter({
+    selectId: 'product_selector',
+    url: '/api/demo/products',
+    valueField: 'id',
+    contentField: 'name',
+    selectedValue: 10,
+    renderOption: (product) => `
+    &lt;div class="d-flex align-items-center"&gt;
+        &lt;img src="${product.image_url || '/assets/img/placeholder.png'}" class="me-2" width="35" height="35"&gt;
+        &lt;div&gt;
+            &lt;div class="fw-bold"&gt;${product.name}&lt;/div&gt;
+            &lt;div class="small text-muted"&gt;${product.price} - ${product.category}&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    `
+});</code>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group form-group-floating {{ app()->getLocale() == "ar" ? "input-rtl" : "" }}">
+                    <select class="form-select" id="item_id4">
+                        <option value="">Select Product</option>
+                    </select>
+                </div>
+                <script>
+                    new MySelecter({
+                        selectId: 'item_id4',
+                        url: '/api/demo/products',
+                        method: 'GET',
+                        csrfToken: csrfToken,
+                        valueField: 'id',
+                        contentField: 'name',
+                        selectedValue: 10,
+                        renderOption: (product) => `
+                            <div class="d-flex align-items-center">
+                                <img src="${product.image_url || '/assets/img/photos/users/1737273572_cropped-image.png'}" class="me-2" width="35" height="35">
+                                <div>
+                                    <div class="fw-bold">${product.name}</div>
+                                    <div class="small text-muted">${product.price} - ${product.category}</div>
+                                </div>
+                            </div>
+                        `
                     });
-                },
-                error: function(xhr, textStatus, errorThrown) {
-                    const response = JSON.parse(xhr.responseText);
-                    $('#loading').hide();
-                    Swal.fire({
-                        icon: response.icon,
-                        title: response.state,
-                        text: response.message,
-                        confirmButtonText: __("Ok",lang)
-                    });
-                }
-            });
-        });
-
-    });
-</script>
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
 
 @endsection
+
+
+@push('header_scripts')
+    <script src="{{ asset('assets/js/MySelecter.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('assets/js/myCodeDisplay.js') }}?v={{ time() }}"></script>
+@endpush

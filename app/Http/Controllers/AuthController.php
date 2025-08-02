@@ -6,15 +6,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller {
     public function login(Request $request) {
       if ($request->ajax()) {
           $validator = Validator::make($request->all(), [
-              'email' => 'required|email',
+              'username' => 'required',
               'password' => 'required',
               'remember' => 'sometimes|in:on',  
           ]);
@@ -26,19 +24,19 @@ class AuthController extends Controller {
           }
 
           try {
-              $credentials = $request->only('email', 'password');
+              $credentials = $request->only('username', 'password');
               $remember = $request->has('remember');
               if (Auth::attempt($credentials,$remember)) {
-                  if (Auth::user()->hasRole('admin')) {
+                //   if (Auth::user()->hasRole('admin')) {
                       return response()->json([
                           'message' => __("Login successful"),
                       ]);
-                  } else {
-                      Auth::logout();
-                      return response()->json([
-                          'message' => __("You are not authorized to access this area."),
-                      ], 403);
-                  }
+                //   } else {
+                //       Auth::logout();
+                //       return response()->json([
+                //           'message' => __("You are not authorized to access this area."),
+                //       ], 403);
+                //   }
               } else {
                   return response()->json([
                       'message' => __("Invalid credentials"),
@@ -53,52 +51,6 @@ class AuthController extends Controller {
         return view('content.auth.login');
     }
 
-    public function redirectToGoogle() {
-        return Socialite::driver('google')->redirect();
-    }
-    
-    public function handleGoogleCallback() {
-      $googleUser = Socialite::driver('google')->user();
-  
-      $user = User::where('email', $googleUser->getEmail())->first();
-  
-      if (!$user) {
-          $user = new User;
-          $user->email = $googleUser->getEmail();
-          $user->fullname = $googleUser->getName();
-          $user->photo = $googleUser->getAvatar();
-          $user->save();
-      }
-  
-      Auth::login($user);
-  
-      return redirect()->route('home');
-    }
-    
-    public function redirectToFacebook() {
-      return Socialite::driver('facebook')->redirect();
-    }
-    
-    public function handleFacebookCallback() {
-  
-      $facebookUser = Socialite::driver('facebook')->user();
-  
-      $user = User::where('email', $facebookUser->getEmail())->first();
-  
-      if (!$user) {
-          $user = new User;
-          $user->email = $facebookUser->getEmail();
-          $user->fullname = $facebookUser->getName();
-          $user->photo = $facebookUser->getAvatar();
-          $user->save();
-
-      }
-  
-      Auth::login($user);
-  
-      return redirect()->route('home');
-  
-    }
     
     public function change(Request $request) {
       $validator = Validator::make($request->all(), [
