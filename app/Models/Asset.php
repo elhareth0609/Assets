@@ -3,33 +3,35 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\AssetStatus;
 
-class Asset extends Model
-{
-    const STATUS_IN_USE = 'in_use';
-    const STATUS_IN_STORAGE = 'in_storage';
-    const STATUS_MAINTENANCE = 'maintenance';
-    const STATUS_DAMAGED = 'damaged';
-
-    const STATUSES = [
-        self::STATUS_IN_USE => 'In Use',
-        self::STATUS_IN_STORAGE => 'In Storage',
-        self::STATUS_MAINTENANCE => 'Under Maintenance',
-        self::STATUS_DAMAGED => 'Damaged'
-    ];
+class Asset extends Model {
 
     protected $fillable = [
-        'asset_name',
-        'asset_number',
+        'name',
+        'number',
+        'manufacturer_serial',
         'purchase_date',
         'status',
         'notes',
-        'type',
-        'user',
-        'location',
-        // 'asset_type_id',
-        // 'current_user_id',
-        // 'location_id'
+        'type_id',
+        'employee_id',
+        'location_id',
     ];
 
+    protected $casts = [
+        'status' => AssetStatus::class,
+    ];
+
+    public function type() {
+        return $this->belongsTo(Type::class, 'type_id');
+    }
+
+    public function employee() {
+        return $this->belongsTo(Employee::class, 'employee_id');
+    }
+
+    public function location() {
+        return $this->belongsTo(Location::class, 'location_id');
+    }
 }

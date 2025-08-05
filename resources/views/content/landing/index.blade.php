@@ -2,7 +2,7 @@
 
 @extends('layouts.app')
 @section('content')
-<div class="container mx-auto p-6 space-y-6">
+<div class="mx-auto p-6 space-y-6">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h1 class="text-3xl font-display font-bold text-slate-900 dark:text-slate-100">سجل الأصول</h1>
@@ -99,7 +99,7 @@
         <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-sm font-medium mb-2">
+                    <label class="block text-sm font-medium mb-2 dark:text-slate-400">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package w-4 h-4 inline ltr:mr-1 rtl:ml-1">
                             <path d="m7.5 4.27 9 5.15"></path>
                             <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
@@ -119,7 +119,7 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-2">
+                    <label class="block text-sm font-medium mb-2 dark:text-slate-400">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-activity w-4 h-4 inline ltr:mr-1 rtl:ml-1">
                             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                         </svg>
@@ -136,7 +136,7 @@
                     </div>
                 </div>
                 <div class="lg:col-span-1">
-                    <label class="block text-sm font-medium mb-2">
+                    <label class="block text-sm font-medium mb-2 dark:text-slate-400">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-4 h-4 inline ltr:mr-1 rtl:ml-1">
                             <circle cx="11" cy="11" r="8"></circle>
                             <path d="m21 21-4.3-4.3"></path>

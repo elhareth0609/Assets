@@ -9,10 +9,14 @@
         "laravel/framework": "^11.9",
         "laravel/reverb": "^1.0",
         "laravel/tinker": "^2.9",
+        "phpoffice/phpspreadsheet": "^2.3",
         "setasign/fpdf": "^1.8",
         "setasign/fpdi-fpdf": "^2.3",
+        "simplesoftwareio/simple-qrcode": "*",
         "symfony/var-dumper": "^7.1",
         "tecnickcom/tcpdf": "^6.7",
+        "yajra/laravel-datatables": "^11.0",
+        "yajra/laravel-datatables-html": "^11.8",
         "yajra/laravel-datatables-oracle": "^11.1"
     },
     "require-dev": {

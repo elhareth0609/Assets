@@ -2,19 +2,28 @@
 
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DataTabelController;
+use App\Http\Controllers\DepreciationEntryController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\SettingController;
-use App\Http\Controllers\SubCategoryController;
+use App\Http\Controllers\TypeController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+
+
+
+
+
 
 
     Route::get('/', [HomeController::class, 'home'])->name('home');
 
     Route::get('/redirect', [HomeController::class, 'redirect'])->name('redirect');
+    Route::get('/assets/{id}', [AssetController::class, 'get'])->name('assets.get');
 
     Route::group(['middleware' => ['guest']], function () {
         Route::get('auth/login', [AuthController::class, 'login'])->name('auth.login');
@@ -34,6 +43,11 @@ use Illuminate\Support\Facades\Route;
         Route::get('sub-categories', [DataTabelController::class, 'sub_categories'])->name('sub-categories');
         Route::get('languages', [DataTabelController::class, 'languages'])->name('languages');
         Route::get('assets-list', [DataTabelController::class, 'assets'])->name('assets');
+        Route::get('types', [DataTabelController::class, 'types'])->name('types');
+        Route::get('locations', [DataTabelController::class, 'locations'])->name('locations');
+        Route::get('employees', [DataTabelController::class, 'employees'])->name('employees');
+        Route::get('depreciation-entries', [DataTabelController::class, 'depreciationEntries'])->name('depreciation-entries');
+
 
 
 
@@ -42,33 +56,57 @@ use Illuminate\Support\Facades\Route;
 
         // Assets
         // Dashboard
-        Route::get('/assets/create', [AssetController::class, 'create'])->name('assets.create');
-        Route::post('/assets/store', [AssetController::class, 'store'])->name('assets.store');
-        Route::delete('/assets/{id}', [AssetController::class, 'delete'])->name('assets.delete');
-        Route::get('/assets/{id}/edit', [AssetController::class, 'edit'])->name('assets.edit');
-        Route::put('/assets/{id}/update', [AssetController::class, 'update'])->name('assets.update');
-        Route::get('/assets/{id}/show', [AssetController::class, 'show'])->name('assets.show');
+        Route::get('/assets-list/create', [AssetController::class, 'create'])->name('assets.create');
+        Route::post('/assets-list/store', [AssetController::class, 'store'])->name('assets.store');
+        Route::delete('/assets-list/{id}', [AssetController::class, 'delete'])->name('assets.delete');
+        Route::get('/assets-list/{id}/edit', [AssetController::class, 'edit'])->name('assets.edit');
+        Route::put('/assets-list/{id}/update', [AssetController::class, 'update'])->name('assets.update');
+        Route::get('/assets-list/{id}/show', [AssetController::class, 'show'])->name('assets.show');
+        Route::get('/assets-list/{id}/qr', [AssetController::class, 'qr'])->name('assets.qr');
         // Route::get('/assets/{id}/generate', [AssetController::class, 'generate'])->name('assets.generate');
+        Route::get('/assets-list/export', [AssetController::class, 'export'])->name('assets.export');
 
-
-        // Catgories
+        // Types
         // Dashboard
-        Route::get('/category/{id}', [CategoryController::class, 'get'])->name('category');
-        Route::post('/category/create', [CategoryController::class, 'create'])->name('category.create');
-        Route::delete('/category/{id}', [CategoryController::class, 'delete'])->name('category.delete');
-        Route::put('/category/{id}', [CategoryController::class, 'update'])->name('category.update');
-        Route::get('/category/{id}/restore', [CategoryController::class, 'restore'])->name('category.restore');
-        Route::get('view/category/{id}', [CategoryController::class, 'view'])->name('category.view');
+        Route::get('/types/{id}', [TypeController::class, 'get'])->name('types.get');
+        Route::post('/types/create', [TypeController::class, 'create'])->name('types.create');
+        Route::delete('/types/{id}', [TypeController::class, 'delete'])->name('types.delete');
+        Route::put('/types/{id}', [TypeController::class, 'update'])->name('types.update');
 
-        Route::get('/categories/all', [CategoryController::class, 'all'])->name('categories.all');
-
-        // Sub Catgories
+        // Locations
         // Dashboard
-        Route::get('/sub-category/{id}', [SubCategoryController::class, 'get'])->name('sub-category');
-        Route::post('/sub-category/create', [SubCategoryController::class, 'create'])->name('sub-category.create');
-        Route::delete('/sub-category/{id}', [SubCategoryController::class, 'delete'])->name('sub-category.delete');
-        Route::put('/sub-category/{id}', [SubCategoryController::class, 'update'])->name('sub-category.update');
-        Route::get('/sub-category/{id}/restore', [SubCategoryController::class, 'restore'])->name('sub-category.restore');
+        Route::get('/locations/{id}', [LocationController::class, 'get'])->name('locations.get');
+        Route::post('/locations/create', [LocationController::class, 'create'])->name('locations.create');
+        Route::delete('/locations/{id}', [LocationController::class, 'delete'])->name('locations.delete');
+        Route::put('/locations/{id}', [LocationController::class, 'update'])->name('locations.update');
+
+        // Depreciation Entries
+        // Dashboard
+        Route::get('/depreciation-entries/{id}/get', [DepreciationEntryController::class, 'get'])->name('depreciation-entries.get');
+        Route::post('/depreciation-entries/create', [DepreciationEntryController::class, 'create'])->name('depreciation-entries.create');
+        Route::delete('/depreciation-entries/{id}', [DepreciationEntryController::class, 'delete'])->name('depreciation-entries.delete');
+        Route::put('/depreciation-entries/{id}', [DepreciationEntryController::class, 'update'])->name('depreciation-entries.update');
+        Route::get('/depreciation-entries/export', [DepreciationEntryController::class, 'export'])->name('depreciation-entries.export');
+
+
+        // Employees
+        // Dashboard
+        Route::get('/employees/{id}', [EmployeeController::class, 'get'])->name('employees.get');
+        Route::post('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
+        Route::delete('/employees/{id}', [EmployeeController::class, 'delete'])->name('employees.delete');
+        Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employees.update');
+
+        // Users
+        // Dashboard
+        Route::get('/user/{id}', [UserController::class, 'get'])->name('user');
+        Route::post('/user/create', [UserController::class, 'create'])->name('user.create');
+        Route::delete('/user/{id}', [UserController::class, 'delete'])->name('user.delete');
+        Route::put('/user/{id}', [UserController::class, 'update'])->name('user.update');
+        Route::get('/user/{id}/restore', [UserController::class, 'restore'])->name('user.restore');
+        Route::get('view/user/{id}', [UserController::class, 'view'])->name('user.view');
+
+
+
 
         Route::post('/language', [LanguageController::class, 'create'])->name('language.create');
         Route::get('/language/{word}', [LanguageController::class, 'get'])->name('language.get');
@@ -85,6 +123,7 @@ use Illuminate\Support\Facades\Route;
         Route::get('settings/account', [SettingController::class, 'get_account'])->name('settings.account.get');
 
         Route::post('settings/account/update', [SettingController::class, 'update_account'])->name('settings.account.update');
+        Route::post('settings/account/password', [SettingController::class, 'update_password'])->name('settings.account.password');
 
         Route::post('settings/account/upload/image', [SettingController::class, 'upload_image'])->name('settings.account.uploadImage');
 
@@ -97,8 +136,6 @@ use Illuminate\Support\Facades\Route;
     });
 
     Route::get('/ddd', function () {
-        // Clear cache
         Artisan::call('optimize');
-        // back to past page
         return 'ok';
     });

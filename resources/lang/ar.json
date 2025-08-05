@@ -332,5 +332,9 @@
     "E-Learning": "تعلم الكتروني",
     "Logistics": "التوصيل",
     "Charts": "الرسومات",
-    "Word already exists.": ""
+    "Word already exists.": "",
+    "in_use" : "قيد الاستخدام",
+    "in_storage" : "في المستودع",
+    "maintenance" : "صيانة",
+    "damaged" : "تالف"
 }

@@ -14,7 +14,7 @@ class AssetRequest extends FormRequest
      */
     public function authorize()
     {
-        return true; 
+        return true;
     }
 
     /**
@@ -25,12 +25,12 @@ class AssetRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'asset_name' => ['required', 'string', 'max:255'],
-            'asset_number' => [
-                'required', 
-                'string', 
+            'name' => ['required', 'string', 'max:255'],
+            'number' => [
+                'required',
+                'string',
                 'max:255',
-                $this->isMethod('put') || $this->isMethod('patch') 
+                $this->isMethod('put') || $this->isMethod('patch')
                     ? Rule::unique('assets')->ignore($this->asset)
                     : Rule::unique('assets')
             ],
@@ -40,9 +40,9 @@ class AssetRequest extends FormRequest
             'type' => ['required'],
             'user' => ['nullable'],
             'location' => ['nullable'],
-            // 'asset_type_id' => ['required', 'exists:asset_types,id'],
-            // 'current_user_id' => ['nullable', 'exists:users,id'],
-            // 'location_id' => ['nullable', 'exists:locations,id'],
+            'type_id' => ['nullable', 'exists:types,id'],
+            'emplyee_id' => ['nullable', 'exists:emplyees,id'],
+            'location_id' => ['nullable', 'exists:locations,id'],
         ];
 
         return $rules;
@@ -56,18 +56,15 @@ class AssetRequest extends FormRequest
     public function attributes()
     {
         return [
-            'asset_name' => 'Asset Name',
-            'asset_number' => 'Asset Number',
+            'name' => 'Name',
+            'number' => 'Number',
             'purchase_date' => 'Purchase Date',
             'status' => 'Status',
             'notes' => 'Notes',
-            'type' => 'Asset Type',
-            'user' => 'Current User',
-            'location' => 'Location',
-            // 'asset_type_id' => 'Asset Type',
-            // 'current_user_id' => 'Current User',
-            // 'location_id' => 'Location',
-            
+            'type_id' => 'Type',
+            'emplyee_id' => 'Employee',
+            'location_id' => 'Location',
+
         ];
     }
 }

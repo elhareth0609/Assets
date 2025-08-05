@@ -8,8 +8,8 @@ class AssetResource extends JsonResource {
     public function toArray($request) {
         return [
             'id' => $this->id,
-            'asset_name' => $this->name,
-            'asset_number' => $this->asset_number,
+            'name' => $this->name,
+            'number' => $this->number,
             'purchase_date' => $this->purchase_date,
             'status' => $this->status,
             'notes' => $this->notes,

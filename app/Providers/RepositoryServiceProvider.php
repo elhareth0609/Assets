@@ -3,18 +3,23 @@
 namespace App\Providers;
 
 use App\Interfaces\AssetRepositoryInterface;
-use App\Interfaces\CategoryRepositoryInterface;
-use App\Interfaces\SubCategoryRepositoryInterface;
+use App\Interfaces\DepreciationEntryRepositoryInterface;
+use App\Interfaces\EmployeeRepositoryInterface;
+use App\Interfaces\LocationRepositoryInterface;
+use App\Interfaces\TypeRepositoryInterface;
 use App\Repositories\AssetRepository;
-use App\Repositories\CategoryRepository;
-use App\Repositories\SubCategoryRepository;
+use App\Repositories\DepreciationEntryRepository;
+use App\Repositories\EmployeeRepository;
+use App\Repositories\LocationRepository;
+use App\Repositories\TypeRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider {
     public function register() {
-        $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
-        $this->app->bind(SubCategoryRepositoryInterface::class, SubCategoryRepository::class);
+        $this->app->bind(DepreciationEntryRepositoryInterface::class, DepreciationEntryRepository::class);
+        $this->app->bind(TypeRepositoryInterface::class, TypeRepository::class);
+        $this->app->bind(LocationRepositoryInterface::class, LocationRepository::class);
+        $this->app->bind(EmployeeRepositoryInterface::class, EmployeeRepository::class);
         $this->app->bind(AssetRepositoryInterface::class, AssetRepository::class);
-
     }
 }
