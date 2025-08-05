@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class EditDepreciationEntryRequest extends FormRequest {
     public function rules() {
         return [
-            'entry_number' => 'required|string|max:255|unique:depreciation_entries,entry_number,' . $this->route(''),
+            'entry_number' => 'required|string|max:255|unique:depreciation_entries,entry_number,' . $this->route('id'),
             'date' => 'required|date',
             'description' => 'required|string',
             'asset_id' => 'required|exists:assets,id',
