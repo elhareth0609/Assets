@@ -286,7 +286,6 @@
 </style>
 
 
-
 <style>
   #assets-table {
     width: 100%;
@@ -363,27 +362,9 @@
 
 
 @section('scripts')
-<!-- Include the component JS file -->
-{{-- <script src="{{ asset('js/components/assets-datatable.js') }}"></script> --}}
 
 <script>
 $(document).ready(function() {
-    // Initialize the Assets DataTable component
-    // const assetsDataTable = new AssetsDataTable({
-    //     tableId: '#assets-table',
-    //     ajaxUrl: '{{ route("assets") }}', // Your assets route
-    //     exportUrl: '{{ route("assets.export") }}', // Your export route
-    //     createUrl: '{{ route("assets.create") }}'
-    // });
-
-    // You can also access the component methods if needed
-    // assetsDataTable.reload(); // To reload the table
-    // assetsDataTable.destroy(); // To destroy the table
-
-
-
-    // Alternative: Simple jQuery implementation directly in the blade file
-// You can use this instead of the component if you prefer a simpler approach
 
 $(document).ready(function() {
     // Initialize DataTable
@@ -521,14 +502,6 @@ $(document).ready(function() {
         table.ajax.reload();
     });
 
-    // Custom search with debounce
-    // var searchTimeout;
-    // $('#dataTables_my_filter').on('keyup', function() {
-    //     clearTimeout(searchTimeout);
-    //     searchTimeout = setTimeout(function() {
-    //         table.ajax.reload();
-    //     }, 500);
-    // });
     $('#dataTables_my_filter').on('input', function () {
         var query = $(this).val();
         table.search(query).draw();
@@ -550,51 +523,51 @@ $(document).ready(function() {
         window.location.href = '/assets-list/export?' + params.toString();
     });
 
-// Delete button functionality
-$(document).on('click', '.delete-btn', function() {
-    var assetId = $(this).data('id');
-    var assetName = $(this).data('name');
-    var deleteUrl = $(this).data('url');
+    // Delete button functionality
+    $(document).on('click', '.delete-btn', function() {
+        var assetId = $(this).data('id');
+        var assetName = $(this).data('name');
+        var deleteUrl = $(this).data('url');
 
-    // Set asset name in the modal
-    $('#deleteAssetName').text(assetName);
+        // Set asset name in the modal
+        $('#deleteAssetName').text(assetName);
 
-    // Show the modal by removing the hidden class
-    $('#deleteModal').removeClass('hidden').addClass('flex');
+        // Show the modal by removing the hidden class
+        $('#deleteModal').removeClass('hidden').addClass('flex');
 
-    // Handle confirm delete
-    $('#confirmDeleteBtn').off('click').on('click', function() {
-        $.ajax({
-            url: deleteUrl,
-            type: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                // Hide the modal
-                $('#deleteModal').addClass('hidden').removeClass('flex');
+        // Handle confirm delete
+        $('#confirmDeleteBtn').off('click').on('click', function() {
+            $.ajax({
+                url: deleteUrl,
+                type: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    // Hide the modal
+                    $('#deleteModal').addClass('hidden').removeClass('flex');
 
-                // Show success message
-                showNotification('تم حذف الأصل بنجاح', 'success');
+                    // Show success message
+                    showNotification('تم حذف الأصل بنجاح', 'success');
 
-                // Reload the table
-                table.ajax.reload();
-            },
-            error: function(xhr) {
-                // Hide the modal
-                $('#deleteModal').addClass('hidden').removeClass('flex');
+                    // Reload the table
+                    table.ajax.reload();
+                },
+                error: function(xhr) {
+                    // Hide the modal
+                    $('#deleteModal').addClass('hidden').removeClass('flex');
 
-                // Show error message
-                showNotification('حدث خطأ أثناء حذف الأصل', 'error');
-            }
+                    // Show error message
+                    showNotification('حدث خطأ أثناء حذف الأصل', 'error');
+                }
+            });
         });
     });
-});
 
-// Cancel delete button
-$('#cancelDeleteBtn').on('click', function() {
-    $('#deleteModal').addClass('hidden').removeClass('flex');
-});
+    // Cancel delete button
+    $('#cancelDeleteBtn').on('click', function() {
+        $('#deleteModal').addClass('hidden').removeClass('flex');
+    });
 
     // QR Code button functionality
     $(document).on('click', '.qr-btn', function() {
