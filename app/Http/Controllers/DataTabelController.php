@@ -20,240 +20,82 @@ use Yajra\DataTables\Facades\DataTables;
 class DataTabelController extends Controller {
 
     public function users(Request $request) {
-        $users = User::all();
+        $query = User::query()->select(['id', 'full_name', 'username', 'created_at']);
+
+        // Handle search
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                ->orWhere('username', 'like', "%{$search}%")
+                // ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('id', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->get();
+
         if ($request->ajax()) {
             return DataTables::of($users)
-            ->editColumn('id', function ($user) {
-                return $user->id;
-            })
-            ->editColumn('fullname', function ($user) {
-                return $user->fullname;
-            })
-            ->editColumn('email', function ($user) {
-                return $user->email;
-            })
-            ->editColumn('phone', function ($user) {
-                return $user->phone;
-            })
-            ->editColumn('created_at', function ($user) {
-                return $user->created_at->format('Y-m-d');
-            })
-            ->addColumn('actions', function ($user) use ($request){
-                if ($request->has('trashed') && $request->trashed == 1) {
-                    return '
-                        <a href="javascript:void(0)" class="btn btn-icon btn-outline-warning" onclick="restoreCoupon(' . $user->id . ')"><i class="mdi mdi-backup-restore"></i></a>
-                        <a href="javascript:void(0)" class="btn btn-icon btn-outline-danger" onclick="deleteCoupon(' . $user->id . ')"><i class="mdi mdi-delete-forever-outline"></i></a>
-                    ';
-                } else {
-                    return '
-                        <a href="javascript:void(0)" class="btn btn-icon btn-outline-primary" onclick="editCoupon(' . $user->id . ')"><i class="mdi mdi-pencil"></i></a>
-                        <a href="javascript:void(0)" class="btn btn-icon btn-outline-success" onclick="printCoupon(' . $user->id . ')"><i class="mdi mdi-printer"></i></a>
-                        <a href="javascript:void(0)" class="btn btn-icon btn-outline-danger" onclick="deleteCoupon(' . $user->id . ')"><i class="mdi mdi-trash-can"></i></a>
-                    ';
-                }            })
-            ->make(true);
+                ->addIndexColumn()
+                ->editColumn('full_name', function ($user) {
+                    return '<div class="flex items-center">
+                        <div class="h-10 w-10 flex-shrink-0">
+                            <div class="flex items-center justify-center w-10 h-10 ' . $user->avatar_background_class . ' ' . $user->avatar_text_color_class . ' rounded-full text-md font-bold focus:outline-none">
+                            '. $user->avatar_initial .'
+                            </div>
+                        </div>
+                        <div class="mr-4">
+                            <div class="text-sm font-medium text-slate-900 dark:text-slate-100">' . $user->full_name . '</div>
+                            <div class="text-sm text-slate-500 dark:text-slate-400">' . $user->username . '</div>
+                        </div>
+                    </div>';
+                })
+                // ->editColumn('email', function ($user) {
+                //     return '<span class="text-slate-600 dark:text-slate-400 text-sm">' . $user->email . '</span>';
+                // })
+                ->editColumn('created_at', function ($user) {
+                    return '<span class="text-slate-600 dark:text-slate-400 text-sm">' . date('d/m/Y', strtotime($user->created_at)) . '</span>';
+                })
+                ->addColumn('action', function($user){
+                    $actions = '<div class="relative group inline-block">
+                        <button type="button"
+                            data-id="'.$user->id.'"
+                            data-full_name="'.$user->full_name.'"
+                            data-username="'.$user->username.'"
+                            class="edit-user-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit w-4 h-4">
+                                    <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
+                                    <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
+                                    <path d="m16 5 3 3"></path>
+                                </svg>
+                        </button>
+                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">تعديل</div>
+                    </div>';
+                    $actions .= '<div class="relative group inline-block">
+                        <button type="button"
+                            class="delete-user-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                            data-id="'.$user->id.'"
+                            data-full_name="'.$user->full_name.'"
+                            data-url="'.route('users.delete', $user->id).'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2 w-4 h-4">
+                                <path d="M3 6h18"></path>
+                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                <line x1="10" x2="10" y1="11" y2="17"></line>
+                                <line x1="14" x2="14" y1="11" y2="17"></line>
+                                </svg>
+                            </button>
+                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">حذف</div>
+                    </div>';
+                    return '<div class="flex ltr:justify-end rtl:justify-start gap-1">'.$actions.'</div>';
+                })
+                ->rawColumns(['action', 'full_name', 'email', 'created_at'])
+                ->make(true);
         }
+
         return view('content.users.list');
     }
-
-    // public function datatabels(Request $request) {
-    //     $query = Coupon::query();
-
-    //     if ($request->has('trashed') && $request->trashed == 1) {
-    //         $query->onlyTrashed();
-    //     }
-
-    //     if ($request->has('type') && $request->type != 'all') {
-    //         if ($request->type == 'expired') {
-    //             $query->where('expired_date', '<', now());
-    //         } elseif ($request->type == 'active') {
-    //             $query->where('status', 'active')->where('expired_date', '>=', now());
-    //         } elseif ($request->type == 'inactive') {
-    //             $query->where('status', 'inactive');
-    //         }
-    //     }
-
-    //     $coupons = $query->get();
-
-    //     $ids = $coupons->pluck('id');
-    //     if($request->ajax()) {
-    //         return DataTables::of($coupons)
-    //         ->editColumn('id', function ($coupon) {
-    //             return (string) $coupon->id;
-    //         })
-    //         ->editColumn('code', function ($coupon) {
-    //             return $coupon->code;
-    //         })
-    //         ->editColumn('status', function ($coupon) {
-    //             if ($coupon->status == 'active') {
-    //                 return '<span class="badge bg-success-subtle border border-success-subtle text-success-emphasis rounded-pill">'. __('Active') .'</span>';
-    //             } else {
-    //                 return '<span class="badge bg-secondary-subtle border border-secondary-subtle text-secondary-emphasis rounded-pill">'. __('In Active') .'</span>';
-    //             }
-    //         })
-    //         ->editColumn('discount', function ($coupon) {
-    //             return $coupon->discount;
-    //         })
-    //         ->editColumn('max', function ($coupon) {
-    //             return $coupon->max;
-    //         })
-    //         ->editColumn('expired_date', function ($coupon) {
-    //             return $coupon->expired_date;
-    //         })
-    //         ->editColumn('created_at', function ($coupon) {
-    //             return $coupon->created_at->format('Y-m-d');
-    //         })
-    //         ->addColumn('actions', function ($coupon) use ($request) {
-    //             if ($request->has('trashed') && $request->trashed == 1) {
-    //                 return '
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-warning" onclick="restoreCoupon(' . $coupon->id . ')"><i class="mdi mdi-backup-restore"></i></a>
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-danger" onclick="deleteCoupon(' . $coupon->id . ')"><i class="mdi mdi-delete-forever-outline"></i></a>
-    //                 ';
-    //             } else {
-    //                 return '
-    //                     <a href="'. route('coupon',$coupon->id) .'" class="btn btn-icon btn-outline-primary"><i class="mdi mdi-pencil"></i></a>
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-primary" onclick="editCoupon(' . $coupon->id . ')"><i class="mdi mdi-pencil"></i></a>
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-success" onclick="printCoupon(' . $coupon->id . ')"><i class="mdi mdi-printer"></i></a>
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-success" onclick="printPdfCoupon(' . $coupon->id . ')"><i class="mdi mdi-printer-outline"></i></a>
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-danger" onclick="deleteCoupon(' . $coupon->id . ')"><i class="mdi mdi-trash-can"></i></a>
-    //                 ';
-    //             }
-    //         })
-    //         ->rawColumns(['status','actions'])
-    //         ->with('ids', $ids)
-    //         ->make(true);
-
-    //         // ->toArray();
-
-    //         // $data = $datatable['data'];
-
-    //         // $ids = collect($data)->pluck('id');
-    //         // $datatable['ids'] = $ids;
-
-    //         // return response()->json($datatable);
-    //     }
-    //     return view('content.datatabels.index');
-    // }
-
-    // public function categories(Request $request) {
-    //     $query = Category::query();
-
-    //     if ($request->has('trashed') && $request->trashed == 1) {
-    //         $query->onlyTrashed();
-    //     }
-
-    //     if ($request->has('type') && $request->type != 'all') {
-    //         if ($request->type == 'active') {
-    //             $query->where('status', 'active');
-    //         } elseif ($request->type == 'inactive') {
-    //             $query->where('status', 'inactive');
-    //         }
-    //     }
-
-    //     $categories = $query->get();
-
-    //     $ids = $categories->pluck('id');
-    //     if($request->ajax()) {
-    //         return DataTables::of($categories)
-    //         ->editColumn('id', function ($category) {
-    //             return (string) $category->id;
-    //         })
-    //         ->editColumn('name', function ($category) {
-    //             return $category->name;
-    //         })
-    //         ->editColumn('status', function ($category) {
-    //             if ($category->status == 'active') {
-    //                 return '<span class="badge bg-success-subtle border border-success-subtle text-success-emphasis rounded-pill">'. __('Active') .'</span>';
-    //             } else {
-    //                 return '<span class="badge bg-secondary-subtle border border-secondary-subtle text-secondary-emphasis rounded-pill">'. __('In Active') .'</span>';
-    //             }
-    //         })
-    //         ->editColumn('created_at', function ($category) {
-    //             return $category->created_at->format('Y-m-d');
-    //         })
-    //         ->addColumn('actions', function ($category) use ($request) {
-    //             if ($request->has('trashed') && $request->trashed == 1) {
-    //                 return '
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-warning" onclick="restoreCategory(' . $category->id . ')"><i class="mdi mdi-backup-restore"></i></a>
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-danger" onclick="deleteCategory(' . $category->id . ')"><i class="mdi mdi-delete-forever-outline"></i></a>
-    //                 ';
-    //             } else {
-    //                 return '
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-primary" onclick="editCategory(' . $category->id . ')"><i class="mdi mdi-pencil"></i></a>
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-danger" onclick="deleteCategory(' . $category->id . ')"><i class="mdi mdi-trash-can"></i></a>
-    //                 ';
-    //             }
-    //         })
-    //         ->rawColumns(['status','actions'])
-    //         ->with('ids', $ids)
-    //         ->make(true);
-    //     }
-    //     return view('content.categories.list');
-    // }
-
-    // public function sub_categories(Request $request) {
-    //     $query = SubCategory::query();
-
-    //     if ($request->has('trashed') && $request->trashed == 1) {
-    //         $query->onlyTrashed();
-    //     }
-
-    //     if ($request->has('type') && $request->type != 'all') {
-    //         if ($request->type == 'active') {
-    //             $query->where('status', 'active');
-    //         } elseif ($request->type == 'inactive') {
-    //             $query->where('status', 'inactive');
-    //         }
-    //     }
-
-    //     $sub_categories = $query->get();
-
-    //     $ids = $sub_categories->pluck('id');
-    //     if($request->ajax()) {
-    //         return DataTables::of($sub_categories)
-    //         ->editColumn('id', function ($sub_category) {
-    //             return (string) $sub_category->id;
-    //         })
-    //         ->editColumn('name', function ($sub_category) {
-    //             return $sub_category->name;
-    //         })
-    //         ->editColumn('category_id', function ($sub_category) {
-    //             return $sub_category->category->name;
-    //         })
-    //         ->editColumn('status', function ($sub_category) {
-    //             if ($sub_category->status == 'active') {
-    //                 return '<span class="badge bg-success-subtle border border-success-subtle text-success-emphasis rounded-pill">'. __('Active') .'</span>';
-    //             } else {
-    //                 return '<span class="badge bg-secondary-subtle border border-secondary-subtle text-secondary-emphasis rounded-pill">'. __('In Active') .'</span>';
-    //             }
-    //         })
-    //         ->editColumn('created_at', function ($sub_category) {
-    //             return $sub_category->created_at->format('Y-m-d');
-    //         })
-    //         ->addColumn('actions', function ($sub_category) use ($request) {
-    //             if ($request->has('trashed') && $request->trashed == 1) {
-    //                 return '
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-warning" onclick="restoreSubCategory(' . $sub_category->id . ')"><i class="mdi mdi-backup-restore"></i></a>
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-danger" onclick="deleteSubCategory(' . $sub_category->id . ')"><i class="mdi mdi-delete-forever-outline"></i></a>
-    //                 ';
-    //             } else {
-    //                 return '
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-primary" onclick="editSubCategory(' . $sub_category->id . ')"><i class="mdi mdi-pencil"></i></a>
-    //                     <a href="javascript:void(0)" class="btn btn-icon btn-outline-danger" onclick="deleteSubCategory(' . $sub_category->id . ')"><i class="mdi mdi-trash-can"></i></a>
-    //                 ';
-    //             }
-    //         })
-    //         ->rawColumns(['status','actions'])
-    //         ->with('ids', $ids)
-    //         ->make(true);
-    //     }
-
-    //     $categories = Category::all();
-
-    //     return view('content.sub-categories.list')
-    //     ->with('categories',$categories);
-
-    // }
 
     public function languages(Request $request) {
         $languages = [];
@@ -366,24 +208,7 @@ class DataTabelController extends Controller {
         return view('content.permissions.index');
     }
 
-    // public function assets(AssetsDataTable  $dataTable) {
-
-    //     $in_use = Asset::where('status','in_use')->count();
-    //     $damaged = Asset::where('status','damaged')->count();
-    //     $maintenance = Asset::where('status','maintenance')->count();
-    //     $total = Asset::count();
-
-    //     $data =  new \StdClass();
-    //     $data->damaged = $damaged;
-    //     $data->total = $total;
-    //     $data->maintenance = $maintenance;
-    //     $data->in_use = $in_use;
-
-    //     return $dataTable->render('content.assets.list', ['data' => $data]);
-    // }
-
-    public function assets(Request $request)
-    {
+    public function assets(Request $request) {
         $query = Asset::query()->select(['id', 'name', 'number', 'purchase_date', 'status', 'created_at']);
 
         // Handle filters
@@ -515,8 +340,7 @@ class DataTabelController extends Controller {
         ->with('types', $types);
     }
 
-    public function types(Request $request)
-    {
+    public function types(Request $request) {
         $query = Type::query()->select(['id', 'name', 'created_at']);
 
         // Handle search
@@ -577,8 +401,7 @@ class DataTabelController extends Controller {
         return view('content.types.list');
     }
 
-    public function locations(Request  $request)
-    {
+    public function locations(Request  $request) {
         $query = Location::query()->select(['id', 'name', 'created_at']);
 
         // Handle search
@@ -636,8 +459,7 @@ class DataTabelController extends Controller {
         return view('content.locations.list');
     }
 
-    public function employees(Request  $request)
-    {
+    public function employees(Request  $request) {
         $query = Employee::query()->select(['id', 'full_name', 'created_at']);
 
         // Handle search
@@ -839,9 +661,4 @@ class DataTabelController extends Controller {
             ->with('years', $years)
             ->with('selectedYear', $selectedYear);
     }
-
-    // public function employees(Request  $request) {
-    //     return view('content.employees.list');
-    //     // return $dataTable->render('content.types.list');
-    // }
 }

@@ -25,15 +25,15 @@ class LocationController extends Controller {
     }
 
     public function create(LocationRequest $request) {
-        return $this->success(new LocationResource($this->LocationService->createLocation($request->validated())), __('Created Successfully.'));
+        return $this->success(new LocationResource($this->LocationService->createLocation($request->validated())), 'تم الإنشاء بنجاح');
     }
 
     public function update(LocationRequest $request, $id) {
-        return $this->success(new LocationResource($this->LocationService->updateLocation($id, $request->validated())), __('Updated Successfully.'));
+        return $this->success(new LocationResource($this->LocationService->updateLocation($id, $request->validated())), 'تم التحديث بنجاح');
     }
 
     public function delete($id) {
         $this->LocationService->deleteLocation($id);
-        return $this->success(null, __('Deleted Successfully.'));
+        return $this->success(null, 'تم الحذف بنجاح');
     }
 }

@@ -296,7 +296,7 @@
                     </div>
                     <div>
                         <label for="accumulatedDepreciationAtStart" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">مجمع الاهلاك في 01/01/س</label>
-                        <input type="number" disabled id="accumulatedDepreciationAtStart" name="accumulated_depreciation_at_start" step="0.01" min="0" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل مجمع الاهلاك في بداية الفترة">
+                        <input type="number" id="accumulatedDepreciationAtStart" name="accumulated_depreciation_at_start" step="0.01" min="0" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل مجمع الاهلاك في بداية الفترة">
                     </div>
                     <div>
                         <label for="currentYearDepreciation" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">اهلاك السنة س</label>
@@ -308,7 +308,7 @@
                     </div>
                     <div>
                         <label for="accumulatedDepreciationAtEnd" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">مجمع الاهلاك في س</label>
-                        <input type="number" id="accumulatedDepreciationAtEnd" name="accumulated_depreciation_at_end" step="0.01" min="0" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل مجمع الاهلاك في نهاية الفترة">
+                        <input type="number" disabled id="accumulatedDepreciationAtEnd" name="accumulated_depreciation_at_end" step="0.01" min="0" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل مجمع الاهلاك في نهاية الفترة">
                     </div>
                     <div>
                         <label for="netBookValue" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">صافي القيمة الدفترية</label>
@@ -798,6 +798,82 @@ $(document).ready(function() {
             });
         }, 3000);
     }
+
+
+    $('#depreciationStartDate, #depreciationYear').on('change', calculateDaysCount);
+    $('#purchaseCost, #additions, #exclusions').on('input', calculateAssetCost);
+    $('#depreciationRate, #assetCostAtEnd, #daysCount').on('input', calculateCurrentYearDepreciation);
+    $('#accumulatedDepreciationAtStart, #excludedDepreciation, #currentYearDepreciation').on('input', calculateAccumulatedDepreciation);
+    $('#assetCostAtEnd, #accumulatedDepreciationAtEnd').on('input', calculateNetBookValue);
+
 });
+
+
+
+// Function to calculate days count
+function calculateDaysCount() {
+    const startDate = new Date($('#depreciationStartDate').val());
+    const year = parseInt($('#depreciationYear').val());
+
+    if (startDate && year) {
+        const endDate = new Date(year, 11, 31); // December 31 of the selected year
+        const diffTime = Math.abs(endDate - startDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        $('#daysCount').val(diffDays);
+
+        // Trigger dependent calculations
+        calculateCurrentYearDepreciation();
+    }
+}
+
+// Function to calculate asset cost at end
+function calculateAssetCost() {
+    const purchaseCost = parseFloat($('#purchaseCost').val()) || 0;
+    const additions = parseFloat($('#additions').val()) || 0;
+    const exclusions = parseFloat($('#exclusions').val()) || 0;
+
+    const assetCostAtEnd = purchaseCost + additions - exclusions;
+    $('#assetCostAtEnd').val(assetCostAtEnd.toFixed(2));
+
+    // Trigger dependent calculations
+    calculateCurrentYearDepreciation();
+}
+
+// Function to calculate current year depreciation
+function calculateCurrentYearDepreciation() {
+    const depreciationRate = parseFloat($('#depreciationRate').val()) || 0;
+    const assetCostAtEnd = parseFloat($('#assetCostAtEnd').val()) || 0;
+    const daysCount = parseFloat($('#daysCount').val()) || 0;
+
+    if (assetCostAtEnd > 0 && depreciationRate > 0 && daysCount > 0) {
+        const currentYearDepreciation = (depreciationRate / 100) * assetCostAtEnd * (daysCount / 365);
+        $('#currentYearDepreciation').val(currentYearDepreciation.toFixed(2));
+
+        // Trigger dependent calculations
+        calculateAccumulatedDepreciation();
+    }
+}
+
+// Function to calculate accumulated depreciation at end
+function calculateAccumulatedDepreciation() {
+    const accumulatedDepreciationAtStart = parseFloat($('#accumulatedDepreciationAtStart').val()) || 0;
+    const excludedDepreciation = parseFloat($('#excludedDepreciation').val()) || 0;
+    const currentYearDepreciation = parseFloat($('#currentYearDepreciation').val()) || 0;
+
+    const accumulatedDepreciationAtEnd = accumulatedDepreciationAtStart + currentYearDepreciation - excludedDepreciation;
+    $('#accumulatedDepreciationAtEnd').val(accumulatedDepreciationAtEnd.toFixed(2));
+
+    // Trigger dependent calculations
+    calculateNetBookValue();
+}
+
+// Function to calculate net book value
+function calculateNetBookValue() {
+    const assetCostAtEnd = parseFloat($('#assetCostAtEnd').val()) || 0;
+    const accumulatedDepreciationAtEnd = parseFloat($('#accumulatedDepreciationAtEnd').val()) || 0;
+
+    const netBookValue = assetCostAtEnd - accumulatedDepreciationAtEnd;
+    $('#netBookValue').val(netBookValue.toFixed(2));
+}
 </script>
 @endsection

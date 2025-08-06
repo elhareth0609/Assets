@@ -7,11 +7,13 @@ use App\Interfaces\DepreciationEntryRepositoryInterface;
 use App\Interfaces\EmployeeRepositoryInterface;
 use App\Interfaces\LocationRepositoryInterface;
 use App\Interfaces\TypeRepositoryInterface;
+use App\Interfaces\UserRepositoryInterface;
 use App\Repositories\AssetRepository;
 use App\Repositories\DepreciationEntryRepository;
 use App\Repositories\EmployeeRepository;
 use App\Repositories\LocationRepository;
 use App\Repositories\TypeRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider {
@@ -21,5 +23,6 @@ class RepositoryServiceProvider extends ServiceProvider {
         $this->app->bind(LocationRepositoryInterface::class, LocationRepository::class);
         $this->app->bind(EmployeeRepositoryInterface::class, EmployeeRepository::class);
         $this->app->bind(AssetRepositoryInterface::class, AssetRepository::class);
+        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
     }
 }

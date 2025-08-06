@@ -6,7 +6,7 @@ trait ApiResponder {
     protected function success($data = null, $message = null, $code = 200) {
         return response()->json([
             'icon' => 'success',
-            'state' => __('Success'),
+            'state' => 'نجاح',
             'message' => $message,
             'data' => $data
         ], $code);
@@ -15,7 +15,7 @@ trait ApiResponder {
     protected function error($message, $code = 422) {
         return response()->json([
             'icon' => 'error',
-            'state' => __('Error'),
+            'state' => 'خطأ',
             'message' => $message
         ], $code);
     }

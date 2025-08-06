@@ -28,16 +28,16 @@ class DepreciationEntryController extends Controller {
     }
 
     public function create(StoreDepreciationEntryRequest $request) {
-        return $this->success(new DepreciationEntryResource($this->DepreciationEntryService->createDepreciationEntry($request->validated())), __('Created Successfully.'));
+        return $this->success(new DepreciationEntryResource($this->DepreciationEntryService->createDepreciationEntry($request->validated())), 'تم الإنشاء بنجاح');
     }
 
     public function update(EditDepreciationEntryRequest $request, $id) {
-        return $this->success(new DepreciationEntryResource($this->DepreciationEntryService->updateDepreciationEntry($id, $request->validated())), __('Updated Successfully.'));
+        return $this->success(new DepreciationEntryResource($this->DepreciationEntryService->updateDepreciationEntry($id, $request->validated())), 'تم التحديث بنجاح');
     }
 
     public function delete($id) {
         $this->DepreciationEntryService->deleteDepreciationEntry($id);
-        return $this->success(null, __('Deleted Successfully.'));
+        return $this->success(null, 'تم الحذف بنجاح');
     }
 
     public function export(Request $request)

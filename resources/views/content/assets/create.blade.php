@@ -15,7 +15,7 @@
         </div>
     </div>
 
-    <form action="{{ route('assets.store') }}" method="POST">
+    <form id="createAssetForm" action="{{ route('assets.store') }}" method="POST">
         @csrf
         <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
             <div class="p-6 border-b border-slate-200 dark:border-slate-700">
@@ -41,7 +41,7 @@
 
                     <div>
                         <label for="type_id" class="block text-sm font-medium mb-2 dark:text-slate-400">نوع الأصل</label>
-                        <select id="type_id" name="type_id" class="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50" required>
+                        <select id="type_id" name="type_id" class="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50">
                             <option value="" disabled selected>اختر نوع الأصل...</option>
                             @foreach($types as $type)
                                 <option value="{{ $type->id }}">{{ $type->name }}</option>
@@ -51,14 +51,14 @@
 
                     <div>
                         <label for="purchase_date" class="block text-sm font-medium mb-2 dark:text-slate-400">تاريخ الشراء</label>
-                        <input type="date" id="purchase_date" name="purchase_date" class="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50" required>
+                        <input type="date" id="purchase_date" name="purchase_date" class="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50">
                     </div>
 
                     <div>
                         <label for="status" class="block text-sm font-medium mb-2 dark:text-slate-400">الحالة</label>
                         <select id="status" name="status" class="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50" required>
-                            <option value="in_use">قيد الاستخدام</option>
-                            <option value="in_storage" selected>في المستودع</option>
+                            <option value="in_use" selected>قيد الاستخدام</option>
+                            <option value="in_storage">في المستودع</option>
                             <option value="maintenance">صيانة</option>
                             <option value="damaged">تالف</option>
                         </select>
@@ -70,6 +70,16 @@
                             <option value="">غير مخصص</option>
                             @foreach($employees as $employee)
                                 <option value="{{ $employee->id }}">{{ $employee->full_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="location_id" class="block text-sm font-medium mb-2 dark:text-slate-400">المستخدم الحالي</label>
+                        <select id="location_id" name="location_id" class="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50">
+                            <option value="">غير مخصص</option>
+                            @foreach($locations as $location)
+                                <option value="{{ $location->id }}">{{ $location->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -90,4 +100,84 @@
         </div>
     </form>
 </div>
+@endsection
+
+
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+            const form = $('#createAssetForm');
+            const submitButton = form.find('button[type="submit"]');
+            const inputs = form.find('input, select, textarea');
+            let originalContent = ''; // 将 originalContent 声明为全局变量
+
+            $('#createAssetForm').on('submit', function(e) {
+                e.preventDefault();
+
+                var formData = new FormData(this);
+                // 保存原始按钮内容
+                originalContent = submitButton.html();
+
+                inputs.prop('disabled', true);
+                submitButton.prop('disabled', true);
+                submitButton.html(`
+                    <svg class="animate-spin -ml-1 ml-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    جاري الحفظ...
+                `);
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: $(this).attr('method'),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(data) {
+                        if (data.icon == 'success') {
+                            showNotification('success', data.message || 'تم حفظ الأصل بنجاح');
+
+                            setTimeout(function() {
+                                window.location.href = '{{ route("assets") }}';
+                            }, 1500);
+                        } else {
+                            showNotification('error', data.message || 'حدث خطأ أثناء حفظ الأصل');
+                            resetForm();
+                        }
+                    },
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseJSON && xhr.responseJSON.message
+                            ? xhr.responseJSON.message
+                            : 'حدث خطأ أثناء حفظ الأصل';
+                        showNotification('error', errorMessage);
+                        resetForm();
+                    }
+                });
+            });
+
+            function resetForm() {
+                inputs.prop('disabled', false);
+                submitButton.prop('disabled', false);
+                submitButton.html(originalContent);
+            }
+
+            function showNotification(type, message) {
+                const notification = $(`
+                    <div class="fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white">
+                        ${message}
+                    </div>
+                `);
+
+                $('body').append(notification);
+
+                setTimeout(function() {
+                    notification.remove();
+                }, 3000);
+            }
+        });
+    </script>
 @endsection

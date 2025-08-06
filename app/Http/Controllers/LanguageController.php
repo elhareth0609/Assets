@@ -27,7 +27,7 @@ class LanguageController extends Controller {
                     File::put($jsonPath, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
                 }
             }
-            return $this->success(null, __('Created Successfully.'));
+            return $this->success(null, 'تم الإنشاء بنجاح');
         } catch (\Exception $e) {
             return $this->error($e->getMessage());
         }
@@ -74,7 +74,7 @@ class LanguageController extends Controller {
                 }
             }
 
-            return $this->success(null, __('Updated Successfully.'));
+            return $this->success(null, 'تم التحديث بنجاح');
         } catch (\Exception $e) {
             return $this->error($e->getMessage());
         }
@@ -98,7 +98,7 @@ class LanguageController extends Controller {
                     }
                 }
             }
-            return $this->success(null, __('Deleted Successfully.'));
+            return $this->success(null, 'تم الحذف بنجاح');
         } catch (\Exception $e) {
             return $this->error($e->getMessage());
         }

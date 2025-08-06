@@ -98,12 +98,10 @@ use Illuminate\Support\Facades\Route;
 
         // Users
         // Dashboard
-        Route::get('/user/{id}', [UserController::class, 'get'])->name('user');
-        Route::post('/user/create', [UserController::class, 'create'])->name('user.create');
-        Route::delete('/user/{id}', [UserController::class, 'delete'])->name('user.delete');
-        Route::put('/user/{id}', [UserController::class, 'update'])->name('user.update');
-        Route::get('/user/{id}/restore', [UserController::class, 'restore'])->name('user.restore');
-        Route::get('view/user/{id}', [UserController::class, 'view'])->name('user.view');
+        Route::get('/users/{id}', [UserController::class, 'get'])->name('users.get');
+        Route::post('/users/create', [UserController::class, 'create'])->name('users.create');
+        Route::delete('/users/{id}', [UserController::class, 'delete'])->name('users.delete');
+        Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
 
 
 

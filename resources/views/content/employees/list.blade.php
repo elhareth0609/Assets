@@ -16,7 +16,7 @@
             </button>
         </div>
     </div>
-    
+
     <!-- Search Section -->
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
         <div class="p-6">
@@ -45,7 +45,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Table Section -->
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
         <div class="p-0 m-0">
@@ -79,7 +79,7 @@
 </div>
 
 <!-- Create Employee Modal -->
-<div id="createTypeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+<div id="createEmployeeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4">
         <div class="p-6">
             <div class="flex justify-between items-center mb-4">
@@ -91,17 +91,17 @@
                     </svg>
                 </button>
             </div>
-            <form id="createTypeForm" action="{{ route('employees.create') }}" method="POST">
+            <form id="createEmployeeForm" action="{{ route('employees.create') }}" method="POST">
                 @csrf
                 <div class="mb-4">
-                    <label for="typeName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم الموظف</label>
-                    <input type="text" id="typeName" name="full_name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
+                    <label for="full_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم الموظف</label>
+                    <input type="text" id="full_name" name="full_name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
                 </div>
                 <div class="flex justify-center flex-row-reverse space-x-4">
                     <button type="button" id="cancelCreateBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
                         إلغاء
                     </button>
-                    <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+                    <button type="submit" class="flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
                         حفظ
                     </button>
                 </div>
@@ -111,7 +111,7 @@
 </div>
 
 <!-- Edit Employee Modal -->
-<div id="editTypeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+<div id="editEmployeeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4">
         <div class="p-6">
             <div class="flex justify-between items-center mb-4">
@@ -123,17 +123,19 @@
                     </svg>
                 </button>
             </div>
-            <form id="editTypeForm" >
-                <input type="hidden" id="editTypeId" name="id">
+            <form id="editEmployeeForm" method="POST">
+                @csrf
+                @method('PUT')
+                <input type="hidden" id="edit_id" name="id">
                 <div class="mb-4">
-                    <label for="editTypeName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم الموظف</label>
-                    <input type="text" id="editTypeName" name="full_name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
+                    <label for="edit_full_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم الموظف</label>
+                    <input type="text" id="edit_full_name" name="full_name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
                 </div>
                 <div class="flex justify-center flex-row-reverse space-x-4">
                     <button type="button" id="cancelEditBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
                         إلغاء
                     </button>
-                    <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+                    <button type="submit" class="flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
                         حفظ التغييرات
                     </button>
                 </div>
@@ -143,7 +145,7 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div id="deleteTypeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+<div id="deleteEmployeeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4">
         <div class="p-6">
             <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 dark:bg-red-900/20 rounded-full mb-4">
@@ -154,12 +156,12 @@
                 </svg>
             </div>
             <h3 class="text-lg font-medium text-center text-slate-900 dark:text-white mb-2">تأكيد الحذف</h3>
-            <p class="text-center text-slate-500 dark:text-slate-400 mb-6">هل أنت متأكد من حذف الموظف: <span id="deleteTypeName" class="font-semibold"></span>؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <p class="text-center text-slate-500 dark:text-slate-400 mb-6">هل أنت متأكد من حذف الموظف: <span id="deleteEmployeeName" class="font-semibold"></span>؟ لا يمكن التراجع عن هذا الإجراء.</p>
             <div class="flex justify-center flex-row-reverse space-x-4">
-                <button id="cancelDeleteTypeBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
+                <button id="cancelDeleteEmployeeBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
                     إلغاء
                 </button>
-                <button id="confirmDeleteTypeBtn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+                <button id="confirmDeleteEmployeeBtn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
                     حذف
                 </button>
             </div>
@@ -306,7 +308,7 @@ $(document).ready(function() {
             updateCustomInfo(settings);
         }
     });
-    
+
     // Apply Tailwind styles function
     function applyTailwindStyles() {
         $(".dataTables_wrapper").addClass("space-y-4");
@@ -317,7 +319,7 @@ $(document).ready(function() {
         $("#employees-table tbody td").addClass("p-4 align-middle text-slate-900 dark:text-slate-300");
         $("#employees-table thead th").addClass("h-12 px-4 ltr:text-left rtl:text-right align-middle font-medium text-slate-500 dark:text-slate-400");
     }
-    
+
     // Update custom info and pagination
     function updateCustomInfo(settings) {
         var api = new $.fn.dataTable.Api(settings);
@@ -327,12 +329,12 @@ $(document).ready(function() {
         // Update pagination
         updateCustomPagination(info, api);
     }
-    
+
     function updateCustomPagination(info, api) {
         var pagination = $('#custom-pagination');
         pagination.empty();
         if (info.pages <= 1) return;
-        
+
         // Previous button
         var prevBtn = $(`
             <div class="relative group inline-block">
@@ -348,7 +350,7 @@ $(document).ready(function() {
             prevBtn.find('button').on('click', function() { api.page('previous').draw('page'); });
         }
         pagination.append(prevBtn);
-        
+
         // Page numbers
         var startPage = Math.max(0, info.page - 2);
         var endPage = Math.min(info.pages - 1, info.page + 2);
@@ -363,7 +365,7 @@ $(document).ready(function() {
             }
             pagination.append(pageBtn);
         }
-        
+
         // Next button
         var nextBtn = $(`
             <div class="relative group inline-block">
@@ -380,117 +382,168 @@ $(document).ready(function() {
         }
         pagination.append(nextBtn);
     }
-    
+
     // Event Handlers
     $('#apply-search-btn').on('click', function() {
         table.ajax.reload();
     });
-    
+
     // Custom search with debounce
     $('#dataTables_my_filter').on('input', function () {
         var query = $(this).val();
         table.search(query).draw();
     });
-    
+
     // Custom length change
     $('#dataTables_my_length').change(function () {
         var selectedValue = $(this).val();
         table.page.len(selectedValue).draw();
     });
-    
+
     // Create Employee Modal
     $('#create-employee-btn').on('click', function() {
-        $('#createTypeModal').removeClass('hidden').addClass('flex');
-        $('#createTypeForm')[0].reset();
+        $('#createEmployeeModal').removeClass('hidden').addClass('flex');
+        $('#createEmployeeForm')[0].reset();
     });
-    
+
     $('#closeCreateModalBtn, #cancelCreateBtn').on('click', function() {
-        $('#createTypeModal').addClass('hidden').removeClass('flex');
+        $('#createEmployeeModal').addClass('hidden').removeClass('flex');
     });
-    
+
     // Create Employee Form Submit
-    $('#createTypeForm').on('submit', function(e) {
+    $('#createEmployeeForm').on('submit', function(e) {
         e.preventDefault();
-        
+
+        var formData = new FormData(this);
+
+        var form = $(this);
+        var submitButton = form.find('button[type="submit"]');
+        var nameInput = form.find('#full_name');
+        var originalButtonText = submitButton.html();
+
+        nameInput.prop('disabled', true);
+        submitButton.prop('disabled', true);
+        submitButton.html(`
+            <svg class="animate-spin ml-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            جاري الحفظ...
+        `);
+
+
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
-            data: $(this).serialize(),
+            data: formData,
+            processData: false,
+            contentType: false,
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                $('#createTypeModal').addClass('hidden').removeClass('flex');
+                $('#createEmployeeModal').addClass('hidden').removeClass('flex');
                 showNotification('تم إضافة الموظف بنجاح', 'success');
                 table.ajax.reload();
             },
             error: function(xhr) {
                 var errors = xhr.responseJSON.errors;
                 var errorMessage = 'حدث خطأ أثناء إضافة الموظف';
-                
+
                 if (errors && errors.name) {
                     errorMessage = errors.name[0];
                 }
-                
+
                 showNotification(errorMessage, 'error');
+            },
+            complete: function() {
+                // 重新启用输入和按钮
+                nameInput.prop('disabled', false);
+                submitButton.prop('disabled', false);
+                submitButton.html(originalButtonText);
             }
         });
     });
-    
+
     // Edit Employee Modal
     $(document).on('click', '.edit-employee-btn', function() {
-        var typeId = $(this).data('id');
-        var typeName = $(this).data('full_name');
-        
-        $('#editTypeId').val(typeId);
-        $('#editTypeName').val(typeName);
-        $('#editTypeModal').removeClass('hidden').addClass('flex');
+        var id = $(this).data('id');
+        var full_name = $(this).data('full_name');
+
+        $('#edit_id').val(id);
+        $('#edit_full_name').val(full_name);
+        $('#editEmployeeModal').removeClass('hidden').addClass('flex');
     });
-    
+
     $('#closeEditModalBtn, #cancelEditBtn').on('click', function() {
-        $('#editTypeModal').addClass('hidden').removeClass('flex');
+        $('#editEmployeeModal').addClass('hidden').removeClass('flex');
     });
-    
+
     // Edit Employee Form Submit
-    $('#editTypeForm').on('submit', function(e) {
+    $('#editEmployeeForm').on('submit', function(e) {
         e.preventDefault();
-        var typeId = $('#editTypeId').val();
-        
+        var formData = new FormData(this);
+
+
+        var id = $('#edit_id').val();
+        var form = $(this);
+        var submitButton = form.find('button[type="submit"]');
+        var nameInput = form.find('#edit_full_name');
+        var originalButtonText = submitButton.html();
+
+        nameInput.prop('disabled', true);
+        submitButton.prop('disabled', true);
+        submitButton.html(`
+            <svg class="animate-spin ml-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            جاري الحفظ...
+        `);
+
+
         $.ajax({
-            url: '/employees/' + typeId,
-            type: 'PUT',
-            data: $(this).serialize(),
+            url: '/employees/' + id,
+            type: $(this).attr('method'),
+            data: formData,
+            processData: false,
+            contentType: false,
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                $('#editTypeModal').addClass('hidden').removeClass('flex');
+                $('#editEmployeeModal').addClass('hidden').removeClass('flex');
                 showNotification('تم تحديث الموظف بنجاح', 'success');
                 table.ajax.reload();
             },
             error: function(xhr) {
                 var errors = xhr.responseJSON.errors;
                 var errorMessage = 'حدث خطأ أثناء تحديث الموظف';
-                
+
                 if (errors && errors.name) {
                     errorMessage = errors.name[0];
                 }
-                
+
                 showNotification(errorMessage, 'error');
+            },
+            complete: function() {
+                nameInput.prop('disabled', false);
+                submitButton.prop('disabled', false);
+                submitButton.html(originalButtonText);
             }
         });
     });
-    
+
     // Delete Employee Modal
     $(document).on('click', '.delete-employee-btn', function() {
-        var typeId = $(this).data('id');
-        var typeName = $(this).data('full_name');
+        var id = $(this).data('id');
+        var full_name = $(this).data('full_name');
         var deleteUrl = $(this).data('url');
-        
-        $('#deleteTypeName').text(typeName);
-        $('#deleteTypeModal').removeClass('hidden').addClass('flex');
-        
-        $('#confirmDeleteTypeBtn').off('click').on('click', function() {
+
+        $('#deleteEmployeeName').text(full_name);
+        $('#deleteEmployeeModal').removeClass('hidden').addClass('flex');
+
+        $('#confirmDeleteEmployeeBtn').off('click').on('click', function() {
             $.ajax({
                 url: deleteUrl,
                 type: 'DELETE',
@@ -498,52 +551,52 @@ $(document).ready(function() {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
-                    $('#deleteTypeModal').addClass('hidden').removeClass('flex');
+                    $('#deleteEmployeeModal').addClass('hidden').removeClass('flex');
                     showNotification('تم حذف الموظف بنجاح', 'success');
                     table.ajax.reload();
                 },
                 error: function(xhr) {
-                    $('#deleteTypeModal').addClass('hidden').removeClass('flex');
+                    $('#deleteEmployeeModal').addClass('hidden').removeClass('flex');
                     showNotification('حدث خطأ أثناء حذف الموظف', 'error');
                 }
             });
         });
     });
-    
-    $('#cancelDeleteTypeBtn').on('click', function() {
-        $('#deleteTypeModal').addClass('hidden').removeClass('flex');
+
+    $('#cancelDeleteEmployeeBtn').on('click', function() {
+        $('#deleteEmployeeModal').addClass('hidden').removeClass('flex');
     });
-    
+
     // Close modals when clicking outside
     $(document).on('click', function(e) {
-        if ($(e.target).is('#createTypeModal')) {
-            $('#createTypeModal').addClass('hidden').removeClass('flex');
+        if ($(e.target).is('#createEmployeeModal')) {
+            $('#createEmployeeModal').addClass('hidden').removeClass('flex');
         }
-        if ($(e.target).is('#editTypeModal')) {
-            $('#editTypeModal').addClass('hidden').removeClass('flex');
+        if ($(e.target).is('#editEmployeeModal')) {
+            $('#editEmployeeModal').addClass('hidden').removeClass('flex');
         }
-        if ($(e.target).is('#deleteTypeModal')) {
-            $('#deleteTypeModal').addClass('hidden').removeClass('flex');
+        if ($(e.target).is('#deleteEmployeeModal')) {
+            $('#deleteEmployeeModal').addClass('hidden').removeClass('flex');
         }
     });
-    
+
     // Also close modals when pressing Escape key
     $(document).on('keydown', function(e) {
         if (e.key === 'Escape') {
-            $('#createTypeModal').addClass('hidden').removeClass('flex');
-            $('#editTypeModal').addClass('hidden').removeClass('flex');
-            $('#deleteTypeModal').addClass('hidden').removeClass('flex');
+            $('#createEmployeeModal').addClass('hidden').removeClass('flex');
+            $('#editEmployeeModal').addClass('hidden').removeClass('flex');
+            $('#deleteEmployeeModal').addClass('hidden').removeClass('flex');
         }
     });
-    
+
     // Notification function
     function showNotification(message, type) {
         var notification = $(`
             <div class="fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} transition-opacity duration-300">
                 <div class="flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-${type === 'success' ? 'check-circle' : 'alert-circle'} w-5 h-5 ml-2">
-                        ${type === 'success' ? 
-                            '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>' : 
+                        ${type === 'success' ?
+                            '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>' :
                             '<circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line>'
                         }
                     </svg>
@@ -551,9 +604,9 @@ $(document).ready(function() {
                 </div>
             </div>
         `);
-        
+
         $('body').append(notification);
-        
+
         // Auto remove after 3 seconds
         setTimeout(function() {
             notification.fadeOut(300, function() {

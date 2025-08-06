@@ -27,7 +27,7 @@
             <ul class="space-y-2 font-medium mb-2">
                 <!-- Dashboard Link -->
                 <li>
-                    <a href="#" class="flex w-full items-center px-2 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 sidebar-item-container bg-primary-50 text-primary-700 dark:bg-slate-800 dark:text-primary-400">
+                    <a href="{{ route('dashboard') }}" class="flex w-full items-center px-2 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 sidebar-item-container dark:text-white {{ Route::currentRouteName() == 'dashboard' ? 'bg-primary-50 text-primary-700 dark:bg-slate-800 dark:text-primary-400' : '' }}">
                         <!-- Home Icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard w-5 h-5 flex-shrink-0">
                             <rect width="7" height="9" x="3" y="3" rx="1" />
@@ -36,6 +36,13 @@
                             <rect width="7" height="5" x="3" y="16" rx="1" />
                         </svg>
                         <span class="sidebar-text rtl:ms-2">لوحة التحكم الرئيسية</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('users') }}" class="flex w-full items-center px-2 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 sidebar-item-container {{ Route::currentRouteName() == 'users' ? 'bg-primary-50 text-primary-700 dark:bg-slate-800 dark:text-primary-400' : 'text-slate-900 dark:text-white'}}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 flex-shrink-0" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list-icon lucide-list"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/></svg>
+                        <span class="sidebar-text rtl:ms-2">المستخدمين</span>
                     </a>
                 </li>
 

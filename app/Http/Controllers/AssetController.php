@@ -63,16 +63,16 @@ class AssetController extends Controller {
     }
 
     public function store(AssetRequest $request) {
-        return $this->success(new AssetResource($this->AssetService->createAsset($request->validated())), __('Created Successfully.'));
+        return $this->success(new AssetResource($this->AssetService->createAsset($request->validated())), 'تم الإنشاء بنجاح');
     }
 
     public function update(AssetRequest $request, $id) {
-        return $this->success(new AssetResource($this->AssetService->updateAsset($id, $request->validated())), __('Updated Successfully.'));
+        return $this->success(new AssetResource($this->AssetService->updateAsset($id, $request->validated())), 'تم التحديث بنجاح');
     }
 
     public function delete($id) {
         $this->AssetService->deleteAsset($id);
-        return $this->success(null, __('Deleted Successfully.'));
+        return $this->success(null, 'تم الحذف بنجاح');
     }
     public function qr($id) {
         $url = route('assets.get', $id);

@@ -1,1003 +1,559 @@
 @extends('layouts.app')
-
-@section('title', __('Users'))
-
 @section('content')
+<div class="mx-auto p-6 space-y-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-display font-bold text-slate-900 dark:text-slate-100">المستخدمين</h1>
+            <p class="text-slate-600 dark:text-slate-400 mt-1">إدارة حسابات المستخدمين في النظام</p>
+        </div>
+        <div class="flex gap-2">
+            <button id="create-user-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-8 px-3 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus w-4 h-4 ltr:mr-2 rtl:ml-2">
+                    <path d="M5 12h14"></path>
+                    <path d="M12 5v14"></path>
+                </svg>
+                إضافة مستخدم جديد
+            </button>
+        </div>
+    </div>
 
-<h1 class="h3 mb-4 text-gray-800" dir="{{ app()->getLocale() == "ar" ? "rtl" : "" }}">{{ __('Users') }}</h1>
+    <!-- Search Section -->
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-1">
+                    <label class="block text-sm font-medium mb-2 dark:text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-4 h-4 inline ltr:mr-1 rtl:ml-1">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </svg>
+                        بحث
+                    </label>
+                    <div class="w-full">
+                        <input id="dataTables_my_filter" type="text" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="ابحث بالاسم، اسم المستخدم، أو البريد الإلكتروني...">
+                    </div>
+                </div>
+                <div class="flex items-end">
+                    <button type="button" id="apply-search-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-10 px-4 text-sm w-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-4 h-4 ltr:mr-2 rtl:ml-2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </svg>
+                        بحث
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="card p-2" dir="{{ app()->getLocale() == "ar" ? "rtl" : "" }}">
-    <div class="container-fluid mt-5">
-        <div class="row {{ app()->getLocale() == "ar" ? "me-1" : "ms-1" }} mb-2">
-            <input type="text" class="form-control my-w-fit-content m-1" id="dataTables_my_filter" placeholder="{{ __('Search ...') }}" name="search">
+    <!-- Table Section -->
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
+        <div class="p-0 m-0">
+            <div class="space-y-4">
+                <div class="w-full overflow-auto rounded-lg">
+                    <table id="users-table" class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>المستخدم</th>
+                                {{-- <th>البريد الإلكتروني</th> --}}
+                                <th>تاريخ التسجيل</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="flex flex-col sm:flex-row items-center justify-between p-4">
+                    <div class="text-sm text-slate-600 dark:text-slate-400" id="custom-pagination-info"></div>
+                    <select id="dataTables_my_length" class="flex h-8 rounded-md border border-slate-300 bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50">
+                        <option value="1">1</option>
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <div class="flex items-center gap-1 rtl:flex-row-reverse" id="custom-pagination"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-            <select class="form-select my-w-fit-content m-1" id="selectType" name="type">
-                <option value="all">{{ __('All') }}</option>
-                <option value="staff">{{ __('Staffs') }}</option>
-                <option value="admin">{{ __('Admins') }}</option>
-                <option value="driver">{{ __('Drivers') }}</option>
-                <option value="user">{{ __('Users') }}</option>
-            </select>
-
-            <select class="form-select my-w-fit-content m-1" id="dataTables_my_length" name="length">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-
-            <button class="btn btn-icon btn-outline-primary m-1" id="" data-bs-toggle="modal" data-bs-target="#createCouponModal"><span class="mdi mdi-plus-outline"></span></button>
-            <button class="btn btn-icon btn-outline-primary m-1" id="" data-bs-toggle="modal" data-bs-target="#uploadCouponModal"><span class="mdi mdi-upload-outline"></span></button>
-            <button class="btn btn-icon btn-outline-primary m-1" id=""><span class="mdi mdi-download-outline"></span></button>
-            <button class="btn btn-icon btn-outline-danger m-1" id="trash-button" data-trashed="0"><span class="mdi mdi-delete-alert-outline"></span></button>
-
-            <div class="dropdown my-w-fit-content px-0">
-                <button class="btn btn-icon btn-outline-primary m-1" type="button" data-bs-toggle="dropdown">
-                    <span class="mdi mdi-filter-outline"></span>
+<!-- Create/Edit User Modal -->
+<div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="userModalTitle" class="text-lg font-medium text-slate-900 dark:text-white">إضافة مستخدم جديد</h3>
+                <button id="closeUserModalBtn" class="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x w-6 h-6">
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
                 </button>
-                <ul class="dropdown-menu p-1 {{ app()->getLocale() == "ar" ? "text-end dropdown-menu-end" : "dropdown-menu-start" }}" aria-labelledby="dropdownMenuButton1" id="columns_filter_dropdown">
-                </ul>
             </div>
-        </div>
-        <div class="table-responsive rounded-3 border mb-3">
-            <table id="table" class="table table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th><input class="form-check-input" type="checkbox" id="check-all"></th>
-                        <th>{{__("Code")}}</th>
-                        <th>{{ __('Discount') }}</th>
-                        <th>{{ __('Max') }}</th>
-                        <th>{{ __('Status') }}</th>
-                        <th>{{ __('Expired At') }}</th>
-                        <th>{{ __('Created At') }}</th>
-                        <th>{{ __('Actions') }}</th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-        <div class="row align-items-baseline justify-content-end">
-            <div class="my-w-fit-content" id="dataTables_my_info"></div>
-            <nav class="my-w-fit-content" aria-label="Table navigation"><ul class="pagination" id="dataTables_my_paginate"></ul></nav>
-        </div>
-    </div>
-</div>
-
-
-<!-- Edit Coupon Modal -->
-<div class="modal fade" id="editCouponModal" tabindex="-1" aria-labelledby="editCouponLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form class="validate" id="editCouponForm" action="{{route('coupon.update')}}" method="POST">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editCouponLabel">{{ __('Edit Coupon') }}</h5>
-                    <button type="button" class="btn btn-light btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    @csrf
-                    <input type="hidden" id="pid" name="pid" required>
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="{{ __('Code') }}" id="pcode" name="pcode" data-v="required" aria-label="{{ __('Code') }}" aria-describedby="button-addon2" disabled required>
-                        <button class="btn btn-light border generate-code" type="button">{{ __('Generate') }}</button>
+            <form id="userForm">
+                <input type="hidden" id="userId" name="id">
+                <div class="space-y-4">
+                    <div>
+                        <label for="fullName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">الاسم الكامل</label>
+                        <input type="text" id="fullName" name="full_name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل الاسم الكامل">
                     </div>
-                    <div class="mb-3">
-                        <label for="puses" class="form-label">{{ __('Max') }}</label>
-                        <input type="text" class="form-control" id="puses" name="puses" data-v="required" required>
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">اسم المستخدم</label>
+                        <input type="text" id="username" name="username" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم المستخدم">
                     </div>
-                    <div class="mb-3">
-                        <label for="pdiscount" class="form-label">{{ __('Discount') }}</label>
-                        <input type="text" class="form-control" id="pdiscount" name="pdiscount" data-v="required" required>
+                    {{-- <div>
+                        <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">البريد الإلكتروني</label>
+                        <input type="email" id="email" name="email" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل البريد الإلكتروني">
+                    </div> --}}
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">كلمة المرور</label>
+                        <input type="password" id="password" name="password" {{ !isset($user) ? 'required' : '' }} class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="{{ isset($user) ? 'أدخل كلمة مرور جديدة (اتركها فارغة للحفاظ على الحالية)' : 'أدخل كلمة المرور' }}">
                     </div>
-                    <div class="form-group mb-3">
-                        <label for="pexpired_date" class="form-label">{{ __('Expired At') }}</label>
-                        <input type="datetime-local" class="form-control" id="pexpired_date" name="pexpired_date" data-v="required" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="pstatus" class="form-label">{{ __('Status') }}</label>
-                        <select class="form-select" id="pstatus" name="pstatus" data-v="required" required>
-                            <option value="1">{{ __('Active') }}</option>
-                            <option value="0">{{ __('Inactive') }}</option>
-                        </select>
+                    <div>
+                        <label for="password_confirmation" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">تأكيد كلمة المرور</label>
+                        <input type="password" id="password_confirmation" name="password_confirmation" {{ !isset($user) ? 'required' : '' }} class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أعد إدخال كلمة المرور">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
-                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">{{ __('Save') }}</button>
+                <div class="flex justify-end flex-row-reverse mt-6 space-x-4">
+                    <button type="button" id="cancelUserBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
+                        إلغاء
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+                        حفظ
+                    </button>
                 </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Create Coupon Modal -->
-<div class="modal fade" id="createCouponModal" tabindex="-1" aria-labelledby="createCouponLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form class="validate" id="createCouponForm" action="{{route('coupon.create')}}" method="POST">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createCouponLabel">{{ __('Create Coupon') }}</h5>
-                    <button type="button" class="btn btn-light btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    @csrf
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="{{ __('Code') }}" id="code" name="code" data-v="required" aria-label="{{ __('Code') }}" aria-describedby="button-addon2" readonly>
-                        <button class="btn btn-icon border copy-code" type="button" data-clipboard-target="#code" >
-                            <span class="my my-copy"></span>
-                            <span class="my my-doubletick d-none"></span>
-                        </button>
-                        <button class="btn btn-light border generate-code" type="button">{{ __('Generate') }}</button>
-                    </div>
-                    <div class="input-group mb-3">
-                        <span for="max" class="input-group-text">{{ __('Max') }}</span>
-                        <input type="number" class="form-control" name="max" data-v="required" required>
-                    </div>
-                    <div class="input-group mb-3">
-                        <span for="discount" class="input-group-text">{{ __('Discount') }}</span>
-                        <input type="number" class="form-control" name="discount" data-v="required" required>
-                        <span class="input-group-text">%</span>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="expired_date" class="form-label">{{ __('Expired At') }}</label>
-                        <input type="datetime-local" class="form-control" name="expired_date" data-v="required" required>
-                    </div>
-                    <div class="input-group mb-3">
-                        <label class="input-group-text" for="status">{{ __('Status') }}</label>
-                        <select class="form-select" name="status" data-v="required" required>
-                            <option selected="0">{{ __('Select Status') }}</option>
-                            <option value="active">{{ __('Active') }}</option>
-                            <option value="inactive">{{ __('Inactive') }}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Print Coupon Image Modal -->
-<div class="modal fade" id="printCouponModal" tabindex="-1" aria-labelledby="printCouponLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="printCouponLabel">{{ __('Print Coupon') }}</h5>
-                <button type="button" class="btn btn-light btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12 col-lg-6 d-flex justify-content-center mb-4">
-                        <div class="printimage-container" id="printedImage">
-                            <img src="{{ asset('assets/img/my/defaults/print.png') }}" width="800px" alt="print">
-                            <div class="text-overlay identifier"></div> <!-- المعرف -->
-                            <div class="text-overlay code"></div> <!-- الكود -->
-                            <div class="text-overlay usage"></div> <!-- الإستعمالات -->
-                            <div class="text-overlay validity"></div> <!-- الصلاحية -->
-                            <div class="text-overlay discount"></div> <!-- الخصم -->
-                            <div class="text-overlay status"></div> <!-- الحالة -->
-                            <div class="text-overlay limit"></div> <!-- الحد الأقصى -->
-                        </div>
-                    </div>
-                    <div class="col-md-12 col-lg-6">
-                        <div class="mb-3">
-                            <label for="pcode" class="form-label">{{ __('Code') }}</label>
-                            <input type="text" class="form-control" id="pcode" name="pcode" data-v="required" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="puses" class="form-label">{{ __('Max') }}</label>
-                            <input type="text" class="form-control" id="puses" name="puses" data-v="required" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pdiscount" class="form-label">{{ __('Discount') }}</label>
-                            <input type="text" class="form-control" id="pdiscount" name="pdiscount" data-v="required" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pexpired_date" class="form-label">{{ __('Expired At') }}</label>
-                            <input type="datetime-local" class="form-control" id="pexpired_date" name="pexpired_date" data-v="required" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pstatus" class="form-label">{{ __('Status') }}</label>
-                            <select class="form-select" id="pstatus" name="pstatus" data-v="required" required>
-                                <option value="1">{{ __('Active') }}</option>
-                                <option value="0">{{ __('Inactive') }}</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
-                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">{{ __('Print') }}</button>
-            </div>
+            </form>
         </div>
     </div>
 </div>
 
-<!-- Print Coupon Pdf Modal -->
-<div class="modal fade" id="printCouponPdfModal" tabindex="-1" aria-labelledby="printCouponPdfLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="printCouponPdfLabel">{{ __('Print Coupon Pdf') }}</h5>
-                <button type="button" class="btn btn-light btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Delete Confirmation Modal -->
+<div id="deleteUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div class="p-6">
+            <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 dark:bg-red-900/20 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-triangle text-red-600 dark:text-red-400">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                    <path d="M12 9v4"></path>
+                    <path d="m12 17 .01 0"></path>
+                </svg>
             </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12 col-lg-6 d-flex justify-content-center mb-4">
-                        <iframe id="pdfPreview" style="width: 100%; height: 600px;" frameborder="0"></iframe>
-                    </div>
-                    <!-- Existing form content on the right side -->
-                    <div class="col-md-12 col-lg-6">
-                        <input type="hidden" class="form-control" id="pdid" name="pdid" data-v="required" required>
-                        <div class="mb-3">
-                            <label for="pdcode" class="form-label">{{ __('Code') }}</label>
-                            <input type="text" class="form-control" id="pdcode" name="pdcode" data-v="required" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pduses" class="form-label">{{ __('Max') }}</label>
-                            <input type="text" class="form-control" id="pduses" name="pduses" data-v="required" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pddiscount" class="form-label">{{ __('Discount') }}</label>
-                            <input type="text" class="form-control" id="pddiscount" name="pddiscount" data-v="required" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pdexpired_date" class="form-label">{{ __('Expired At') }}</label>
-                            <input type="datetime-local" class="form-control" id="pdexpired_date" name="pdexpired_date" data-v="required" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pdstatus" class="form-label">{{ __('Status') }}</label>
-                            <select class="form-select" id="pdstatus" name="pdstatus" data-v="required" required>
-                                <option value="1">{{ __('Active') }}</option>
-                                <option value="0">{{ __('Inactive') }}</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
-                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">{{ __('Print') }}</button>
+            <h3 class="text-lg font-medium text-center text-slate-900 dark:text-white mb-2">تأكيد الحذف</h3>
+            <p class="text-center text-slate-500 dark:text-slate-400 mb-6">هل أنت متأكد من حذف المستخدم: <span id="deleteUserName" class="font-semibold"></span>؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <div class="flex justify-center flex-row-reverse space-x-4">
+                <button id="cancelDeleteUserBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
+                    إلغاء
+                </button>
+                <button id="confirmDeleteUserBtn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+                    حذف
+                </button>
             </div>
         </div>
     </div>
 </div>
+@endsection
 
-<!-- Upload Coupon Modal -->
-<div class="modal fade" id="uploadCouponModal" tabindex="-1" aria-labelledby="uploadCouponLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form id="printCouponForm"  method="POST">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="printCouponLabel">{{ __('Upload Coupon') }}</h5>
-                    <button type="button" class="btn btn-light btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+@section('styles')
+<style>
+    .dt-search,
+    .dt-paging,
+    .dt-length,
+    .dt-info,
+    .dt-buttons {
+        display: none !important;
+    }
+    /* Hide default DataTables controls */
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+        display: none !important;
+    }
+    /* Ensure only one thead is visible */
+    .dt-scroll-head {
+        display: none !important;
+    }
+</style>
+
+<style>
+  #users-table {
+    width: 100%;
+    caption-side: bottom;
+    font-size: 0.875rem; /* text-sm */
+    border-collapse: collapse;
+  }
+  #users-table thead {
+    background-color: rgb(248 250 252); /* bg-slate-50 */
+  }
+  html.dark #users-table thead {
+    background-color: rgb(30 41 59); /* dark:bg-slate-800 */
+  }
+  #users-table thead tr {
+    border-bottom: 1px solid rgb(226 232 240); /* border-slate-200 */
+    transition: background-color 0.2s;
+  }
+  html.dark #users-table thead tr {
+    border-bottom: 1px solid rgb(51 65 85); /* dark:border-slate-700 */
+  }
+  #users-table thead tr:hover {
+    background-color: rgb(248 250 252); /* hover:bg-slate-50 */
+  }
+  html.dark #users-table thead tr:hover {
+    background-color: rgba(30, 41, 59, 0.5); /* dark:hover:bg-slate-800/50 */
+  }
+  #users-table tbody tr {
+    border-bottom: 1px solid rgb(226 232 240);
+    transition: background-color 0.2s;
+  }
+  html.dark #users-table tbody tr {
+    border-bottom: 1px solid rgb(51 65 85);
+  }
+  #users-table tbody tr:hover {
+    background-color: rgb(248 250 252);
+  }
+  html.dark #users-table tbody tr:hover {
+    background-color: rgba(30, 41, 59, 0.5);
+  }
+  #users-table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    color: rgb(15 23 42); /* text-slate-900 */
+  }
+  html.dark #users-table tbody td {
+    color: rgb(203 213 225); /* dark:text-slate-300 */
+  }
+  #users-table thead th {
+    height: 3rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    vertical-align: middle;
+    font-weight: 500;
+    color: rgb(100 116 139); /* text-slate-500 */
+  }
+  html.ltr #users-table thead th {
+    text-align: left;
+  }
+  html.rtl #users-table thead th {
+    text-align: right;
+  }
+  html.dark #users-table thead th {
+    color: rgb(148 163 184); /* dark:text-slate-400 */
+  }
+</style>
+@endsection
+
+@section('scripts')
+<script>
+$(document).ready(function() {
+    // Initialize DataTable
+    var table = $('#users-table').DataTable({
+        language: {
+            zeroRecords: `
+                <div class="flex flex-col items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300 dark:text-slate-600">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                        <line x1="8" x2="14" y1="11" y2="11"></line>
+                    </svg>
+                    <p class="text-slate-500 font-medium">لم يتم العثور على مستخدمين للفترة المحددة.</p>
                 </div>
-                <div class="modal-body">
-                    <div id="dropzone" class="dropzone"></div>
+            `,
+            emptyTable: `
+                <div class="flex flex-col items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300 dark:text-slate-600">
+                        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path>
+                        <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
+                        <path d="M10 9H8"></path>
+                        <path d="M16 13H8"></path>
+                        <path d="M16 17H8"></path>
+                    </svg>
+                    <p class="text-slate-500 font-medium">لا توجد مستخدمين مسجلين في النظام.</p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
-                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">{{ __('Upload') }}</button>
-                </div>
+            `,
+        },
+        ajax: {
+            url: "{{ route('users') }}",
+            data: function(d) {
+                d.search = $('#dataTables_my_filter').val();
+            }
+        },
+        columns: [
+            { data: 'id', name: 'id', title: 'المعرف' },
+            { data: 'full_name', name: 'full_name', title: 'المستخدم' },
+            // { data: 'email', name: 'email', title: 'البريد الإلكتروني' },
+            { data: 'created_at', name: 'created_at', title: 'تاريخ التسجيل' },
+            { data: 'action', name: 'action', title: 'الإجراءات', orderable: false, searchable: false }
+        ],
+        order: [[0, 'desc']],
+        initComplete: function(settings, json) {
+            applyTailwindStyles();
+        },
+        drawCallback: function(settings) {
+            applyTailwindStyles();
+            updateCustomInfo(settings);
+        }
+    });
+
+    // Apply Tailwind styles function
+    function applyTailwindStyles() {
+        $(".dataTables_wrapper").addClass("space-y-4");
+        $("#users-table").addClass("w-full caption-bottom text-sm border-collapse");
+        $("#users-table thead").addClass("bg-slate-50 dark:bg-slate-800");
+        $("#users-table thead tr").addClass("border-b border-slate-200 dark:border-slate-700 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50");
+        $("#users-table tbody tr").addClass("border-b border-slate-200 dark:border-slate-700 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50");
+        $("#users-table tbody td").addClass("p-4 align-middle text-slate-900 dark:text-slate-300");
+        $("#users-table thead th").addClass("h-12 px-4 ltr:text-left rtl:text-right align-middle font-medium text-slate-500 dark:text-slate-400");
+    }
+
+    // Update custom info and pagination
+    function updateCustomInfo(settings) {
+        var api = new $.fn.dataTable.Api(settings);
+        var info = api.page.info();
+        // Update info text
+        $('#custom-pagination-info').text(`عرض ${info.start + 1} إلى ${info.end} من إجمالي ${info.recordsTotal} مُدخلًا`);
+        // Update pagination
+        updateCustomPagination(info, api);
+    }
+
+    function updateCustomPagination(info, api) {
+        var pagination = $('#custom-pagination');
+        pagination.empty();
+        if (info.pages <= 1) return;
+
+        // Previous button
+        var prevBtn = $(`
+            <div class="relative group inline-block">
+                <button class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 h-8 text-sm p-2 ${info.page === 0 ? 'opacity-50 cursor-not-allowed' : ''}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m15 18-6-6 6-6"></path>
+                    </svg>
+                </button>
+                <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">السابق</div>
             </div>
-        </form>
-    </div>
-</div>
+        `);
+        if (info.page !== 0) {
+            prevBtn.find('button').on('click', function() { api.page('previous').draw('page'); });
+        }
+        pagination.append(prevBtn);
 
+        // Page numbers
+        var startPage = Math.max(0, info.page - 2);
+        var endPage = Math.min(info.pages - 1, info.page + 2);
+        for (var i = startPage; i <= endPage; i++) {
+            var pageBtn = $(`
+                <button class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 h-8 px-3 text-sm ${i === info.page ? 'bg-primary-600 text-white border-primary-600' : 'bg-transparent border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 hidden'}">${i + 1}</button>
+            `);
+            if (i !== info.page) {
+                (function(pageIndex) {
+                    pageBtn.on('click', function() { api.page(pageIndex).draw('page'); });
+                })(i);
+            }
+            pagination.append(pageBtn);
+        }
 
-<script type="text/javascript">
-        var table;
-        // Start of checkboxes
-        var selectedIds = [];
-        var ids = [];
-        let isCheckAllTrigger = false;
-        // End of checkboxes
+        // Next button
+        var nextBtn = $(`
+            <div class="relative group inline-block">
+                <button class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 h-8 text-sm p-2 ${info.page === info.pages - 1 ? 'opacity-50 cursor-not-allowed' : ''}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                </button>
+                <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">التالي</div>
+            </div>
+        `);
+        if (info.page !== info.pages - 1) {
+            nextBtn.find('button').on('click', function() { api.page('next').draw('page'); });
+        }
+        pagination.append(nextBtn);
+    }
 
+    // Event Handlers
+    $('#apply-search-btn').on('click', function() {
+        table.ajax.reload();
+    });
 
-        Pusher.logToConsole = true;
-        var pusher = new Pusher('f513c6dba43174cbee4d', {
-            cluster: 'eu'
+    // Custom search
+    $('#dataTables_my_filter').on('input', function () {
+        var query = $(this).val();
+        table.search(query).draw();
+    });
+
+    // Custom length change
+    $('#dataTables_my_length').change(function () {
+        var selectedValue = $(this).val();
+        table.page.len(selectedValue).draw();
+    });
+
+    // Create User Modal
+    $('#create-user-btn').on('click', function() {
+        $('#userModalTitle').text('إضافة مستخدم جديد');
+        $('#userForm')[0].reset();
+        $('#userId').val('');
+        $('#password').attr('required', true);
+        $('#password_confirmation').attr('required', true);
+        $('#userModal').removeClass('hidden').addClass('flex');
+    });
+
+    // Edit User Modal
+    $(document).on('click', '.edit-user-btn', function() {
+        var userId = $(this).data('id');
+
+        // Get user details via AJAX
+        $.ajax({
+            url: '/users/' + userId,
+            type: 'GET',
+            success: function(response) {
+                $('#userModalTitle').text('تعديل المستخدم');
+                $('#userId').val(response.id);
+                $('#fullName').val(response.full_name);
+                $('#username').val(response.username);
+                $('#email').val(response.email);
+                $('#password').removeAttr('required');
+                $('#password_confirmation').removeAttr('required');
+                $('#password').val('');
+                $('#password_confirmation').val('');
+
+                $('#userModal').removeClass('hidden').addClass('flex');
+            },
+            error: function(xhr) {
+                showNotification('حدث خطأ أثناء جلب بيانات المستخدم', 'error');
+            }
         });
-
-        function updateOverlay() {
-            document.querySelector('.text-overlay.identifier').innerText = document.getElementById('pid').value || '';
-            document.querySelector('.text-overlay.code').innerText = document.getElementById('pcode').value || '';
-            document.querySelector('.text-overlay.usage').innerText = document.getElementById('puses').value || '';
-            document.querySelector('.text-overlay.discount').innerText = document.getElementById('pdiscount').value + '%' || '';
-            const datetimeValue = document.getElementById('pexpired_date').value;
-            const dateValue = datetimeValue ? datetimeValue.split('T')[0] : '';
-            document.querySelector('.text-overlay.validity').innerText = dateValue || '';
-            document.querySelector('.text-overlay.status').innerText = document.getElementById('pstatus').value || '';
-            document.querySelector('.text-overlay.limit').innerText = document.getElementById('puses').value || '';
-        }
-
-        function updatePdfOverlay() {
-            $('#loading').show();
-
-            const id = document.getElementById('pdid').value || '';
-            const code = document.getElementById('pdcode').value || '';
-            const uses = document.getElementById('pduses').value || '';
-            const discount = document.getElementById('pddiscount').value || '';
-            const expired_date = document.getElementById('pdexpired_date').value || '';
-            const status = document.getElementById('pdstatus').value || '';
-
-            $.ajax({
-                url: '/coupon/pdf/' + id,
-                type: 'POST',
-                xhrFields: {
-                    responseType: 'blob' // Important to get the binary data
-                },
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                data: {
-                    code: code,
-                    uses: uses,
-                    discount: discount,
-                    expired_date: expired_date,
-                    status: status,
-                },
-                success: function(blob) {
-                    $('#loading').hide();
-
-                    // Create an object URL from the blob
-                    const url = URL.createObjectURL(blob);
-                    // Set the source of the iframe or embed to display the PDF
-                    $('#pdfPreview').attr('src', url);
-                    // $('#printCouponPdfModal').modal('show');
-
-                    // Release the URL when the modal is closed
-                    $('#printCouponPdfModal').on('hidden.bs.modal', function () {
-                        URL.revokeObjectURL(url);
-                        $('#pdfPreview').attr('src', ''); // Clear the src to release memory
-                    });
-                },
-                error: function(xhr, textStatus, errorThrown) {
-                    const response = JSON.parse(xhr.responseText);
-                    $('#loading').hide();
-                    Swal.fire({
-                        icon: response.icon,
-                        title: response.state,
-                        text: response.message,
-                        confirmButtonText: __("Ok", lang)
-                    });
-                }
-            });
-        }
-
-        document.getElementById('pid').addEventListener('input', updateOverlay);
-        document.getElementById('pcode').addEventListener('input', updateOverlay);
-        document.getElementById('puses').addEventListener('input', updateOverlay);
-        document.getElementById('pdiscount').addEventListener('input', updateOverlay);
-        document.getElementById('pexpired_date').addEventListener('input', updateOverlay);
-        document.getElementById('pstatus').addEventListener('change', updateOverlay);
-
-        document.getElementById('pdcode').addEventListener('input', updatePdfOverlay);
-        document.getElementById('pduses').addEventListener('input', updatePdfOverlay);
-        document.getElementById('pddiscount').addEventListener('input', updatePdfOverlay);
-        document.getElementById('pdexpired_date').addEventListener('input', updatePdfOverlay);
-        document.getElementById('pdstatus').addEventListener('change', updatePdfOverlay);
-
-
-        function printImage() {
-            const printedImageElement = document.querySelector(".printimage-container");
-
-            html2canvas(printedImageElement, {
-              // allowTaint: true,
-                useCORS: true
-            }).then(function(canvas) {
-                const imgData = canvas.toDataURL('image/png');
-                const newWindow = window.open('', '_blank');
-                newWindow.document.write(`<img src="${imgData}" onload="window.print();">`);
-                newWindow.document.close();  // Ensure the window is fully loaded before printing
-                newWindow.focus();  // Bring the new window to the front
-            });
-        }
-
-        function printCoupon(id) {
-            $('#loading').show();
-
-            $.ajax({
-                url: '/coupon/' + id,
-                type: 'GET',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                success: function(data) {
-                coupon = data.coupon;
-                $('#pid').val(coupon.id);
-                $('#pcode').val(coupon.code);
-                $('#puses').val(coupon.max);
-                $('#pdiscount').val(coupon.discount);
-                $('#pexpired_date').val(coupon.expired_date.replace(' ', 'T'));
-                $('#pstatus').val(coupon.status);
-                updateOverlay();
-
-                $('#loading').hide();
-                $('#printCouponModal').modal('show');
-                },
-                error: function(xhr, textStatus, errorThrown) {
-                    const response = JSON.parse(xhr.responseText);
-                    $('#loading').hide();
-                    Swal.fire({
-                        icon: response.icon,
-                        title: response.state,
-                        text: response.message,
-                        confirmButtonText: __("Ok",lang)
-                    });
-                }
-            });
-        }
-
-        function printPdfCoupon(id) {
-            $('#loading').show();
-            $.ajax({
-                url: '/coupon/pdf/' + id,
-                type: 'POST',
-                xhrFields: {
-                    responseType: 'blob' // Important to get the binary data
-                },
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                success: function(blob,data) {
-                    $('#loading').hide();
-
-                    coupon = data.coupon;
-                    if (coupon) {
-
-                        $('#pdid').val(coupon.id);
-                        $('#pdcode').val(coupon.code);
-                        $('#pduses').val(coupon.max);
-                        $('#pddiscount').val(coupon.discount);
-                        $('#pdexpired_date').val(coupon.expired_date.replace(' ', 'T'));
-                        $('#pdstatus').val(coupon.status);
-                    }
-
-                    // Create an object URL from the blob
-                    const url = URL.createObjectURL(blob);
-                    // Set the source of the iframe or embed to display the PDF
-                    $('#pdfPreview').attr('src', url);
-                    $('#printCouponPdfModal').modal('show');
-
-                    // Release the URL when the modal is closed
-                    $('#printCouponPdfModal').on('hidden.bs.modal', function () {
-                        URL.revokeObjectURL(url);
-                        $('#pdfPreview').attr('src', ''); // Clear the src to release memory
-                    });
-                },
-                error: function(xhr, textStatus, errorThrown) {
-                    const response = JSON.parse(xhr.responseText);
-                    $('#loading').hide();
-                    Swal.fire({
-                        icon: response.icon,
-                        title: response.state,
-                        text: response.message,
-                        confirmButtonText: __("Ok", lang)
-                    });
-                }
-            });
-        }
-
-        function editCoupon(id) {
-            $('#loading').show();
-
-            $.ajax({
-                url: '/coupon/' + id,
-                type: 'GET',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                success: function(data) {
-                coupon = data.coupon;
-                $('#id').val(coupon.id);
-                $('#code').val(coupon.code);
-                $('#uses').val(coupon.max);
-                $('#discount').val(coupon.discount);
-                $('#expired_date').val(coupon.expired_date.replace(' ', 'T'));
-                $('#status').val(coupon.status);
-
-                $('#loading').hide();
-                $('#editCouponModal').modal('show');
-                },
-                error: function(xhr, textStatus, errorThrown) {
-                    const response = JSON.parse(xhr.responseText);
-                    $('#loading').hide();
-                    Swal.fire({
-                        icon: response.icon,
-                        title: response.state,
-                        text: response.message,
-                        confirmButtonText: __("Ok",lang)
-                    });
-                }
-            });
-
-        }
-
-        function deleteCoupon(id) {
-            confirmDelete({
-                id: id,
-                url: '/coupon',
-                table: table
-            });
-        }
-
-        function restoreCoupon(id) {
-            confirmRestore({
-                id: id,
-                url: '/coupon',
-                table: table
-            });
-        }
-
-        // function demoProduct(id) {
-        //     window.open("{{ url('view/product') }}/" + id, "_blank");
-        // }
-
-        // function editCoupon(id) {
-        //     window.open("{{ url('view/product') }}/" + id);
-        // }
-
-        function showContextMenu(id, x, y) {
-
-            var contextMenu = $('<ul class="context-menu" dir="{{ app()->isLocale("ar") ? "rtl" : "" }}"></ul>')
-                .append('<li><a onclick="editCoupon(' + id + ')"><i class="tf-icons mdi mdi-pencil-outline {{ app()->isLocale("ar") ? "ms-1" : "me-1" }}"></i>{{ __("Edit") }}</a></li>')
-                .append('<li class="px-0 pe-none"><div class="divider border-top my-0"></div></li>')
-                .append('<li><a onclick="deleteCoupon(' + id + ')"><i class="tf-icons mdi mdi-trash-can-outline {{ app()->isLocale("ar") ? "ms-1" : "me-1" }}"></i>{{ __("Delete") }}</a></li>');
-
-
-            contextMenu.css({
-                top: y,
-                left: x
-            });
-
-
-            $('body').append(contextMenu);
-
-                $(document).on('click', function() {
-                $('.context-menu').remove();
-                });
-        }
-
-    Dropzone.autoDiscover = false;
-    var myDropzone = new Dropzone("#dropzone", {
-        url: "{{ route('coupons.import') }}",
-        autoProcessQueue: false,
-        acceptedFiles: '.xlsx,.xls',
-        maxFilesize: 150, // Max file size in MB
-        maxFiles: 1, // Allow only one file
-        addRemoveLinks: true,
-        parallelUploads: 1, // Only one upload at a time
-        dictDefaultMessage: "{{ __('Drag and drop Excel files here or click to upload') }}",
-        dictMaxFilesExceeded: "{{ __('You can only upload one file.') }}", // Error message when max files exceeded
-        headers: {
-            'X-CSRF-TOKEN': csrfToken
-        }
     });
 
-    // Optional: remove the previous file when a new one is added
-    myDropzone.on("addedfile", function() {
-        if (this.files.length > 1) {
-            this.removeFile(this.files[0]); // Remove the first file to keep only the latest one
+    // User Form Submit
+    $('#userForm').on('submit', function(e) {
+        e.preventDefault();
+        var userId = $('#userId').val();
+        var url = userId ? '/users/' + userId : '/users/create';
+        var method = userId ? 'PUT' : 'POST';
+
+        // For edit, if password is empty, remove it from the form data
+        if (userId && !$('#password').val()) {
+            $('#password').removeAttr('name');
+            $('#password_confirmation').removeAttr('name');
+        } else {
+            $('#password').attr('name', 'password');
+            $('#password_confirmation').attr('name', 'password_confirmation');
         }
-    });
 
-    myDropzone.on("success", function(file, response) {
-    table.ajax.reload();
-    });
-
-    myDropzone.on("error", function(file, errorMessage) {
-        console.error('Error uploading file:', errorMessage);
-    });
-
-    $(document).ready(function() {
-        // $.noConflict();
-            table = $('#table').DataTable({
-                pageLength: 100,
-                language: {
-                    "emptyTable": "<div id='no-data-animation' style='width: 100%; height: 200px;'></div>",
-                    "zeroRecords": "<div id='no-data-animation' style='width: 100%; height: 200px;'></div>"
-                },
-                ajax: {
-                    url: "{{ route('datatabels') }}",
-                    data: function(d) {
-                        d.type = $('#selectType').val();
-                        d.trashed = $('#trash-button').data('trashed');
-                    },
-                    // Start of checkboxes
-                    dataSrc: function(response) {
-                        ids = (response.ids || []).map(id => parseInt(id, 10)); // Ensure all IDs are integers
-                        selectedIds = [];
-                        return response.data;
-                    }
-                // End of checkboxes
-                },
-                columns: [
-                    // Start of checkboxes
-                    {
-                        data: 'id',
-                        name: '#',
-                        orderable: false,
-                        searchable: false,
-                        render: function(data, type, full, meta) {
-                            return '<input type="checkbox" class="form-check-input rounded-2 check-item" value="' + data + '">';
-                        }
-                    },
-                    // End  of checkboxes
-                    {data: 'code', name: '{{__("Code")}}',},
-                    {data: 'discount', name: '{{__("Discount")}}',},
-                    {data: 'max', name: '{{__("Max")}}',},
-                    {data: 'status', name: '{{__("Status")}}',},
-                    {data: 'expired_date', name: '{{__("Expired At")}}',},
-                    {data: 'created_at', name: '{{__("Created At")}}',},
-                    {data: 'actions', name: '{{__("Actions")}}', orderable: false, searchable: false,}
-                ],
-                order: [[6, 'desc']], // Default order by created_at column
-
-                // Start of checkboxes
-
-                // End of checkboxes
-                rowCallback: function(row, data) {
-                    $(row).attr('id', 'coupon_' + data.id);
-
-                    // $(row).on('dblclick', function() {
-                    //     window.location.href = "{{ url('coupon') }}/" + data.id;
-                    // });
-
-                    $(row).on('contextmenu', function(e) {
-                        e.preventDefault();
-                        showContextMenu(data.id, e.pageX, e.pageY);
-                    });
-
-                    // Start of checkboxes
-                    var $checkbox = $(row).find('.check-item');
-                    var couponId = parseInt($checkbox.val());
-
-                    if (selectedIds.includes(couponId)) {
-                        $checkbox.prop('checked', true);
-                    } else {
-                        $checkbox.prop('checked', false);
-                    }
-                    // End of checkboxes
-
-                    $(row).find('td').eq(1).on('dblclick', function() {
-
-                        var cell = $(this);
-
-                        if (cell.find('input').length > 0) {
-                            return; // Exit if already in edit mode
-                        }
-
-                        var originalValue = cell.text();
-                        var input = $('<input>', {
-                            type: 'text',
-                            value: originalValue,
-                            class: 'form-control',
-                            'data-id': data.id
-                        }).css('width', '100%');
-
-                        cell.html(input);
-
-                        input.focus();
-
-                        // Handle Enter key or focus loss
-                        input.on('keypress blur', function(e) {
-                            if (e.type === 'keypress' && e.which !== 13) {
-                                return;
-                            }
-
-                            var newValue = $(this).val();
-
-                            // Only proceed if the value has changed
-                            if (newValue !== originalValue) {
-                                $.ajax({
-                                    url: '/coupon/' + data.id + '/update/code',  // Update with your actual route
-                                    type: 'POST',
-                                    headers: {
-                                        'X-CSRF-TOKEN': csrfToken
-                                    },
-                                    data: { code: newValue },
-                                    success: function(response) {
-                                        cell.text(newValue);
-                                        // show badge success message
-                                        // Swal.fire({
-                                        //     icon: response.icon,
-                                        //     title: response.state,
-                                        //     text: response.message,
-                                        //     confirmButtonText: __("Ok", lang),
-                                        // });
-                                    },
-                                    error: function(xhr) {
-                                        // show badge error message
-                                        const response = JSON.parse(xhr.responseText);
-                                        // Swal.fire({
-                                        //     icon: response.icon,
-                                        //     title: response.state,
-                                        //     text: response.message,
-                                        //     confirmButtonText: __("Ok", lang),
-                                        // });
-                                        cell.text(originalValue); // revert back on error
-                                    }
-                                });
-                            } else {
-                                cell.text(originalValue);
-                            }
-                        });
-                    });
-
-                    $(row).find('td').eq(4).on('dblclick', function() {
-
-                        var cell = $(this);
-
-                        if (cell.find('select').length > 0) {
-                            return; // Exit if already in edit mode
-                        }
-
-                        var originalValue = cell.text();
-                        // Create a select element and add options
-                        var select = $('<select>', {
-                            class: 'form-control',
-                            'data-id': data.id
-                        }).css('width', '100%');
-
-                        // Add options to the select dropdown
-                        var options = [
-                            { value: 'active', text: 'Active' },
-                            { value: 'inactive', text: 'In Active' }
-                        ];
-
-                        // Append each option to the select element
-                        options.forEach(function(option) {
-                            select.append($('<option>', {
-                                value: option.value,
-                                text: option.text,
-                                selected: option.text === originalValue // Select the option if it matches the original value
-                            }));
-                        });
-
-                        cell.html(select);
-                        select.focus();
-
-                        // Handle the select change or blur event
-                        select.on('change blur', function(e) {
-                            var newValue = $(this).val();
-                            var newText = $(this).find('option:selected').text();
-
-                            // Only proceed if the value has changed
-                            if (newText !== originalValue) {
-                                $.ajax({
-                                    url: '/coupon/' + data.id + '/update/status',  // Update with your actual route
-                                    type: 'POST',
-                                    headers: {
-                                        'X-CSRF-TOKEN': csrfToken
-                                    },
-                                    data: { status: newValue },
-                                    success: function(response) {
-                                        cell.text(newValue);
-                                        // show badge success message
-                                        // Swal.fire({
-                                        //     icon: response.icon,
-                                        //     title: response.state,
-                                        //     text: response.message,
-                                        //     confirmButtonText: __("Ok", lang),
-                                        // });
-                                    },
-                                    error: function(xhr) {
-                                        // show badge error message
-                                        const response = JSON.parse(xhr.responseText);
-                                        // Swal.fire({
-                                        //     icon: response.icon,
-                                        //     title: response.state,
-                                        //     text: response.message,
-                                        //     confirmButtonText: __("Ok", lang),
-                                        // });
-                                        cell.text(originalValue); // revert back on error
-                                    }
-                                });
-                            } else {
-                                cell.text(originalValue);
-                            }
-                        });
-                    });
-                },
-                drawCallback: function() {
-                  // Start of checkboxes
-                    $('#check-all').off('click').on('click', function() { // Unbind previous event and bind a new one
-                        $('.check-item').prop('checked', this.checked);
-                        var totalCheckboxes = ids.length;
-                        var checkedCheckboxes = selectedIds.length;
-
-                        if (checkedCheckboxes === 0 || checkedCheckboxes < totalCheckboxes) { // if new all checked or some checked
-                            selectedIds = [];
-                            selectedIds = ids.slice();
-                        } else {
-                            selectedIds = [];
-                        }
-                    });
-
-                    $('.check-item').on('change', function() {
-                        var itemId = parseInt($(this).val());
-
-                        if (this.checked) { // if new checked add to selected
-                            selectedIds.push(itemId);
-                        } else { // if remove checked remove from selected
-                            selectedIds = selectedIds.filter(id => id !== itemId);
-                        }
-
-                        var totalCheckboxes = ids.length;
-                        var checkedCheckboxes = selectedIds.length;
-                        if (checkedCheckboxes === totalCheckboxes) { // all checkboxes checked
-                            $('#check-all').prop('checked', true).prop('indeterminate', false);
-                            selectedIds = ids.slice();
-                        } else if (checkedCheckboxes > 0) { // not all checkboxes are checked
-                            $('#check-all').prop('checked', false).prop('indeterminate', true);
-                        } else {  // all checkboxes are not checked
-                            $('#check-all').prop('checked', false).prop('indeterminate', false);
-                            selectedIds = [];
-                        }
-                    });
-                  // End of checkboxes
-                }
-
-            });
-
-            // Initialize Components
-            initLengthChange(table);
-            initSearchFilter(table);
-            initTypeChange(table);
-            initTrashButton(table);
-            // initPagination(table);
-            initColumnVisibilityToggle(table);
-
-            // Table draw event for sorting icons and pagination updates
-            table.on('draw', function () {
-                handlePagination(table);
-                updateSortingIcons(table);
-                updateInfoText(table);
-            });
-
-            $('#createCouponForm').submit(function(event) {
-                event.preventDefault();
-                $('#createCouponModal').modal('hide');
-                
-                if (!$(this).valid()) {
-                    $('#createCouponModal').modal('show');
-                    return;
-                }
-                $('#loading').show();
-
-                var formData = $(this).serialize();
-
-
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: $(this).attr('method'),
-                    data: formData,
-                    dataType: 'json',
-                    success: function(response) {
-                        $('#loading').hide();
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.state,
-                            text: response.message,
-                            confirmButtonText: __("Ok",lang)
-                        });
-                        $('#createCouponForm')[0].reset();
-                        $('#createCouponForm .form-control').removeClass('valid');
-                        $('#createCouponForm .form-select').removeClass('valid');
-                        table.ajax.reload();
-                    },
-                    error: function(xhr, textStatus, errorThrown) {
-                        $('#loading').hide();
-                        const response = JSON.parse(xhr.responseText);
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.state,
-                            text: response.message,
-                            confirmButtonText: __("Ok",lang)
-                        });
-                    }
-                });
-            });
-
-            $('#editCouponForm').submit(function(event) {
-                event.preventDefault();
-
-                var formData = $(this).serialize();
-
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: $(this).attr('method'),
-                    data: formData,
-                    dataType: 'json',
-                    success: function(response) {
-                    Swal.fire({
-                        icon: response.icon,
-                        title: response.state,
-                        text: response.message,
-                        confirmButtonText: __("Ok",lang)
-                    });
-                    table.ajax.reload();
-                    },
-                    error: function(xhr, textStatus, errorThrown) {
-                    const response = JSON.parse(xhr.responseText);
-                    Swal.fire({
-                        icon: response.icon,
-                        title: response.state,
-                        text: response.message,
-                        confirmButtonText: __("Ok",lang)
-                    });
-                    }
-                });
-            });
-
-            $('#uploadCouponForm').click(function(event) {
-                if (myDropzone.getQueuedFiles().length > 0) {
-                    myDropzone.processQueue();
-                } else {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: __("Error",lang),
-                        text: __("No files to upload",lang),
-                        confirmButtonText: __("Ok",lang)
-                    });
-                }
-            });
-
-            $('.generate-code').click(function(event) {
-                event.preventDefault(); // Prevent default button behavior
-
-                $.ajax({
-                    url: "{{ route('coupons.generate') }}",
-                    type: 'GET',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    success: function(response) {
-                        if (response.code) {
-                            $('#code').val(response.code);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error generating code:', error);
-                    }
-                });
-            });
-
-            // Initialize ClipboardJS
-            var clipboard = new ClipboardJS('.copy-code');
-
-            // Success feedback
-            clipboard.on('success', function (e) {
-                const icon = $(e.trigger).find('span.my-copy');
-                const icon1 = $(e.trigger).find('span.my-doubletick');
-                icon.addClass('d-none');
-                icon1.removeClass('d-none');
-
-                // icon.removeClass('my-copy').addClass('my-doubletick');
-                setTimeout(() => {
-                    icon.removeClass('d-none');
-                    icon1.addClass('d-none');
-                    // icon.removeClass('my-doubletick').addClass('my-copy');
-                }, 2000);
-
-                console.log('Copied:', e.text);
-            });
-
-            // Error feedback
-            clipboard.on('error', function (e) {
-                console.error('Copy failed:', e.action); // Log error
-            });
-
-            
-            var channel = pusher.subscribe('coupons');
-            channel.bind('couponsEdited', function(data) {
+        $.ajax({
+            url: url,
+            type: method,
+            data: $(this).serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#userModal').addClass('hidden').removeClass('flex');
+                showNotification(userId ? 'تم تحديث المستخدم بنجاح' : 'تم إضافة المستخدم بنجاح', 'success');
                 table.ajax.reload();
-            });
+            },
+            error: function(xhr) {
+                // Restore password fields if they were removed
+                $('#password').attr('name', 'password');
+                $('#password_confirmation').attr('name', 'password_confirmation');
+
+                var errors = xhr.responseJSON.errors;
+                var errorMessage = 'حدث خطأ أثناء حفظ المستخدم';
+
+                if (errors) {
+                    var firstError = Object.values(errors)[0];
+                    if (firstError && firstError[0]) {
+                        errorMessage = firstError[0];
+                    }
+                }
+
+                showNotification(errorMessage, 'error');
+            }
+        });
     });
 
-</script>
+    // Close User Modal
+    $('#closeUserModalBtn, #cancelUserBtn').on('click', function() {
+        $('#userModal').addClass('hidden').removeClass('flex');
+    });
 
+    // Delete User Modal
+    $(document).on('click', '.delete-user-btn', function() {
+        var userId = $(this).data('id');
+        var userName = $(this).data('full_name');
+        var deleteUrl = $(this).data('url');
+
+        $('#deleteUserName').text(userName);
+        $('#deleteUserModal').removeClass('hidden').addClass('flex');
+
+        $('#confirmDeleteUserBtn').off('click').on('click', function() {
+            $.ajax({
+                url: deleteUrl,
+                type: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    $('#deleteUserModal').addClass('hidden').removeClass('flex');
+                    showNotification('تم حذف المستخدم بنجاح', 'success');
+                    table.ajax.reload();
+                },
+                error: function(xhr) {
+                    $('#deleteUserModal').addClass('hidden').removeClass('flex');
+                    showNotification('حدث خطأ أثناء حذف المستخدم', 'error');
+                }
+            });
+        });
+    });
+
+    $('#cancelDeleteUserBtn').on('click', function() {
+        $('#deleteUserModal').addClass('hidden').removeClass('flex');
+    });
+
+    // Close modals when clicking outside
+    $(document).on('click', function(e) {
+        if ($(e.target).is('#userModal')) {
+            $('#userModal').addClass('hidden').removeClass('flex');
+        }
+        if ($(e.target).is('#deleteUserModal')) {
+            $('#deleteUserModal').addClass('hidden').removeClass('flex');
+        }
+    });
+
+    // Also close modals when pressing Escape key
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            $('#userModal').addClass('hidden').removeClass('flex');
+            $('#deleteUserModal').addClass('hidden').removeClass('flex');
+        }
+    });
+
+    // Notification function
+    function showNotification(message, type) {
+        var notification = $(`
+            <div class="fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} transition-opacity duration-300">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-${type === 'success' ? 'check-circle' : 'alert-circle'} w-5 h-5 ml-2">
+                        ${type === 'success' ?
+                            '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>' :
+                            '<circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line>'
+                        }
+                    </svg>
+                    <span>${message}</span>
+                </div>
+            </div>
+        `);
+
+        $('body').append(notification);
+
+        // Auto remove after 3 seconds
+        setTimeout(function() {
+            notification.fadeOut(300, function() {
+                $(this).remove();
+            });
+        }, 3000);
+    }
+});
+</script>
 @endsection

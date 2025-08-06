@@ -95,14 +95,14 @@
             <form id="createTypeForm" action="{{ route('types.create') }}" method="POST">
                 @csrf
                 <div class="mb-4">
-                    <label for="typeName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم النوع</label>
-                    <input type="text" id="typeName" name="name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم النوع">
+                    <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم النوع</label>
+                    <input type="text" id="name" name="name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم النوع">
                 </div>
                 <div class="flex justify-center flex-row-reverse space-x-4">
                     <button type="button" id="cancelCreateBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
                         إلغاء
                     </button>
-                    <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+                    <button type="submit" class="flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
                         حفظ
                     </button>
                 </div>
@@ -124,17 +124,19 @@
                     </svg>
                 </button>
             </div>
-            <form id="editTypeForm" >
-                <input type="hidden" id="editTypeId" name="id">
+            <form id="editTypeForm" method="POST">
+                @csrf
+                @method('PUT')
+                <input type="hidden" id="edit_id" name="id">
                 <div class="mb-4">
-                    <label for="editTypeName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم النوع</label>
-                    <input type="text" id="editTypeName" name="name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم النوع">
+                    <label for="edit_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم النوع</label>
+                    <input type="text" id="edit_name" name="name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم النوع">
                 </div>
                 <div class="flex justify-center flex-row-reverse space-x-4">
                     <button type="button" id="cancelEditBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
                         إلغاء
                     </button>
-                    <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+                    <button type="submit" class="flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
                         حفظ التغييرات
                     </button>
                 </div>
@@ -414,10 +416,30 @@ $(document).ready(function() {
     $('#createTypeForm').on('submit', function(e) {
         e.preventDefault();
 
+        var formData = new FormData(this);
+
+        var form = $(this);
+        var submitButton = form.find('button[type="submit"]');
+        var nameInput = form.find('#name');
+        var originalButtonText = submitButton.html();
+
+        nameInput.prop('disabled', true);
+        submitButton.prop('disabled', true);
+        submitButton.html(`
+            <svg class="animate-spin ml-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            جاري الحفظ...
+        `);
+
+
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
-            data: $(this).serialize(),
+            data: formData,
+            processData: false,
+            contentType: false,
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
@@ -435,17 +457,22 @@ $(document).ready(function() {
                 }
 
                 showNotification(errorMessage, 'error');
+            },
+            complete: function() {
+                nameInput.prop('disabled', false);
+                submitButton.prop('disabled', false);
+                submitButton.html(originalButtonText);
             }
         });
     });
 
     // Edit Type Modal
     $(document).on('click', '.edit-type-btn', function() {
-        var typeId = $(this).data('id');
-        var typeName = $(this).data('name');
+        var id = $(this).data('id');
+        var name = $(this).data('name');
 
-        $('#editTypeId').val(typeId);
-        $('#editTypeName').val(typeName);
+        $('#edit_id').val(id);
+        $('#edit_name').val(name);
         $('#editTypeModal').removeClass('hidden').addClass('flex');
     });
 
@@ -456,12 +483,33 @@ $(document).ready(function() {
     // Edit Type Form Submit
     $('#editTypeForm').on('submit', function(e) {
         e.preventDefault();
-        var typeId = $('#editTypeId').val();
+        var formData = new FormData(this);
+
+
+        var id = $('#edit_id').val();
+        var form = $(this);
+        var submitButton = form.find('button[type="submit"]');
+        var nameInput = form.find('#edit_name');
+        var originalButtonText = submitButton.html();
+
+        // 禁用输入和按钮
+        nameInput.prop('disabled', true);
+        submitButton.prop('disabled', true);
+        submitButton.html(`
+            <svg class="animate-spin ml-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            جاري الحفظ...
+        `);
+
 
         $.ajax({
-            url: '/types/' + typeId,
-            type: 'PUT',
-            data: $(this).serialize(),
+            url: '/types/' + id,
+            type: $(this).attr('method'),
+            data: formData,
+            processData: false,
+            contentType: false,
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
@@ -479,17 +527,22 @@ $(document).ready(function() {
                 }
 
                 showNotification(errorMessage, 'error');
+            },
+            complete: function() {
+                nameInput.prop('disabled', false);
+                submitButton.prop('disabled', false);
+                submitButton.html(originalButtonText);
             }
         });
     });
 
     // Delete Type Modal
     $(document).on('click', '.delete-type-btn', function() {
-        var typeId = $(this).data('id');
-        var typeName = $(this).data('name');
+        var id = $(this).data('id');
+        var name = $(this).data('name');
         var deleteUrl = $(this).data('url');
 
-        $('#deleteTypeName').text(typeName);
+        $('#deleteTypeName').text(name);
         $('#deleteTypeModal').removeClass('hidden').addClass('flex');
 
         $('#confirmDeleteTypeBtn').off('click').on('click', function() {

@@ -25,15 +25,15 @@ class EmployeeController extends Controller {
     }
 
     public function create(EmployeeRequest $request) {
-        return $this->success(new EmployeeResource($this->EmployeeService->createEmployee($request->validated())), __('Created Successfully.'));
+        return $this->success(new EmployeeResource($this->EmployeeService->createEmployee($request->validated())), 'تم الإنشاء بنجاح');
     }
 
     public function update(EmployeeRequest $request, $id) {
-        return $this->success(new EmployeeResource($this->EmployeeService->updateEmployee($id, $request->validated())), __('Updated Successfully.'));
+        return $this->success(new EmployeeResource($this->EmployeeService->updateEmployee($id, $request->validated())), 'تم التحديث بنجاح');
     }
 
     public function delete($id) {
         $this->EmployeeService->deleteEmployee($id);
-        return $this->success(null, __('Deleted Successfully.'));
+        return $this->success(null, 'تم الحذف بنجاح');
     }
 }

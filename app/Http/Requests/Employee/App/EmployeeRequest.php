@@ -10,4 +10,11 @@ class EmployeeRequest extends FormRequest {
             'full_name' => 'required|string',
         ];
     }
+
+    public function messages() {
+        return [
+            'full_name.required' => 'حقل الاسم مطلوب',
+            'full_name.string' => 'حقل الاسم يجب أن يكون نصاً',
+        ];
+    }
 }

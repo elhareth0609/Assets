@@ -64,9 +64,14 @@
                 </div>
 
                 <div class="flex items-center justify-end mt-6">
-                    <button type="submit" class="inline-flex w-full items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-10 px-4 text-sm">
-                        تسجيل الدخول
-                    </button>
+                        <button type="submit" class="inline-flex w-full items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-10 px-4 text-sm">
+                            <span class="button-text">تسجيل الدخول</span>
+                            <svg class="animate-spin ml-3 h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </button>
+
                 </div>
             </form>
         </div>
@@ -74,31 +79,65 @@
 
 <script>
 $(document).ready(function() {
-    $('#loginForm').submit(function(event) {
-        event.preventDefault();
+    const form = $('#loginForm');
+    const submitButton = form.find('button[type="submit"]');
+    const buttonText = submitButton.find('.button-text');
+    const loadingSpinner = submitButton.find('svg');
+    const inputs = form.find('input');
 
-        $('#loading').show();
-        var formData = $(this).serialize();
+    form.submit(function(event) {
+        event.preventDefault();
+        
+        var formData = new FormData(this);
+        // 禁用输入和按钮
+        inputs.prop('disabled', true);
+        submitButton.prop('disabled', true);
+        buttonText.addClass('hidden');
+        loadingSpinner.removeClass('hidden');
 
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
             data: formData,
-            success: function(response) {
-                $('#loading').hide();
-                window.location.href = ("{{ route('home') }}");
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            error: function(xhr, textStatus, errorThrown) {
-                $('#loading').hide();
-                const response = JSON.parse(xhr.responseText);
-                if ($('#error-alert').hasClass('d-none')) {
-                    $('#error-alert').removeClass('d-none').text(response.message);
-                } else {
-                    $('#error-alert').text(response.message);
-                }
+            success: function(response) {
+                showNotification('success', 'تم تسجيل الدخول بنجاح');
+                setTimeout(function() {
+                    window.location.href = "{{ route('home') }}";
+                }, 1500);
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                showNotification('error', response.message || 'فشل تسجيل الدخول');
+                resetForm();
             }
-            });
+        });
     });
+
+    function resetForm() {
+        inputs.prop('disabled', false);
+        submitButton.prop('disabled', false);
+        buttonText.removeClass('hidden');
+        loadingSpinner.addClass('hidden');
+    }
+
+    function showNotification(type, message) {
+        const notification = $(`
+            <div class="fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white">
+                ${message}
+            </div>
+        `);
+
+        $('body').append(notification);
+
+        setTimeout(function() {
+            notification.remove();
+        }, 3000);
+    }
 });
 </script>
 @endsection

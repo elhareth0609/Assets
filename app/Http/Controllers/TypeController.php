@@ -25,15 +25,15 @@ class TypeController extends Controller {
     }
 
     public function create(TypeRequest $request) {
-        return $this->success(new TypeResource($this->TypeService->createType($request->validated())), __('Created Successfully.'));
+        return $this->success(new TypeResource($this->TypeService->createType($request->validated())), 'تم الإنشاء بنجاح');
     }
 
     public function update(TypeRequest $request, $id) {
-        return $this->success(new TypeResource($this->TypeService->updateType($id, $request->validated())), __('Updated Successfully.'));
+        return $this->success(new TypeResource($this->TypeService->updateType($id, $request->validated())), 'تم التحديث بنجاح');
     }
 
     public function delete($id) {
         $this->TypeService->deleteType($id);
-        return $this->success(null, __('Deleted Successfully.'));
+        return $this->success(null, 'تم الحذف بنجاح');
     }
 }
