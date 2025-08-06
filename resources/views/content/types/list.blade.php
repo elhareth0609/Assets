@@ -16,7 +16,7 @@
             </button>
         </div>
     </div>
-    
+
     <!-- Search Section -->
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
         <div class="p-6">
@@ -45,7 +45,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Table Section -->
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
         <div class="p-0 m-0">
@@ -56,6 +56,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>اسم النوع</th>
+                                <th>عدد الأصول</th>
                                 <th>الإجراءات</th>
                             </tr>
                         </thead>
@@ -295,6 +296,7 @@ $(document).ready(function() {
         columns: [
             { data: 'id', name: 'id', title: 'المعرف' },
             { data: 'name', name: 'name', title: 'اسم النوع' },
+            { data: 'asset_count', name: 'asset_count', title: 'عدد الأصول' },
             { data: 'action', name: 'action', title: 'الإجراءات', orderable: false, searchable: false }
         ],
         order: [[0, 'desc']],
@@ -306,7 +308,7 @@ $(document).ready(function() {
             updateCustomInfo(settings);
         }
     });
-    
+
     // Apply Tailwind styles function
     function applyTailwindStyles() {
         $(".dataTables_wrapper").addClass("space-y-4");
@@ -317,7 +319,7 @@ $(document).ready(function() {
         $("#types-table tbody td").addClass("p-4 align-middle text-slate-900 dark:text-slate-300");
         $("#types-table thead th").addClass("h-12 px-4 ltr:text-left rtl:text-right align-middle font-medium text-slate-500 dark:text-slate-400");
     }
-    
+
     // Update custom info and pagination
     function updateCustomInfo(settings) {
         var api = new $.fn.dataTable.Api(settings);
@@ -327,12 +329,12 @@ $(document).ready(function() {
         // Update pagination
         updateCustomPagination(info, api);
     }
-    
+
     function updateCustomPagination(info, api) {
         var pagination = $('#custom-pagination');
         pagination.empty();
         if (info.pages <= 1) return;
-        
+
         // Previous button
         var prevBtn = $(`
             <div class="relative group inline-block">
@@ -348,7 +350,7 @@ $(document).ready(function() {
             prevBtn.find('button').on('click', function() { api.page('previous').draw('page'); });
         }
         pagination.append(prevBtn);
-        
+
         // Page numbers
         var startPage = Math.max(0, info.page - 2);
         var endPage = Math.min(info.pages - 1, info.page + 2);
@@ -363,7 +365,7 @@ $(document).ready(function() {
             }
             pagination.append(pageBtn);
         }
-        
+
         // Next button
         var nextBtn = $(`
             <div class="relative group inline-block">
@@ -380,38 +382,38 @@ $(document).ready(function() {
         }
         pagination.append(nextBtn);
     }
-    
+
     // Event Handlers
     $('#apply-search-btn').on('click', function() {
         table.ajax.reload();
     });
-    
+
     // Custom search with debounce
     $('#dataTables_my_filter').on('input', function () {
         var query = $(this).val();
         table.search(query).draw();
     });
-    
+
     // Custom length change
     $('#dataTables_my_length').change(function () {
         var selectedValue = $(this).val();
         table.page.len(selectedValue).draw();
     });
-    
+
     // Create Type Modal
     $('#create-type-btn').on('click', function() {
         $('#createTypeModal').removeClass('hidden').addClass('flex');
         $('#createTypeForm')[0].reset();
     });
-    
+
     $('#closeCreateModalBtn, #cancelCreateBtn').on('click', function() {
         $('#createTypeModal').addClass('hidden').removeClass('flex');
     });
-    
+
     // Create Type Form Submit
     $('#createTypeForm').on('submit', function(e) {
         e.preventDefault();
-        
+
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
@@ -427,35 +429,35 @@ $(document).ready(function() {
             error: function(xhr) {
                 var errors = xhr.responseJSON.errors;
                 var errorMessage = 'حدث خطأ أثناء إضافة النوع';
-                
+
                 if (errors && errors.name) {
                     errorMessage = errors.name[0];
                 }
-                
+
                 showNotification(errorMessage, 'error');
             }
         });
     });
-    
+
     // Edit Type Modal
     $(document).on('click', '.edit-type-btn', function() {
         var typeId = $(this).data('id');
         var typeName = $(this).data('name');
-        
+
         $('#editTypeId').val(typeId);
         $('#editTypeName').val(typeName);
         $('#editTypeModal').removeClass('hidden').addClass('flex');
     });
-    
+
     $('#closeEditModalBtn, #cancelEditBtn').on('click', function() {
         $('#editTypeModal').addClass('hidden').removeClass('flex');
     });
-    
+
     // Edit Type Form Submit
     $('#editTypeForm').on('submit', function(e) {
         e.preventDefault();
         var typeId = $('#editTypeId').val();
-        
+
         $.ajax({
             url: '/types/' + typeId,
             type: 'PUT',
@@ -471,25 +473,25 @@ $(document).ready(function() {
             error: function(xhr) {
                 var errors = xhr.responseJSON.errors;
                 var errorMessage = 'حدث خطأ أثناء تحديث النوع';
-                
+
                 if (errors && errors.name) {
                     errorMessage = errors.name[0];
                 }
-                
+
                 showNotification(errorMessage, 'error');
             }
         });
     });
-    
+
     // Delete Type Modal
     $(document).on('click', '.delete-type-btn', function() {
         var typeId = $(this).data('id');
         var typeName = $(this).data('name');
         var deleteUrl = $(this).data('url');
-        
+
         $('#deleteTypeName').text(typeName);
         $('#deleteTypeModal').removeClass('hidden').addClass('flex');
-        
+
         $('#confirmDeleteTypeBtn').off('click').on('click', function() {
             $.ajax({
                 url: deleteUrl,
@@ -509,11 +511,11 @@ $(document).ready(function() {
             });
         });
     });
-    
+
     $('#cancelDeleteTypeBtn').on('click', function() {
         $('#deleteTypeModal').addClass('hidden').removeClass('flex');
     });
-    
+
     // Close modals when clicking outside
     $(document).on('click', function(e) {
         if ($(e.target).is('#createTypeModal')) {
@@ -526,7 +528,7 @@ $(document).ready(function() {
             $('#deleteTypeModal').addClass('hidden').removeClass('flex');
         }
     });
-    
+
     // Also close modals when pressing Escape key
     $(document).on('keydown', function(e) {
         if (e.key === 'Escape') {
@@ -535,15 +537,15 @@ $(document).ready(function() {
             $('#deleteTypeModal').addClass('hidden').removeClass('flex');
         }
     });
-    
+
     // Notification function
     function showNotification(message, type) {
         var notification = $(`
             <div class="fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} transition-opacity duration-300">
                 <div class="flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-${type === 'success' ? 'check-circle' : 'alert-circle'} w-5 h-5 ml-2">
-                        ${type === 'success' ? 
-                            '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>' : 
+                        ${type === 'success' ?
+                            '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>' :
                             '<circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line>'
                         }
                     </svg>
@@ -551,9 +553,9 @@ $(document).ready(function() {
                 </div>
             </div>
         `);
-        
+
         $('body').append(notification);
-        
+
         // Auto remove after 3 seconds
         setTimeout(function() {
             notification.fadeOut(300, function() {

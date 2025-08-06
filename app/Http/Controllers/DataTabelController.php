@@ -518,7 +518,7 @@ class DataTabelController extends Controller {
     public function types(Request $request)
     {
         $query = Type::query()->select(['id', 'name', 'created_at']);
-        
+
         // Handle search
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
@@ -527,12 +527,15 @@ class DataTabelController extends Controller {
                 ->orWhere('id', 'like', "%{$search}%");
             });
         }
-        
+
         if ($request->ajax()) {
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->editColumn('name', function ($type) {
                     return '<strong class="text-slate-900 dark:text-slate-300">'.$type->name.'</strong>';
+                })
+                ->addColumn('asset_count', function ($type) {
+                    return $type->assets->count();
                 })
                 ->addColumn('action', function($type){
                     $actions = '';
@@ -570,14 +573,14 @@ class DataTabelController extends Controller {
                 ->rawColumns(['action', 'name'])
                 ->make(true);
         }
-        
+
         return view('content.types.list');
     }
 
-    public function locations(Request  $request) 
+    public function locations(Request  $request)
     {
         $query = Location::query()->select(['id', 'name', 'created_at']);
-        
+
         // Handle search
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
@@ -586,7 +589,7 @@ class DataTabelController extends Controller {
                 ->orWhere('id', 'like', "%{$search}%");
             });
         }
-        
+
         if ($request->ajax()) {
             return DataTables::of($query)
                 ->addIndexColumn()
@@ -629,14 +632,14 @@ class DataTabelController extends Controller {
                 ->rawColumns(['action', 'name'])
                 ->make(true);
         }
-        
+
         return view('content.locations.list');
     }
 
-    public function employees(Request  $request) 
+    public function employees(Request  $request)
     {
         $query = Employee::query()->select(['id', 'full_name', 'created_at']);
-        
+
         // Handle search
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
@@ -645,7 +648,7 @@ class DataTabelController extends Controller {
                 ->orWhere('id', 'like', "%{$search}%");
             });
         }
-        
+
         if ($request->ajax()) {
             return DataTables::of($query)
                 ->addIndexColumn()
@@ -688,155 +691,154 @@ class DataTabelController extends Controller {
                 ->rawColumns(['action', 'full_name'])
                 ->make(true);
         }
-        
+
         return view('content.employees.list');
     }
 
-    public function depreciationEntries(Request $request)
-{
-    $query = DepreciationEntry::with('asset')->select('*');
-    
-    // Handle year filter
-    $selectedYear = $request->get('year', date('Y'));
-    if ($selectedYear) {
-        $query->where('depreciation_year', $selectedYear);
-    }
-    
-    // Handle asset filter
-    if ($request->has('asset_id') && $request->asset_id != '') {
-        $query->where('asset_id', $request->asset_id);
-    }
-    
-    // Handle search
-    if ($request->has('search') && $request->search != '') {
-        $search = $request->search;
-        $query->where(function($q) use ($search) {
-            $q->where('entry_number', 'like', "%{$search}%")
-              ->orWhere('description', 'like', "%{$search}%")
-              ->orWhere('classification', 'like', "%{$search}%")
-              ->orWhereHas('asset', function($assetQuery) use ($search) {
-                  $assetQuery->where('name', 'like', "%{$search}%")
-                             ->orWhere('number', 'like', "%{$search}%");
-              });
-        });
-    }
-    
-    $entries = $query->orderBy('entry_number', 'asc')->get();
-    
-    if ($request->ajax()) {
-        return DataTables::of($entries)
-            ->addIndexColumn()
-            ->editColumn('entry_number', function ($entry) {
-                return '<span class="font-mono text-slate-800 dark:text-slate-300">'.$entry->entry_number.'</span>';
-            })
-            ->editColumn('date', function ($entry) {
-                return $entry->date ?
-                    '<span class="text-slate-600 dark:text-slate-400 text-sm">'.date('d/m/Y', strtotime($entry->date)).'</span>' :
-                    '<span class="text-slate-400 dark:text-slate-500 text-sm">-</span>';
-            })
-            ->editColumn('description', function ($entry) {
-                return '<span class="text-slate-800 dark:text-slate-300">'.$entry->description.'</span>';
-            })
-            ->editColumn('depreciation_rate', function ($entry) {
-                return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->depreciation_rate, 2).'%</span>';
-            })
-            ->editColumn('depreciation_start_date', function ($entry) {
-                return $entry->depreciation_start_date ?
-                    '<span class="text-slate-600 dark:text-slate-400 text-sm">'.date('d/m/Y', strtotime($entry->depreciation_start_date)).'</span>' :
-                    '<span class="text-slate-400 dark:text-slate-500 text-sm">-</span>';
-            })
-            ->editColumn('depreciation_year', function ($entry) {
-                return '<span class="font-mono text-slate-800 dark:text-slate-300">'.$entry->depreciation_year.'</span>';
-            })
-            ->editColumn('days_count', function ($entry) {
-                return '<span class="font-mono text-slate-800 dark:text-slate-300">'.$entry->days_count.'</span>';
-            })
-            ->editColumn('purchase_cost', function ($entry) {
-                return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->purchase_cost, 2).'</span>';
-            })
-            ->editColumn('additions', function ($entry) {
-                return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->additions, 2).'</span>';
-            })
-            ->editColumn('exclusions', function ($entry) {
-                return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->exclusions, 2).'</span>';
-            })
-            ->editColumn('asset_cost_at_end', function ($entry) {
-                return '<span class="font-mono text-slate-800 dark:text-slate-300 font-semibold">'.number_format($entry->asset_cost_at_end, 2).'</span>';
-            })
-            ->editColumn('accumulated_depreciation_at_start', function ($entry) {
-                return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->accumulated_depreciation_at_start, 2).'</span>';
-            })
-            ->editColumn('current_year_depreciation', function ($entry) {
-                return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->current_year_depreciation, 2).'</span>';
-            })
-            ->editColumn('excluded_depreciation', function ($entry) {
-                return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->excluded_depreciation, 2).'</span>';
-            })
-            ->editColumn('accumulated_depreciation_at_end', function ($entry) {
-                return '<span class="font-mono text-slate-800 dark:text-slate-300 font-semibold">'.number_format($entry->accumulated_depreciation_at_end, 2).'</span>';
-            })
-            ->editColumn('net_book_value', function ($entry) {
-                return '<span class="font-mono text-slate-800 dark:text-slate-300 font-semibold">'.number_format($entry->net_book_value, 2).'</span>';
-            })
-            ->editColumn('classification', function ($entry) {
-                return '<span class="text-slate-600 dark:text-slate-400">'.$entry->classification.'</span>';
-            })
-            ->addColumn('action', function($entry){
-                $actions = '<div class="relative group inline-block">
-                    <button type="button"
-                        data-id="'.$entry->id.'"
-                        class="edit-entry-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit w-4 h-4">
-                                <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
-                                <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
-                                <path d="m16 5 3 3"></path>
-                            </svg>
-                    </button>
-                    <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">تعديل</div>
-                </div>';
-                $actions .= '<div class="relative group inline-block">
-                    <button type="button"
-                        class="delete-entry-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                        data-id="'.$entry->id.'"
-                        data-url="'.route('depreciation-entries.delete', $entry->id).'">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2 w-4 h-4">
-                            <path d="M3 6h18"></path>
-                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                            <line x1="10" x2="10" y1="11" y2="17"></line>
-                            <line x1="14" x2="14" y1="11" y2="17"></line>
-                            </svg>
+    public function depreciationEntries(Request $request) {
+        $query = DepreciationEntry::with('asset')->select('*');
+
+        // Handle year filter
+        $selectedYear = $request->get('year', date('Y'));
+        if ($selectedYear) {
+            $query->where('depreciation_year', $selectedYear);
+        }
+
+        // Handle asset filter
+        if ($request->has('asset_id') && $request->asset_id != '') {
+            $query->where('asset_id', $request->asset_id);
+        }
+
+        // Handle search
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('entry_number', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%")
+                ->orWhere('classification', 'like', "%{$search}%")
+                ->orWhereHas('asset', function($assetQuery) use ($search) {
+                    $assetQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('number', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $entries = $query->orderBy('entry_number', 'asc')->get();
+
+        if ($request->ajax()) {
+            return DataTables::of($entries)
+                ->addIndexColumn()
+                ->editColumn('entry_number', function ($entry) {
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300">'.$entry->entry_number.'</span>';
+                })
+                ->editColumn('date', function ($entry) {
+                    return $entry->date ?
+                        '<span class="text-slate-600 dark:text-slate-400 text-sm">'.date('d/m/Y', strtotime($entry->date)).'</span>' :
+                        '<span class="text-slate-400 dark:text-slate-500 text-sm">-</span>';
+                })
+                ->editColumn('description', function ($entry) {
+                    return '<span class="text-slate-800 dark:text-slate-300">'.$entry->description.'</span>';
+                })
+                ->editColumn('depreciation_rate', function ($entry) {
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->depreciation_rate, 2).'%</span>';
+                })
+                ->editColumn('depreciation_start_date', function ($entry) {
+                    return $entry->depreciation_start_date ?
+                        '<span class="text-slate-600 dark:text-slate-400 text-sm">'.date('d/m/Y', strtotime($entry->depreciation_start_date)).'</span>' :
+                        '<span class="text-slate-400 dark:text-slate-500 text-sm">-</span>';
+                })
+                ->editColumn('depreciation_year', function ($entry) {
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300">'.$entry->depreciation_year.'</span>';
+                })
+                ->editColumn('days_count', function ($entry) {
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300">'.$entry->days_count.'</span>';
+                })
+                ->editColumn('purchase_cost', function ($entry) {
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->purchase_cost, 2).'</span>';
+                })
+                ->editColumn('additions', function ($entry) {
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->additions, 2).'</span>';
+                })
+                ->editColumn('exclusions', function ($entry) {
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->exclusions, 2).'</span>';
+                })
+                ->editColumn('asset_cost_at_end', function ($entry) {
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300 font-semibold">'.number_format($entry->asset_cost_at_end, 2).'</span>';
+                })
+                ->editColumn('accumulated_depreciation_at_start', function ($entry) {
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->accumulated_depreciation_at_start, 2).'</span>';
+                })
+                ->editColumn('current_year_depreciation', function ($entry) {
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->current_year_depreciation, 2).'</span>';
+                })
+                ->editColumn('excluded_depreciation', function ($entry) {
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300">'.number_format($entry->excluded_depreciation, 2).'</span>';
+                })
+                ->editColumn('accumulated_depreciation_at_end', function ($entry) {
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300 font-semibold">'.number_format($entry->accumulated_depreciation_at_end, 2).'</span>';
+                })
+                ->editColumn('net_book_value', function ($entry) {
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300 font-semibold">'.number_format($entry->net_book_value, 2).'</span>';
+                })
+                ->editColumn('classification', function ($entry) {
+                    return '<span class="text-slate-600 dark:text-slate-400">'.$entry->classification.'</span>';
+                })
+                ->addColumn('action', function($entry){
+                    $actions = '<div class="relative group inline-block">
+                        <button type="button"
+                            data-id="'.$entry->id.'"
+                            class="edit-entry-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit w-4 h-4">
+                                    <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
+                                    <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
+                                    <path d="m16 5 3 3"></path>
+                                </svg>
                         </button>
-                    <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">حذف</div>
-                </div>';
-                return '<div class="flex ltr:justify-end rtl:justify-start gap-1">'.$actions.'</div>';
-            })
-            ->rawColumns(['action', 'entry_number', 'date', 'description', 'depreciation_rate', 'depreciation_start_date', 'depreciation_year', 'days_count', 'purchase_cost', 'additions', 'exclusions', 'asset_cost_at_end', 'accumulated_depreciation_at_start', 'current_year_depreciation', 'excluded_depreciation', 'accumulated_depreciation_at_end', 'net_book_value', 'classification'])
-            ->make(true);
+                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">تعديل</div>
+                    </div>';
+                    $actions .= '<div class="relative group inline-block">
+                        <button type="button"
+                            class="delete-entry-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                            data-id="'.$entry->id.'"
+                            data-url="'.route('depreciation-entries.delete', $entry->id).'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2 w-4 h-4">
+                                <path d="M3 6h18"></path>
+                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                <line x1="10" x2="10" y1="11" y2="17"></line>
+                                <line x1="14" x2="14" y1="11" y2="17"></line>
+                                </svg>
+                            </button>
+                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">حذف</div>
+                    </div>';
+                    return '<div class="flex ltr:justify-end rtl:justify-start gap-1">'.$actions.'</div>';
+                })
+                ->rawColumns(['action', 'entry_number', 'date', 'description', 'depreciation_rate', 'depreciation_start_date', 'depreciation_year', 'days_count', 'purchase_cost', 'additions', 'exclusions', 'asset_cost_at_end', 'accumulated_depreciation_at_start', 'current_year_depreciation', 'excluded_depreciation', 'accumulated_depreciation_at_end', 'net_book_value', 'classification'])
+                ->make(true);
+        }
+
+        // Calculate totals
+        $totals = new \StdClass();
+        $totals->purchase_cost = $entries->sum('purchase_cost');
+        $totals->additions = $entries->sum('additions');
+        $totals->exclusions = $entries->sum('exclusions');
+        $totals->asset_cost_at_end = $entries->sum('asset_cost_at_end');
+        $totals->accumulated_depreciation_at_start = $entries->sum('accumulated_depreciation_at_start');
+        $totals->current_year_depreciation = $entries->sum('current_year_depreciation');
+        $totals->excluded_depreciation = $entries->sum('excluded_depreciation');
+        $totals->accumulated_depreciation_at_end = $entries->sum('accumulated_depreciation_at_end');
+        $totals->net_book_value = $entries->sum('net_book_value');
+
+        $assets = Asset::all();
+        $years = range(2000, date('Y') + 1);
+        rsort($years);
+
+        return view('content.depreciation-entries.list')
+            ->with('totals', $totals)
+            ->with('assets', $assets)
+            ->with('years', $years)
+            ->with('selectedYear', $selectedYear);
     }
-    
-    // Calculate totals
-    $totals = new \StdClass();
-    $totals->purchase_cost = $entries->sum('purchase_cost');
-    $totals->additions = $entries->sum('additions');
-    $totals->exclusions = $entries->sum('exclusions');
-    $totals->asset_cost_at_end = $entries->sum('asset_cost_at_end');
-    $totals->accumulated_depreciation_at_start = $entries->sum('accumulated_depreciation_at_start');
-    $totals->current_year_depreciation = $entries->sum('current_year_depreciation');
-    $totals->excluded_depreciation = $entries->sum('excluded_depreciation');
-    $totals->accumulated_depreciation_at_end = $entries->sum('accumulated_depreciation_at_end');
-    $totals->net_book_value = $entries->sum('net_book_value');
-    
-    $assets = Asset::all();
-    $years = range(2000, date('Y') + 1);
-    rsort($years);
-    
-    return view('content.depreciation-entries.list')
-        ->with('totals', $totals)
-        ->with('assets', $assets)
-        ->with('years', $years)
-        ->with('selectedYear', $selectedYear);
-}
 
     // public function employees(Request  $request) {
     //     return view('content.employees.list');

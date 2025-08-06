@@ -547,7 +547,7 @@ $(document).ready(function() {
             searchi: $('#dataTables_my_filter').val() || '',
             format: 'csv'
         });
-        window.location.href = '/assets/export?' + params.toString();
+        window.location.href = '/assets-list/export?' + params.toString();
     });
 
 // Delete button functionality
@@ -555,13 +555,13 @@ $(document).on('click', '.delete-btn', function() {
     var assetId = $(this).data('id');
     var assetName = $(this).data('name');
     var deleteUrl = $(this).data('url');
-    
+
     // Set asset name in the modal
     $('#deleteAssetName').text(assetName);
-    
+
     // Show the modal by removing the hidden class
     $('#deleteModal').removeClass('hidden').addClass('flex');
-    
+
     // Handle confirm delete
     $('#confirmDeleteBtn').off('click').on('click', function() {
         $.ajax({
@@ -573,17 +573,17 @@ $(document).on('click', '.delete-btn', function() {
             success: function(response) {
                 // Hide the modal
                 $('#deleteModal').addClass('hidden').removeClass('flex');
-                
+
                 // Show success message
                 showNotification('تم حذف الأصل بنجاح', 'success');
-                
+
                 // Reload the table
                 table.ajax.reload();
             },
             error: function(xhr) {
                 // Hide the modal
                 $('#deleteModal').addClass('hidden').removeClass('flex');
-                
+
                 // Show error message
                 showNotification('حدث خطأ أثناء حذف الأصل', 'error');
             }
@@ -596,153 +596,148 @@ $('#cancelDeleteBtn').on('click', function() {
     $('#deleteModal').addClass('hidden').removeClass('flex');
 });
 
-// QR Code button functionality
-$(document).on('click', '.qr-btn', function() {
-    var assetId = $(this).data('id');
-    var assetName = $(this).data('name');
-    var assetNumber = $(this).data('number');
-    
-    // Set asset info in the modal
-    $('#qrAssetName').text(assetName);
-    $('#qrAssetNumber').text(assetNumber);
-    
-    // Generate QR code
-    $('#qrCodeContainer').html(`
-        <div class="flex items-center justify-center w-40 h-40">
-            <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-            </svg>
-        </div>
-    `);
+    // QR Code button functionality
+    $(document).on('click', '.qr-btn', function() {
+        var assetId = $(this).data('id');
+        var assetName = $(this).data('name');
+        var assetNumber = $(this).data('number');
 
-    var qrCodeUrl = "{{ route('assets.qr', ['id' => ':id']) }}".replace(':id', assetId) + `?_t=${Date.now()}`;
+        // Set asset info in the modal
+        $('#qrAssetName').text(assetName);
+        $('#qrAssetNumber').text(assetNumber);
 
-    let img = new Image();
-    img.src = qrCodeUrl;
-    img.className = "w-40 h-40";
-    img.alt = "QR Code";
-
-    img.onload = function () {
-        $('#qrCodeContainer').html(img);
-    };
-
-    img.onerror = function () {
-        $('#qrCodeContainer').html('<p class="text-red-500 text-sm">⚠️ Failed to load QR Code</p>');
-    };
-
-    // } else {
-    //     // Fallback to an online QR code generator
-    //     var qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(qrCodeUrl);
-    //     $('#qrCodeContainer').html(
-    //         '<img src="' + qrImageUrl + '" alt="QR Code" class="w-48 h-48">'
-    //     );
-    // }
-    
-    // Show the modal by removing the hidden class
-    $('#qrModal').removeClass('hidden').addClass('flex');
-    
-    // Handle download QR code
-    $('#printQrBtn').on('click', function() {
-        // var qrImage = $('#qrCodeContainer img')[0];
-        // var link = document.createElement('a');
-        // link.download = 'QR_Code_' + assetNumber + '.png';
-        // link.href = qrImage.src;
-        // link.click();
-  var qrImage = $('#qrCodeContainer img')[0];
-  if (!qrImage) {
-    alert('QR Code not loaded yet.');
-    return;
-  }
-
-  // Open new window
-  var printWindow = window.open('', '_blank');
-
-  // Build minimal HTML
-  var doc = printWindow.document;
-  doc.open();
-  doc.write('<!doctype html><html><head><meta charset="utf-8"><title>Print QR Code</title>');
-  doc.write('<style>body{display:flex;align-items:center;justify-content:center;height:100vh;margin:0}img{width:160px;height:160px}</style>');
-  doc.write('</head><body>');
-  doc.write('<img id="qrToPrint" alt="QR Code" src="' + qrImage.src + '">');
-  doc.write('</body></html>');
-  doc.close();
-
-  // Wait for the image inside the new window to load, then print and close
-  var imgInNewWin = printWindow.document.getElementById('qrToPrint');
-  if (imgInNewWin.complete) {
-    // already loaded
-    printWindow.focus();
-    printWindow.print();
-    // printWindow.close();
-  } else {
-    imgInNewWin.onload = function () {
-      printWindow.focus();
-      printWindow.print();
-    //   printWindow.close();
-    };
-    imgInNewWin.onerror = function () {
-      // fallback if can't load
-      alert('Failed to load QR image for printing.');
-      // optionally close the window:
-      // printWindow.close();
-    };
-  }
-
-    });
-});
-
-// Close QR modal
-$('#closeQrModalBtn').on('click', function() {
-    $('#qrModal').addClass('hidden').removeClass('flex');
-});
-
-// Close modals when clicking outside
-$(document).on('click', function(e) {
-    // Check if click is outside the delete modal content
-    if ($(e.target).is('#deleteModal')) {
-        $('#deleteModal').addClass('hidden').removeClass('flex');
-    }
-    
-    // Check if click is outside the QR modal content
-    if ($(e.target).is('#qrModal')) {
-        $('#qrModal').addClass('hidden').removeClass('flex');
-    }
-});
-
-// Also close modals when pressing Escape key
-$(document).on('keydown', function(e) {
-    if (e.key === 'Escape') {
-        $('#deleteModal').addClass('hidden').removeClass('flex');
-        $('#qrModal').addClass('hidden').removeClass('flex');
-    }
-});
-
-// Notification function
-function showNotification(message, type) {
-    var notification = $(`
-        <div class="fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} transition-opacity duration-300">
-            <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-${type === 'success' ? 'check-circle' : 'alert-circle'} w-5 h-5 ml-2">
-                    ${type === 'success' ? 
-                        '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>' : 
-                        '<circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line>'
-                    }
+        // Generate QR code
+        $('#qrCodeContainer').html(`
+            <div class="flex items-center justify-center w-40 h-40">
+                <svg class="animate-spin h-8 w-8 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                 </svg>
-                <span>${message}</span>
             </div>
-        </div>
-    `);
-    
-    $('body').append(notification);
-    
-    // Auto remove after 3 seconds
-    setTimeout(function() {
-        notification.fadeOut(300, function() {
-            $(this).remove();
+        `);
+
+        var qrCodeUrl = "{{ route('assets.qr', ['id' => ':id']) }}".replace(':id', assetId) + `?_t=${Date.now()}`;
+
+        let img = new Image();
+        img.src = qrCodeUrl;
+        img.className = "w-40 h-40";
+        img.alt = "QR Code";
+
+        img.onload = function () {
+            $('#qrCodeContainer').html(img);
+        };
+
+        img.onerror = function () {
+            $('#qrCodeContainer').html('<p class="text-red-500 text-sm">⚠️ Failed to load QR Code</p>');
+        };
+
+        // } else {
+        //     // Fallback to an online QR code generator
+        //     var qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(qrCodeUrl);
+        //     $('#qrCodeContainer').html(
+        //         '<img src="' + qrImageUrl + '" alt="QR Code" class="w-48 h-48">'
+        //     );
+        // }
+
+        // Show the modal by removing the hidden class
+        $('#qrModal').removeClass('hidden').addClass('flex');
+
+        // Handle download QR code
+        $('#printQrBtn').on('click', function() {
+            var qrImage = $('#qrCodeContainer img')[0];
+            if (!qrImage) {
+                alert('QR Code not loaded yet.');
+                return;
+            }
+
+            // Open new window
+            var printWindow = window.open('', '_blank');
+
+            // Build minimal HTML
+            var doc = printWindow.document;
+            doc.open();
+            doc.write('<!doctype html><html><head><meta charset="utf-8"><title>Print QR Code</title>');
+            doc.write('<style>body{display:flex;align-items:center;justify-content:center;height:100vh;margin:0}img{width:160px;height:160px}</style>');
+            doc.write('</head><body>');
+            doc.write('<img id="qrToPrint" alt="QR Code" src="' + qrImage.src + '">');
+            doc.write('</body></html>');
+            doc.close();
+
+            // Wait for the image inside the new window to load, then print and close
+            var imgInNewWin = printWindow.document.getElementById('qrToPrint');
+            if (imgInNewWin.complete) {
+                // already loaded
+                printWindow.focus();
+                printWindow.print();
+                // printWindow.close();
+            } else {
+                imgInNewWin.onload = function () {
+                printWindow.focus();
+                printWindow.print();
+                //   printWindow.close();
+                };
+                imgInNewWin.onerror = function () {
+                // fallback if can't load
+                alert('Failed to load QR image for printing.');
+                // optionally close the window:
+                // printWindow.close();
+                };
+            }
+
         });
-    }, 3000);
-}
+    });
+
+    // Close QR modal
+    $('#closeQrModalBtn').on('click', function() {
+        $('#qrModal').addClass('hidden').removeClass('flex');
+    });
+
+    // Close modals when clicking outside
+    $(document).on('click', function(e) {
+        // Check if click is outside the delete modal content
+        if ($(e.target).is('#deleteModal')) {
+            $('#deleteModal').addClass('hidden').removeClass('flex');
+        }
+
+        // Check if click is outside the QR modal content
+        if ($(e.target).is('#qrModal')) {
+            $('#qrModal').addClass('hidden').removeClass('flex');
+        }
+    });
+
+    // Also close modals when pressing Escape key
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            $('#deleteModal').addClass('hidden').removeClass('flex');
+            $('#qrModal').addClass('hidden').removeClass('flex');
+        }
+    });
+
+    // Notification function
+    function showNotification(message, type) {
+        var notification = $(`
+            <div class="fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} transition-opacity duration-300">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-${type === 'success' ? 'check-circle' : 'alert-circle'} w-5 h-5 ml-2">
+                        ${type === 'success' ?
+                            '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>' :
+                            '<circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line>'
+                        }
+                    </svg>
+                    <span>${message}</span>
+                </div>
+            </div>
+        `);
+
+        $('body').append(notification);
+
+        // Auto remove after 3 seconds
+        setTimeout(function() {
+            notification.fadeOut(300, function() {
+                $(this).remove();
+            });
+        }, 3000);
+    }
 
     // Context menu functionality (right-click)
     $(document).on('contextmenu', '#assets-table tbody tr', function(e) {
@@ -759,10 +754,10 @@ function showNotification(message, type) {
 
         var contextMenu = $(`
             <ul class="context-menu fixed bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-2 z-50" style="left: ${x}px; top: ${y}px;">
-                <li><a href="/assets/${id}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                <li><a href="/assets-list/${id}/show" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
                     <i class="lucide lucide-eye w-4 h-4 inline mr-2"></i>عرض
                 </a></li>
-                <li><a href="/assets/${id}/edit" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                <li><a href="/assets-list/${id}/edit" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
                     <i class="lucide lucide-edit w-4 h-4 inline mr-2"></i>تعديل
                 </a></li>
                 <li class="border-t border-slate-200 dark:border-slate-700"></li>
@@ -784,7 +779,7 @@ function showNotification(message, type) {
     $(document).on('dblclick', '#assets-table tbody tr', function() {
         var rowData = table.row(this).data();
         if (rowData) {
-            window.location.href = `/assets/${rowData.id}/edit`;
+            window.location.href = `/assets-list/${rowData.id}/edit`;
         }
     });
 
@@ -793,7 +788,7 @@ function showNotification(message, type) {
         // Ctrl/Cmd + N = New Asset
         if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
             e.preventDefault();
-            window.location.href = '/assets/create';
+            window.location.href = '/assets-list/create';
         }
 
         // Ctrl/Cmd + R = Refresh Table

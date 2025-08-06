@@ -12,7 +12,7 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
     <title>Perfume Store Inventory</title>
 
     {{-- Fonts --}}
@@ -266,6 +266,7 @@
                     sidebar.classList.add('show-mobile');
                     sidebarOverlay.classList.remove('hidden');
                     document.body.style.overflow = 'hidden';
+                    document.body.classList.remove('sidebar-collapsed');
                 });
             }
 
@@ -316,11 +317,13 @@
                         submenu.style.maxHeight = submenu.scrollHeight + 'px';
                         if (chevron) chevron.style.transform = 'rotate(180deg)';
                         button.setAttribute('aria-expanded', 'true');
+                        submenu.classList.add('py-2');
                     } else {
                         // Collapse the submenu
                         submenu.style.maxHeight = '0px';
                         if (chevron) chevron.style.transform = 'rotate(0deg)';
                         button.setAttribute('aria-expanded', 'false');
+                        submenu.classList.remove('py-2');
                     }
                 });
             });
