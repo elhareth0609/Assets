@@ -11,7 +11,8 @@ class HomeController extends Controller {
     }
 
     public function dashboard() {
-        return view('content.index');
+        return redirect()->route('assets');
+        // return view('content.index');
     }
 
     public function redirect() {

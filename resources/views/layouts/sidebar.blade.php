@@ -26,7 +26,7 @@
             <!-- Main Navigation -->
             <ul class="space-y-2 font-medium mb-2">
                 <!-- Dashboard Link -->
-                <li>
+                {{-- <li>
                     <a href="{{ route('dashboard') }}" class="flex w-full items-center px-2 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 sidebar-item-container dark:text-white {{ Route::currentRouteName() == 'dashboard' ? 'bg-primary-50 text-primary-700 dark:bg-slate-800 dark:text-primary-400' : '' }}">
                         <!-- Home Icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard w-5 h-5 flex-shrink-0">
@@ -37,7 +37,7 @@
                         </svg>
                         <span class="sidebar-text rtl:ms-2">لوحة التحكم الرئيسية</span>
                     </a>
-                </li>
+                </li> --}}
 
                 <li>
                     <a href="{{ route('users') }}" class="flex w-full items-center px-2 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 sidebar-item-container {{ Route::currentRouteName() == 'users' ? 'bg-primary-50 text-primary-700 dark:bg-slate-800 dark:text-primary-400' : 'text-slate-900 dark:text-white'}}">
