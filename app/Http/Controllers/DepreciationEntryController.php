@@ -112,19 +112,20 @@ class DepreciationEntryController extends Controller {
             $sheet->setCellValue('K' . $row, $entry->exclusions);
 
             // Asset Cost at End Formula
-            $assetCostFormula = '=I' . $row . '+J' . $row . '-K' . $row;
+            $assetCostFormula = '=I' . $row . '+J' . $row . '+K' . $row;
             $sheet->setCellValue('L' . $row, $assetCostFormula);
 
             $sheet->setCellValue('M' . $row, $entry->accumulated_depreciation_at_start);
 
             // Current Year Depreciation Formula
-            $depreciationFormula = '=IF(AND(E' . $row . '<>"", L' . $row . '<>"", H' . $row . '<>""), (E' . $row . '/100)*L' . $row . '*(H' . $row . '/365), "")';
+            $depreciationFormula = '=L' . $row . '*E' . $row . '/365*H' . $row;
+
             $sheet->setCellValue('N' . $row, $depreciationFormula);
 
             $sheet->setCellValue('O' . $row, $entry->excluded_depreciation);
 
             // Accumulated Depreciation at End Formula
-            $accumulatedFormula = '=M' . $row . '+N' . $row . '-O' . $row;
+            $accumulatedFormula = '=M' . $row . '+N' . $row . '+O' . $row;
             $sheet->setCellValue('P' . $row, $accumulatedFormula);
 
             // Net Book Value Formula

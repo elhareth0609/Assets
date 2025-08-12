@@ -874,8 +874,7 @@ function calculateAssetCost() {
     const purchaseCost = parseFloat($('#purchaseCost').val()) || 0;
     const additions = parseFloat($('#additions').val()) || 0;
     const exclusions = parseFloat($('#exclusions').val()) || 0;
-
-    const assetCostAtEnd = purchaseCost + additions - exclusions;
+    const assetCostAtEnd = purchaseCost + additions + exclusions;
     $('#assetCostAtEnd').val(assetCostAtEnd.toFixed(2));
 
     // Trigger dependent calculations
@@ -888,13 +887,10 @@ function calculateCurrentYearDepreciation() {
     const assetCostAtEnd = parseFloat($('#assetCostAtEnd').val()) || 0;
     const daysCount = parseFloat($('#daysCount').val()) || 0;
 
-    if (assetCostAtEnd > 0 && depreciationRate > 0 && daysCount > 0) {
-        const currentYearDepreciation = (depreciationRate / 100) * assetCostAtEnd * (daysCount / 365);
-        $('#currentYearDepreciation').val(currentYearDepreciation.toFixed(2));
+    const currentYearDepreciation = ((depreciationRate * assetCostAtEnd) / 365) * daysCount;
+    $('#currentYearDepreciation').val(currentYearDepreciation.toFixed(2));
 
-        // Trigger dependent calculations
-        calculateAccumulatedDepreciation();
-    }
+    calculateAccumulatedDepreciation();
 }
 
 // Function to calculate accumulated depreciation at end
@@ -903,7 +899,7 @@ function calculateAccumulatedDepreciation() {
     const excludedDepreciation = parseFloat($('#excludedDepreciation').val()) || 0;
     const currentYearDepreciation = parseFloat($('#currentYearDepreciation').val()) || 0;
 
-    const accumulatedDepreciationAtEnd = accumulatedDepreciationAtStart + currentYearDepreciation - excludedDepreciation;
+    const accumulatedDepreciationAtEnd = accumulatedDepreciationAtStart + currentYearDepreciation + excludedDepreciation;
     $('#accumulatedDepreciationAtEnd').val(accumulatedDepreciationAtEnd.toFixed(2));
 
     // Trigger dependent calculations
