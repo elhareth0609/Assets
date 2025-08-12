@@ -20,7 +20,7 @@
     <!-- Search Section -->
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
         <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 gap-4">
                 <div class="md:col-span-1">
                     <label class="block text-sm font-medium mb-2 dark:text-slate-400">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-4 h-4 inline ltr:mr-1 rtl:ml-1">
@@ -33,15 +33,6 @@
                         <input id="dataTables_my_filter" type="text" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="ابحث بالاسم أو الرقم...">
                     </div>
                 </div>
-                <div class="flex items-end">
-                    <button type="button" id="apply-search-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-10 px-4 text-sm w-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-4 h-4 ltr:mr-2 rtl:ml-2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.3-4.3"></path>
-                        </svg>
-                        بحث
-                    </button>
-                </div>
             </div>
         </div>
     </div>
@@ -50,7 +41,7 @@
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
         <div class="p-0 m-0">
             <div class="space-y-4">
-                <div class="w-full overflow-auto rounded-lg">
+                <div class="w-full overflow-auto md:overflow-visible rounded-lg">
                     <table id="types-table" class="table table-hover mb-0">
                         <thead>
                             <tr>
@@ -257,6 +248,39 @@
   html.dark #types-table thead th {
     color: rgb(148 163 184); /* dark:text-slate-400 */
   }
+
+
+
+      /* Ensure table container doesn't clip dropdowns */
+    .dataTables_wrapper {
+        overflow: visible !important;
+    }
+
+    .dataTables_scrollBody {
+        overflow: visible !important;
+    }
+
+    /* Ensure table cells don't clip content */
+    #locations-table tbody td {
+        overflow: visible !important;
+    }
+
+    /* Style for dropdown menus */
+    .actions-dropdown {
+        min-width: 160px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Ensure dropdown appears above other content */
+    .actions-dropdown:not(.hidden) {
+        z-index: 9999 !important;
+    }
+
+    /* Fix for RTL layout if needed */
+    html[dir="rtl"] .actions-dropdown {
+        right: auto;
+        left: 0;
+    }
 </style>
 @endsection
 
@@ -468,6 +492,8 @@ $(document).ready(function() {
 
     // Edit Type Modal
     $(document).on('click', '.edit-type-btn', function() {
+        $('.actions-dropdown').addClass('hidden');
+
         var id = $(this).data('id');
         var name = $(this).data('name');
 
@@ -538,6 +564,8 @@ $(document).ready(function() {
 
     // Delete Type Modal
     $(document).on('click', '.delete-type-btn', function() {
+        $('.actions-dropdown').addClass('hidden');
+
         var id = $(this).data('id');
         var name = $(this).data('name');
         var deleteUrl = $(this).data('url');
@@ -616,6 +644,28 @@ $(document).ready(function() {
             });
         }, 3000);
     }
+
+
+
+
+        $(document).on('click', '.actions-dropdown-btn', function (e) {
+        e.stopPropagation(); // prevent document click from immediately closing
+
+        let relativeParent = $(this).closest('.relative');
+        let dropdown = relativeParent.find('.actions-dropdown');
+
+        // Close other dropdowns
+        $('.actions-dropdown').not(dropdown).addClass('hidden');
+
+        // Toggle current dropdown
+        dropdown.toggleClass('hidden');
+    });
+
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.actions-dropdown-btn, .actions-dropdown').length) {
+            $('.actions-dropdown').addClass('hidden');
+        }
+    });
 });
 </script>
 @endsection

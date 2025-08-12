@@ -75,7 +75,7 @@
                     </div>
 
                     <div>
-                        <label for="location_id" class="block text-sm font-medium mb-2 dark:text-slate-400">المستخدم الحالي</label>
+                        <label for="location_id" class="block text-sm font-medium mb-2 dark:text-slate-400">الإدارة</label>
                         <select id="location_id" name="location_id" class="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50">
                             <option value="">غير مخصص</option>
                             @foreach($locations as $location)

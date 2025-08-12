@@ -3,8 +3,8 @@
 <div class="mx-auto p-6 space-y-6">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <h1 class="text-3xl font-display font-bold text-slate-900 dark:text-slate-100">مواقع الأصول</h1>
-            <p class="text-slate-600 dark:text-slate-400 mt-1">إدارة وتصنيف مواقع الأصول</p>
+            <h1 class="text-3xl font-display font-bold text-slate-900 dark:text-slate-100">الإدارات</h1>
+            <p class="text-slate-600 dark:text-slate-400 mt-1">إدارة وتصنيف الإدارات</p>
         </div>
         <div class="flex gap-2">
             <button id="create-location-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-8 px-3 text-sm">
@@ -12,7 +12,7 @@
                     <path d="M5 12h14"></path>
                     <path d="M12 5v14"></path>
                 </svg>
-                إضافة موقع جديد
+                إضافة إدارة جديد
             </button>
         </div>
     </div>
@@ -20,7 +20,7 @@
     <!-- Search Section -->
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
         <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 gap-4">
                 <div class="md:col-span-1">
                     <label class="block text-sm font-medium mb-2 dark:text-slate-400">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-4 h-4 inline ltr:mr-1 rtl:ml-1">
@@ -33,15 +33,6 @@
                         <input id="dataTables_my_filter" type="text" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="ابحث بالاسم أو الرقم...">
                     </div>
                 </div>
-                <div class="flex items-end">
-                    <button type="button" id="apply-search-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-10 px-4 text-sm w-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-4 h-4 ltr:mr-2 rtl:ml-2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.3-4.3"></path>
-                        </svg>
-                        بحث
-                    </button>
-                </div>
             </div>
         </div>
     </div>
@@ -50,12 +41,12 @@
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
         <div class="p-0 m-0">
             <div class="space-y-4">
-                <div class="w-full overflow-auto rounded-lg">
+                <div class="w-full overflow-auto md:overflow-visible rounded-lg">
                     <table id="locations-table" class="table table-hover mb-0">
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>اسم الموقع</th>
+                                <th>اسم الادارة</th>
                                 <th>الإجراءات</th>
                             </tr>
                         </thead>
@@ -94,8 +85,8 @@
             <form id="createLocationForm" action="{{ route('locations.create') }}" method="POST">
                 @csrf
                 <div class="mb-4">
-                    <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم الموقع</label>
-                    <input type="text" id="name" name="name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموقع">
+                    <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم الادارة</label>
+                    <input type="text" id="name" name="name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الادارة">
                 </div>
                 <div class="flex justify-center flex-row-reverse space-x-4">
                     <button type="button" id="cancelCreateBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
@@ -115,7 +106,7 @@
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4">
         <div class="p-6">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium text-slate-900 dark:text-white">تعديل الموقع</h3>
+                <h3 class="text-lg font-medium text-slate-900 dark:text-white">تعديل الادارة</h3>
                 <button id="closeEditModalBtn" class="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x w-6 h-6">
                         <path d="M18 6 6 18"></path>
@@ -128,8 +119,8 @@
                 @method('PUT')
                 <input type="hidden" id="edit_id" name="id">
                 <div class="mb-4">
-                    <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم الموقع</label>
-                    <input type="text" id="edit_name" name="name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموقع">
+                    <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم الادارة</label>
+                    <input type="text" id="edit_name" name="name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الادارة">
                 </div>
                 <div class="flex justify-center flex-row-reverse space-x-4">
                     <button type="button" id="cancelEditBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
@@ -156,7 +147,7 @@
                 </svg>
             </div>
             <h3 class="text-lg font-medium text-center text-slate-900 dark:text-white mb-2">تأكيد الحذف</h3>
-            <p class="text-center text-slate-500 dark:text-slate-400 mb-6">هل أنت متأكد من حذف الموقع: <span id="deleteLocationName" class="font-semibold"></span>؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <p class="text-center text-slate-500 dark:text-slate-400 mb-6">هل أنت متأكد من حذف الادارة: <span id="deleteLocationName" class="font-semibold"></span>؟ لا يمكن التراجع عن هذا الإجراء.</p>
             <div class="flex justify-center flex-row-reverse space-x-4">
                 <button id="cancelDeleteTypeBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
                     إلغاء
@@ -256,6 +247,39 @@
   html.dark #locations-table thead th {
     color: rgb(148 163 184); /* dark:text-slate-400 */
   }
+
+
+
+      /* Ensure table container doesn't clip dropdowns */
+    .dataTables_wrapper {
+        overflow: visible !important;
+    }
+
+    .dataTables_scrollBody {
+        overflow: visible !important;
+    }
+
+    /* Ensure table cells don't clip content */
+    #locations-table tbody td {
+        overflow: visible !important;
+    }
+
+    /* Style for dropdown menus */
+    .actions-dropdown {
+        min-width: 160px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Ensure dropdown appears above other content */
+    .actions-dropdown:not(.hidden) {
+        z-index: 9999 !important;
+    }
+
+    /* Fix for RTL layout if needed */
+    html[dir="rtl"] .actions-dropdown {
+        right: auto;
+        left: 0;
+    }
 </style>
 @endsection
 
@@ -296,7 +320,7 @@ $(document).ready(function() {
         },
         columns: [
             { data: 'id', name: 'id', title: 'المعرف' },
-            { data: 'name', name: 'name', title: 'اسم الموقع' },
+            { data: 'name', name: 'name', title: 'اسم الادارة' },
             { data: 'action', name: 'action', title: 'الإجراءات', orderable: false, searchable: false }
         ],
         order: [[0, 'desc']],
@@ -443,12 +467,12 @@ $(document).ready(function() {
             },
             success: function(response) {
                 $('#createLocationModal').addClass('hidden').removeClass('flex');
-                showNotification('تم إضافة الموقع بنجاح', 'success');
+                showNotification('تم إضافة الادارة بنجاح', 'success');
                 table.ajax.reload();
             },
             error: function(xhr) {
                 var errors = xhr.responseJSON.errors;
-                var errorMessage = 'حدث خطأ أثناء إضافة الموقع';
+                var errorMessage = 'حدث خطأ أثناء إضافة الادارة';
 
                 if (errors && errors.name) {
                     errorMessage = errors.name[0];
@@ -467,6 +491,8 @@ $(document).ready(function() {
 
     // Edit Location Modal
     $(document).on('click', '.edit-location-btn', function() {
+        $('.actions-dropdown').addClass('hidden');
+
         var id = $(this).data('id');
         var name = $(this).data('name');
 
@@ -513,12 +539,12 @@ $(document).ready(function() {
             },
             success: function(response) {
                 $('#editLocationModal').addClass('hidden').removeClass('flex');
-                showNotification('تم تحديث الموقع بنجاح', 'success');
+                showNotification('تم تحديث الادارة بنجاح', 'success');
                 table.ajax.reload();
             },
             error: function(xhr) {
                 var errors = xhr.responseJSON.errors;
-                var errorMessage = 'حدث خطأ أثناء تحديث الموقع';
+                var errorMessage = 'حدث خطأ أثناء تحديث الادارة';
 
                 if (errors && errors.name) {
                     errorMessage = errors.name[0];
@@ -536,6 +562,8 @@ $(document).ready(function() {
 
     // Delete Location Modal
     $(document).on('click', '.delete-location-btn', function() {
+        $('.actions-dropdown').addClass('hidden');
+
         var id = $(this).data('id');
         var name = $(this).data('name');
         var deleteUrl = $(this).data('url');
@@ -552,12 +580,12 @@ $(document).ready(function() {
                 },
                 success: function(response) {
                     $('#deleteLocationModal').addClass('hidden').removeClass('flex');
-                    showNotification('تم حذف الموقع بنجاح', 'success');
+                    showNotification('تم حذف الادارة بنجاح', 'success');
                     table.ajax.reload();
                 },
                 error: function(xhr) {
                     $('#deleteLocationModal').addClass('hidden').removeClass('flex');
-                    showNotification('حدث خطأ أثناء حذف الموقع', 'error');
+                    showNotification('حدث خطأ أثناء حذف الادارة', 'error');
                 }
             });
         });
@@ -614,6 +642,27 @@ $(document).ready(function() {
             });
         }, 3000);
     }
+
+    $(document).on('click', '.actions-dropdown-btn', function (e) {
+        e.stopPropagation(); // prevent document click from immediately closing
+
+        let relativeParent = $(this).closest('.relative');
+        let dropdown = relativeParent.find('.actions-dropdown');
+
+        // Close other dropdowns
+        $('.actions-dropdown').not(dropdown).addClass('hidden');
+
+        // Toggle current dropdown
+        dropdown.toggleClass('hidden');
+    });
+
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.actions-dropdown-btn, .actions-dropdown').length) {
+            $('.actions-dropdown').addClass('hidden');
+        }
+    });
+
+
 });
 </script>
 @endsection

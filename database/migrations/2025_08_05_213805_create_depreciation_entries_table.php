@@ -20,7 +20,8 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('depreciation_rate', 5, 2)->nullable();
             $table->date('depreciation_start_date')->nullable();
-            $table->integer('depreciation_year')->nullable();
+            $table->date('depreciation_year')->nullable();
+            // $table->date('depreciation_start_date')->nullable();
             $table->integer('days_count')->nullable();
 
             $table->decimal('purchase_cost', 15, 2)->default(0);

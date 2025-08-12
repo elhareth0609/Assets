@@ -9,6 +9,9 @@ use App\Models\DepreciationEntry;
 use App\Services\DepreciationEntryService;
 use App\Traits\ApiResponder;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class DepreciationEntryController extends Controller {
     use ApiResponder;
@@ -40,13 +43,12 @@ class DepreciationEntryController extends Controller {
         return $this->success(null, 'تم الحذف بنجاح');
     }
 
-    public function export(Request $request)
-    {
-        $query = DepreciationEntry::with('asset');
 
+    public function export(Request $request) {
+        $query = DepreciationEntry::with('asset');
         // Apply filters
         if ($request->has('year') && $request->year != '') {
-            $query->where('depreciation_year', $request->year);
+            $query->whereYear('depreciation_year', $request->year);
         }
         if ($request->has('asset_id') && $request->asset_id != '') {
             $query->where('asset_id', $request->asset_id);
@@ -63,11 +65,10 @@ class DepreciationEntryController extends Controller {
                 });
             });
         }
-
         $entries = $query->orderBy('entry_number', 'asc')->get();
 
         // Create spreadsheet
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
         // Set headers
@@ -95,49 +96,84 @@ class DepreciationEntryController extends Controller {
         foreach ($entries as $entry) {
             $sheet->setCellValue('A' . $row, $row - 1);
             $sheet->setCellValue('B' . $row, $entry->entry_number);
-            $sheet->setCellValue('C' . $row, $entry->date ? date('d/m/Y', strtotime($entry->date)) : '');
+            $sheet->setCellValue('C' . $row, $entry->date ? Date::PHPToExcel($entry->date) : '');
             $sheet->setCellValue('D' . $row, $entry->description);
             $sheet->setCellValue('E' . $row, $entry->depreciation_rate);
-            $sheet->setCellValue('F' . $row, $entry->depreciation_start_date ? date('d/m/Y', strtotime($entry->depreciation_start_date)) : '');
-            $sheet->setCellValue('G' . $row, $entry->depreciation_year);
-            $sheet->setCellValue('H' . $row, $entry->days_count);
+            $sheet->setCellValue('F' . $row, $entry->depreciation_start_date ? Date::PHPToExcel($entry->depreciation_start_date) : '');
+            $sheet->setCellValue('G' . $row, $entry->depreciation_year ? Date::PHPToExcel($entry->depreciation_year) : '');
+            // $sheet->setCellValue('G' . $row, $entry->depreciation_year);
+
+            // Days Count Formula
+            $daysCountFormula = '=G' . $row . '-F' . $row;
+            $sheet->setCellValue('H' . $row, $daysCountFormula);
+
             $sheet->setCellValue('I' . $row, $entry->purchase_cost);
             $sheet->setCellValue('J' . $row, $entry->additions);
             $sheet->setCellValue('K' . $row, $entry->exclusions);
-            $sheet->setCellValue('L' . $row, $entry->asset_cost_at_end);
-            $sheet->setCellValue('M' . $row, $entry->accumulated_depreciation_at_start);
-            $sheet->setCellValue('N' . $row, $entry->current_year_depreciation);
-            $sheet->setCellValue('O' . $row, $entry->excluded_depreciation);
-            $sheet->setCellValue('P' . $row, $entry->accumulated_depreciation_at_end);
-            $sheet->setCellValue('Q' . $row, $entry->net_book_value);
-            $sheet->setCellValue('R' . $row, $entry->classification);
 
+            // Asset Cost at End Formula
+            $assetCostFormula = '=I' . $row . '+J' . $row . '-K' . $row;
+            $sheet->setCellValue('L' . $row, $assetCostFormula);
+
+            $sheet->setCellValue('M' . $row, $entry->accumulated_depreciation_at_start);
+
+            // Current Year Depreciation Formula
+            $depreciationFormula = '=IF(AND(E' . $row . '<>"", L' . $row . '<>"", H' . $row . '<>""), (E' . $row . '/100)*L' . $row . '*(H' . $row . '/365), "")';
+            $sheet->setCellValue('N' . $row, $depreciationFormula);
+
+            $sheet->setCellValue('O' . $row, $entry->excluded_depreciation);
+
+            // Accumulated Depreciation at End Formula
+            $accumulatedFormula = '=M' . $row . '+N' . $row . '-O' . $row;
+            $sheet->setCellValue('P' . $row, $accumulatedFormula);
+
+            // Net Book Value Formula
+            $netBookValueFormula = '=L' . $row . '-P' . $row;
+            $sheet->setCellValue('Q' . $row, $netBookValueFormula);
+
+            $sheet->setCellValue('R' . $row, $entry->classification);
             $row++;
         }
 
         // Add totals row
         $sheet->setCellValue('A' . $row, 'الإجمالي');
-        $sheet->setCellValue('I' . $row, $entries->sum('purchase_cost'));
-        $sheet->setCellValue('J' . $row, $entries->sum('additions'));
-        $sheet->setCellValue('K' . $row, $entries->sum('exclusions'));
-        $sheet->setCellValue('L' . $row, $entries->sum('asset_cost_at_end'));
-        $sheet->setCellValue('M' . $row, $entries->sum('accumulated_depreciation_at_start'));
-        $sheet->setCellValue('N' . $row, $entries->sum('current_year_depreciation'));
-        $sheet->setCellValue('O' . $row, $entries->sum('excluded_depreciation'));
-        $sheet->setCellValue('P' . $row, $entries->sum('accumulated_depreciation_at_end'));
-        $sheet->setCellValue('Q' . $row, $entries->sum('net_book_value'));
+
+        // Totals formulas
+        $sheet->setCellValue('I' . $row, '=SUM(I2:I' . ($row-1) . ')');
+        $sheet->setCellValue('J' . $row, '=SUM(J2:J' . ($row-1) . ')');
+        $sheet->setCellValue('K' . $row, '=SUM(K2:K' . ($row-1) . ')');
+        $sheet->setCellValue('L' . $row, '=SUM(L2:L' . ($row-1) . ')');
+        $sheet->setCellValue('M' . $row, '=SUM(M2:M' . ($row-1) . ')');
+        $sheet->setCellValue('N' . $row, '=SUM(N2:N' . ($row-1) . ')');
+        $sheet->setCellValue('O' . $row, '=SUM(O2:O' . ($row-1) . ')');
+        $sheet->setCellValue('P' . $row, '=SUM(P2:P' . ($row-1) . ')');
+        $sheet->setCellValue('Q' . $row, '=SUM(Q2:Q' . ($row-1) . ')');
 
         // Style the totals row
         $sheet->getStyle('A' . $row . ':R' . $row)->getFont()->setBold(true);
 
-        // Create writer and output
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        // Format date columns
+        $sheet->getStyle('C2:C' . ($row-1))->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+        $sheet->getStyle('F2:F' . ($row-1))->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+        $sheet->getStyle('G2:G' . ($row-1))->getNumberFormat()->setFormatCode('dd/mm/yyyy');
 
+        // Format numeric columns
+        $sheet->getStyle('E2:E' . $row)->getNumberFormat()->setFormatCode('#,##0.00');
+        $sheet->getStyle('H2:H' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('I2:Q' . $row)->getNumberFormat()->setFormatCode('#,##0.00');
+
+        // Auto-size columns
+        foreach (range('A', 'R') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Create writer and output
+        $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="depreciation_entries.xlsx"');
         header('Cache-Control: max-age=0');
-
         $writer->save('php://output');
         exit;
     }
+
 }

@@ -13,9 +13,16 @@ class Employee extends Model
      */
     protected $fillable = [
         'full_name',
+        'email',
+        'job_title',
+        'location_id',
     ];
 
     public function assets() {
         return $this->hasMany(Asset::class);
+    }
+
+    public function location() {
+        return $this->belongsTo(Location::class);
     }
 }

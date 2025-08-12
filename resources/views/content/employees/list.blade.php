@@ -7,6 +7,14 @@
             <p class="text-slate-600 dark:text-slate-400 mt-1">إدارة الموظفين</p>
         </div>
         <div class="flex gap-2">
+            <button id="import-employee-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none border border-primary-600 text-primary-600 hover:border-primary-700 hover:text-primary-700 h-8 px-3 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload w-4 h-4 ltr:mr-2 rtl:ml-2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" x2="12" y1="3" y2="15"></line>
+                </svg>
+                استيراد Excel
+            </button>
             <button id="create-employee-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-8 px-3 text-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus w-4 h-4 ltr:mr-2 rtl:ml-2">
                     <path d="M5 12h14"></path>
@@ -20,7 +28,7 @@
     <!-- Search Section -->
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
         <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="md:col-span-1">
                     <label class="block text-sm font-medium mb-2 dark:text-slate-400">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-4 h-4 inline ltr:mr-1 rtl:ml-1">
@@ -31,6 +39,23 @@
                     </label>
                     <div class="w-full">
                         <input id="dataTables_my_filter" type="text" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="ابحث بالاسم أو الرقم...">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 dark:text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag w-4 h-4 inline ltr:mr-1 rtl:ml-1">
+                            <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"></path>
+                            <path d="M7 7h.01"></path>
+                        </svg>
+                        الإدارة
+                    </label>
+                    <div class="w-full">
+                        <select id="location_id" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" name="asset_type">
+                            <option value="">جميع الإدارات</option>
+                            @foreach ($locations as $location)
+                                <option value="{{ $location->id }}">{{ $location->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="flex items-end">
@@ -50,12 +75,15 @@
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
         <div class="p-0 m-0">
             <div class="space-y-4">
-                <div class="w-full overflow-auto rounded-lg">
+                <div class="w-full overflow-auto md:overflow-visible rounded-lg">
                     <table id="employees-table" class="table table-hover mb-0">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>اسم الموظف</th>
+                                <th>المسمى الوظيفي</th>
+                                <th>الإدارة</th>
+                                <th>البريد الإلكتروني</th>
                                 <th>الإجراءات</th>
                             </tr>
                         </thead>
@@ -97,6 +125,23 @@
                     <label for="full_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم الموظف</label>
                     <input type="text" id="full_name" name="full_name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
                 </div>
+                <div class="mb-4">
+                    <label for="location_id" class="block text-sm font-medium mb-2 dark:text-slate-400">الإدارة</label>
+                    <select id="location_id" name="location_id" class="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50">
+                        <option value="">غير مخصص</option>
+                        @foreach($locations as $location)
+                            <option value="{{ $location->id }}">{{ $location->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="job_title" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">المسمى الوظيفي</label>
+                    <input type="text" id="job_title" name="job_title" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">البريد الإلكتروني</label>
+                    <input type="text" id="email" name="email" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
+                </div>
                 <div class="flex justify-center flex-row-reverse space-x-4">
                     <button type="button" id="cancelCreateBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
                         إلغاء
@@ -130,6 +175,23 @@
                 <div class="mb-4">
                     <label for="edit_full_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم الموظف</label>
                     <input type="text" id="edit_full_name" name="full_name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
+                </div>
+                <div class="mb-4">
+                    <label for="edit_location_id" class="block text-sm font-medium mb-2 dark:text-slate-400">الإدارة</label>
+                    <select id="edit_location_id" name="location_id" class="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50">
+                        <option value="">غير مخصص</option>
+                        @foreach($locations as $location)
+                            <option value="{{ $location->id }}">{{ $location->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="edit_job_title" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">المسمى الوظيفي</label>
+                    <input type="text" id="edit_job_title" name="job_title" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
+                </div>
+                <div class="mb-4">
+                    <label for="edit_email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">البريد الإلكتروني</label>
+                    <input type="email" id="edit_email" name="email" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
                 </div>
                 <div class="flex justify-center flex-row-reverse space-x-4">
                     <button type="button" id="cancelEditBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
@@ -168,6 +230,57 @@
         </div>
     </div>
 </div>
+
+<!-- Import Employee Modal -->
+<div id="importEmployeeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-slate-900 dark:text-white">استيراد موظفين من ملف Excel</h3>
+                <button id="closeImportModalBtn" class="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x w-6 h-6">
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form id="importEmployeeForm" action="{{ route('employees.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="mb-4">
+                    <label for="excel_file" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">ملف Excel</label>
+                    <div class="flex items-center justify-center w-full">
+                        <label for="excel_file" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:hover:bg-bray-800 dark:bg-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:hover:border-slate-500 dark:hover:bg-slate-600">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-spreadsheet w-8 h-8 mb-2 text-slate-500 dark:text-slate-400">
+                                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <path d="M8 13h2"></path>
+                                    <path d="M8 17h2"></path>
+                                    <path d="M14 13h2"></path>
+                                    <path d="M14 17h2"></path>
+                                </svg>
+                                <p class="mb-1 text-sm text-slate-500 dark:text-slate-400">
+                                    <span class="font-semibold">اضغط لرفع الملف</span>
+                                </p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Excel فقط</p>
+                            </div>
+                            <input id="excel_file" name="excel_file" type="file" class="hidden" accept=".xlsx, .xls" required />
+                        </label>
+                    </div>
+                    <p id="file-name" class="mt-2 text-sm text-slate-500 dark:text-slate-400"></p>
+                </div>
+                <div class="flex justify-center flex-row-reverse space-x-4">
+                    <button type="button" id="cancelImportBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
+                        إلغاء
+                    </button>
+                    <button type="submit" class="flex items-center px-4 py-2 border border-primary-600 text-primary-600 hover:border-primary-700 hover:text-primary-700 rounded-md transition-colors">
+                        استيراد
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('styles')
@@ -193,69 +306,100 @@
 </style>
 
 <style>
-  #employees-table {
-    width: 100%;
-    caption-side: bottom;
-    font-size: 0.875rem; /* text-sm */
-    border-collapse: collapse;
-  }
-  #employees-table thead {
-    background-color: rgb(248 250 252); /* bg-slate-50 */
-  }
-  html.dark #employees-table thead {
-    background-color: rgb(30 41 59); /* dark:bg-slate-800 */
-  }
-  #employees-table thead tr {
-    border-bottom: 1px solid rgb(226 232 240); /* border-slate-200 */
-    transition: background-color 0.2s;
-  }
-  html.dark #employees-table thead tr {
-    border-bottom: 1px solid rgb(51 65 85); /* dark:border-slate-700 */
-  }
-  #employees-table thead tr:hover {
-    background-color: rgb(248 250 252); /* hover:bg-slate-50 */
-  }
-  html.dark #employees-table thead tr:hover {
-    background-color: rgba(30, 41, 59, 0.5); /* dark:hover:bg-slate-800/50 */
-  }
-  #employees-table tbody tr {
-    border-bottom: 1px solid rgb(226 232 240);
-    transition: background-color 0.2s;
-  }
-  html.dark #employees-table tbody tr {
-    border-bottom: 1px solid rgb(51 65 85);
-  }
-  #employees-table tbody tr:hover {
-    background-color: rgb(248 250 252);
-  }
-  html.dark #employees-table tbody tr:hover {
-    background-color: rgba(30, 41, 59, 0.5);
-  }
-  #employees-table tbody td {
-    padding: 1rem;
-    vertical-align: middle;
-    color: rgb(15 23 42); /* text-slate-900 */
-  }
-  html.dark #employees-table tbody td {
-    color: rgb(203 213 225); /* dark:text-slate-300 */
-  }
-  #employees-table thead th {
-    height: 3rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    vertical-align: middle;
-    font-weight: 500;
-    color: rgb(100 116 139); /* text-slate-500 */
-  }
-  html.ltr #employees-table thead th {
-    text-align: left;
-  }
-  html.rtl #employees-table thead th {
-    text-align: right;
-  }
-  html.dark #employees-table thead th {
-    color: rgb(148 163 184); /* dark:text-slate-400 */
-  }
+    #employees-table {
+        width: 100%;
+        caption-side: bottom;
+        font-size: 0.875rem; /* text-sm */
+        border-collapse: collapse;
+    }
+    #employees-table thead {
+        background-color: rgb(248 250 252); /* bg-slate-50 */
+    }
+    html.dark #employees-table thead {
+        background-color: rgb(30 41 59); /* dark:bg-slate-800 */
+    }
+    #employees-table thead tr {
+        border-bottom: 1px solid rgb(226 232 240); /* border-slate-200 */
+        transition: background-color 0.2s;
+    }
+    html.dark #employees-table thead tr {
+        border-bottom: 1px solid rgb(51 65 85); /* dark:border-slate-700 */
+    }
+    #employees-table thead tr:hover {
+        background-color: rgb(248 250 252); /* hover:bg-slate-50 */
+    }
+    html.dark #employees-table thead tr:hover {
+        background-color: rgba(30, 41, 59, 0.5); /* dark:hover:bg-slate-800/50 */
+    }
+    #employees-table tbody tr {
+        border-bottom: 1px solid rgb(226 232 240);
+        transition: background-color 0.2s;
+    }
+    html.dark #employees-table tbody tr {
+        border-bottom: 1px solid rgb(51 65 85);
+    }
+    #employees-table tbody tr:hover {
+        background-color: rgb(248 250 252);
+    }
+    html.dark #employees-table tbody tr:hover {
+        background-color: rgba(30, 41, 59, 0.5);
+    }
+    #employees-table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        color: rgb(15 23 42); /* text-slate-900 */
+    }
+    html.dark #employees-table tbody td {
+        color: rgb(203 213 225); /* dark:text-slate-300 */
+    }
+    #employees-table thead th {
+        height: 3rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        vertical-align: middle;
+        font-weight: 500;
+        color: rgb(100 116 139); /* text-slate-500 */
+    }
+    html.ltr #employees-table thead th {
+        text-align: left;
+    }
+    html.rtl #employees-table thead th {
+        text-align: right;
+    }
+    html.dark #employees-table thead th {
+        color: rgb(148 163 184); /* dark:text-slate-400 */
+    }
+
+    /* Ensure table container doesn't clip dropdowns */
+    .dataTables_wrapper {
+        overflow: visible !important;
+    }
+
+    .dataTables_scrollBody {
+        overflow: visible !important;
+    }
+
+    /* Ensure table cells don't clip content */
+    #locations-table tbody td {
+        overflow: visible !important;
+    }
+
+    /* Style for dropdown menus */
+    .actions-dropdown {
+        min-width: 160px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Ensure dropdown appears above other content */
+    .actions-dropdown:not(.hidden) {
+        z-index: 9999 !important;
+    }
+
+    /* Fix for RTL layout if needed */
+    html[dir="rtl"] .actions-dropdown {
+        right: auto;
+        left: 0;
+    }
 </style>
 @endsection
 
@@ -291,12 +435,15 @@ $(document).ready(function() {
         ajax: {
             url: '/employees', // Your employees route
             data: function(d) {
-                d.search = $('#dataTables_my_filter').val();
+                d.location_id = $('#location_id').val();
             }
         },
         columns: [
             { data: 'id', name: 'id', title: 'المعرف' },
             { data: 'full_name', name: 'full_name', title: 'اسم الموظف' },
+            { data: 'job_title', name: 'job_title', title: 'المسمى الوظيفي' },
+            { data: 'location_id', name: 'location_id', title: 'الإدارة' },
+            { data: 'email', name: 'email', title: 'البريد الإلكتروني' },
             { data: 'action', name: 'action', title: 'الإجراءات', orderable: false, searchable: false }
         ],
         order: [[0, 'desc']],
@@ -465,13 +612,65 @@ $(document).ready(function() {
         });
     });
 
+    // Import Employee Form Submit
+    $('#importEmployeeForm').on('submit', function(e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        var form = $(this);
+        var submitButton = form.find('button[type="submit"]');
+        var originalButtonText = submitButton.html();
+        submitButton.prop('disabled', true);
+        submitButton.html(`
+            <svg class="animate-spin ml-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            جاري الاستيراد...
+        `);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#importEmployeeModal').addClass('hidden').removeClass('flex');
+                showNotification('تم استيراد الموظفين بنجاح', 'success');
+                table.ajax.reload();
+            },
+            error: function(xhr) {
+                var errorMessage = 'حدث خطأ أثناء استيراد الملف';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+                showNotification(errorMessage, 'error');
+            },
+            complete: function() {
+                submitButton.prop('disabled', false);
+                submitButton.html(originalButtonText);
+            }
+        });
+    });
+
     // Edit Employee Modal
     $(document).on('click', '.edit-employee-btn', function() {
+        $('.actions-dropdown').addClass('hidden');
+
         var id = $(this).data('id');
         var full_name = $(this).data('full_name');
+        var location_id = $(this).data('location_id');
+        var job_title = $(this).data('job_title');
+        var email = $(this).data('email');
 
         $('#edit_id').val(id);
         $('#edit_full_name').val(full_name);
+        $('#edit_location_id').val(location_id);
+        $('#edit_job_title').val(job_title);
+        $('#edit_email').val(email);
         $('#editEmployeeModal').removeClass('hidden').addClass('flex');
     });
 
@@ -536,6 +735,8 @@ $(document).ready(function() {
 
     // Delete Employee Modal
     $(document).on('click', '.delete-employee-btn', function() {
+        $('.actions-dropdown').addClass('hidden');
+
         var id = $(this).data('id');
         var full_name = $(this).data('full_name');
         var deleteUrl = $(this).data('url');
@@ -614,6 +815,43 @@ $(document).ready(function() {
             });
         }, 3000);
     }
+
+    $(document).on('click', '.actions-dropdown-btn', function (e) {
+        e.stopPropagation(); // prevent document click from immediately closing
+
+        let relativeParent = $(this).closest('.relative');
+        let dropdown = relativeParent.find('.actions-dropdown');
+
+        // Close other dropdowns
+        $('.actions-dropdown').not(dropdown).addClass('hidden');
+
+        // Toggle current dropdown
+        dropdown.toggleClass('hidden');
+    });
+
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.actions-dropdown-btn, .actions-dropdown').length) {
+            $('.actions-dropdown').addClass('hidden');
+        }
+    });
+
+    // Import Employee Modal
+    $('#import-employee-btn').on('click', function() {
+        $('#importEmployeeModal').removeClass('hidden').addClass('flex');
+        $('#importEmployeeForm')[0].reset();
+        $('#file-name').text('');
+    });
+
+    $('#closeImportModalBtn, #cancelImportBtn').on('click', function() {
+        $('#importEmployeeModal').addClass('hidden').removeClass('flex');
+    });
+
+    // Display selected file name
+    $('#excel_file').on('change', function() {
+        var fileName = $(this).val().split('\\').pop();
+        $('#file-name').text(fileName);
+    });
+
 });
 </script>
 @endsection

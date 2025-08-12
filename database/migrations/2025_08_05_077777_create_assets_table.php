@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->comment('اسم وصفي للأصل');
             $table->string('number')->unique()->comment('الرقم التسلسلي أو رقم الأصل الفريد');
-            $table->string('manufacturer_serial')->comment('الرقم التسلسلي للشركة المصنعة');
+            $table->string('manufacturer_serial')->nullable()->comment('الرقم التسلسلي للشركة المصنعة');
             $table->date('purchase_date')->nullable()->comment('تاريخ شراء الأصل');
             $table->enum('status', [
                 'in_use',

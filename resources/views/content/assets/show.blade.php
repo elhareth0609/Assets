@@ -67,7 +67,7 @@
                         <span class="text-sm text-slate-800 dark:text-slate-200">{{ $asset->employee->full_name ?? 'غير مخصص' }}</span>
                     </div>
                     <div class="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-slate-700">
-                        <span class="text-sm font-medium text-slate-500 dark:text-slate-400">الموقع</span>
+                        <span class="text-sm font-medium text-slate-500 dark:text-slate-400">الإدارة</span>
                         <span class="text-sm text-slate-800 dark:text-slate-200">{{ $asset->location->name ?? 'غير مخصص' }}</span>
                     </div>
                     <div class="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-slate-700">

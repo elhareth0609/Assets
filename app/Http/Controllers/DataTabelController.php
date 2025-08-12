@@ -28,7 +28,6 @@ class DataTabelController extends Controller {
             $query->where(function($q) use ($search) {
                 $q->where('full_name', 'like', "%{$search}%")
                 ->orWhere('username', 'like', "%{$search}%")
-                // ->orWhere('email', 'like', "%{$search}%")
                 ->orWhere('id', 'like', "%{$search}%");
             });
         }
@@ -58,37 +57,48 @@ class DataTabelController extends Controller {
                     return '<span class="text-slate-600 dark:text-slate-400 text-sm">' . date('d/m/Y', strtotime($user->created_at)) . '</span>';
                 })
                 ->addColumn('action', function($user){
-                    $actions = '<div class="relative group inline-block">
-                        <button type="button"
-                            data-id="'.$user->id.'"
-                            data-full_name="'.$user->full_name.'"
-                            data-username="'.$user->username.'"
-                            class="edit-user-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit w-4 h-4">
-                                    <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
-                                    <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
-                                    <path d="m16 5 3 3"></path>
-                                </svg>
-                        </button>
-                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">تعديل</div>
-                    </div>';
-                    $actions .= '<div class="relative group inline-block">
-                        <button type="button"
-                            class="delete-user-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                            data-id="'.$user->id.'"
-                            data-full_name="'.$user->full_name.'"
-                            data-url="'.route('users.delete', $user->id).'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2 w-4 h-4">
-                                <path d="M3 6h18"></path>
-                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                                <line x1="10" x2="10" y1="11" y2="17"></line>
-                                <line x1="14" x2="14" y1="11" y2="17"></line>
+                    $actions = '<div class="relative inline-block text-left">
+                        <div>
+                            <button type="button" class="actions-dropdown-btn inline-flex justify-center w-full rounded-md border border-slate-300 shadow-sm px-2 py-1 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700" id="options-menu-'.$user->id.'" aria-expanded="false" aria-haspopup="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                    <circle cx="19" cy="12" r="1"></circle>
+                                    <circle cx="5" cy="12" r="1"></circle>
                                 </svg>
                             </button>
-                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">حذف</div>
+                        </div>
+                        <div class="actions-dropdown hidden absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 dark:bg-slate-800 dark:ring-slate-700" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-'.$user->id.'" tabindex="-1">
+                            <div class="py-1" role="none">
+                                <button type="button"
+                                    data-id="'.$user->id.'"
+                                    data-full_name="'.$user->full_name.'"
+                                    data-username="'.$user->username.'"
+                                    class="edit-user-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
+                                        <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
+                                        <path d="m16 5 3 3"></path>
+                                    </svg>
+                                    تعديل
+                                </button>
+                                <button type="button"
+                                    class="delete-user-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+                                    data-id="'.$user->id.'"
+                                    data-full_name="'.$user->full_name.'"
+                                    data-url="'.route('users.delete', $user->id).'" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                        <line x1="10" x2="10" y1="11" y2="17"></line>
+                                        <line x1="14" x2="14" y1="11" y2="17"></line>
+                                    </svg>
+                                    حذف
+                                </button>
+                            </div>
+                        </div>
                     </div>';
-                    return '<div class="flex ltr:justify-end rtl:justify-start gap-1">'.$actions.'</div>';
+                    return $actions;
                 })
                 ->rawColumns(['action', 'full_name', 'email', 'created_at'])
                 ->make(true);
@@ -209,7 +219,7 @@ class DataTabelController extends Controller {
     }
 
     public function assets(Request $request) {
-        $query = Asset::query()->select(['id', 'name', 'number', 'purchase_date', 'status', 'created_at']);
+        $query = Asset::query();
 
         // Handle filters
         if ($request->has('type_id') && $request->type_id != '') {
@@ -247,77 +257,81 @@ class DataTabelController extends Controller {
                 ->editColumn('number', function ($asset) {
                     return '<span class="font-mono bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 px-2 py-1 rounded text-sm">'.$asset->number.'</span>';
                 })
+                ->editColumn('employee_id', function ($asset) {
+                    return '<span class="text-slate-900 dark:text-slate-300">'.$asset->employee->full_name ?? 'غير مخصص' .'</span>';
+                })
                 ->addColumn('action', function($asset){
-                    $actions = '';
-
-                    $actions .= '<div class="relative group inline-block">
-                        <a href="'.route('assets.show', $asset->id).'"
-                            class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye w-4 h-4">
-                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </a>
-                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">عرض</div>
-                    </div>';
-
-                    $actions .= '<div class="relative group inline-block">
-                        <a href="'.route('assets.edit', $asset->id).'"
-                            class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit w-4 h-4">
-                                    <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
-                                    <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
-                                <path d="m16 5 3 3"></path>
-                            </svg>
-                        </a>
-                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">تعديل</div>
-                    </div>';
-
-                    $actions .= '<div class="relative group inline-block">
-                        <button type="button"
-                            data-id="'.$asset->id.'"
-                            data-name="'.$asset->name.'"
-                            data-number="'.$asset->number.'"
-                            class="qr-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-900/20 qr-btn"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-qr-code w-4 h-4">
-                                    <rect width="5" height="5" x="3" y="3" rx="1"></rect>
-                                    <rect width="5" height="5" x="16" y="3" rx="1"></rect>
-                                    <rect width="5" height="5" x="3" y="16" rx="1"></rect>
-                                    <path d="M21 16h-3a2 2 0 0 0-2 2v3"></path>
-                                    <path d="M21 21v.01"></path>
-                                    <path d="M12 7v3a2 2 0 0 1-2 2H7"></path>
-                                    <path d="M3 12h.01"></path>
-                                    <path d="M12 3h.01"></path>
-                                    <path d="M12 16v.01"></path>
-                                    <path d="M16 12h1"></path>
-                                    <path d="M21 12v.01"></path>
-                                    <path d="M12 21v-1"></path>
-                                </svg>
-                        </button>
-                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">باركود</div>
-                    </div>';
-
-                    $actions .= '<div class="relative group inline-block">
-                        <button type="button"
-                            class="delete-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 delete-btn"
-                            data-id="'.$asset->id.'"
-                            data-name="'.$asset->name.'"
-                            data-url="'.route('assets.delete', $asset->id).'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2 w-4 h-4">
-                                <path d="M3 6h18"></path>
-                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                                <line x1="10" x2="10" y1="11" y2="17"></line>
-                                <line x1="14" x2="14" y1="11" y2="17"></line>
+                    $actions = '<div class="relative inline-block text-left">
+                        <div>
+                            <button type="button" class="actions-dropdown-btn inline-flex justify-center w-full rounded-md border border-slate-300 shadow-sm px-2 py-1 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700" id="options-menu-'.$asset->id.'" aria-expanded="false" aria-haspopup="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                    <circle cx="19" cy="12" r="1"></circle>
+                                    <circle cx="5" cy="12" r="1"></circle>
                                 </svg>
                             </button>
-                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">حذف</div>
-                    </div>';
+                        </div>
+                        <div class="actions-dropdown hidden absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 dark:bg-slate-800 dark:ring-slate-700" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-'.$asset->id.'" tabindex="-1">
+                            <div class="py-1" role="none">
+                                <a href="'.route('assets.show', $asset->id).'"
+                                    class="edit-asset-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                    عرض
+                                </a>
+                                <a href="'.route('assets.edit', $asset->id).'"
+                                    class="edit-asset-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
+                                        <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
+                                        <path d="m16 5 3 3"></path>
+                                    </svg>
+                                    تعديل
+                                </a>
+                                <button type="button"
+                                    class="delete-asset-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+                                    data-id="'.$asset->id.'"
+                                    data-name="'.$asset->name.'"
+                                    data-url="'.route('assets.delete', $asset->id).'" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                        <line x1="10" x2="10" y1="11" y2="17"></line>
+                                        <line x1="14" x2="14" y1="11" y2="17"></line>
+                                    </svg>
+                                    حذف
+                                </button>
+                                <button type="button"
+                                    data-id="'.$asset->id.'"
+                                    data-name="'.$asset->name.'"
+                                    data-number="'.$asset->number.'"
+                                    class="qr-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <rect width="5" height="5" x="3" y="3" rx="1"></rect>
+                                        <rect width="5" height="5" x="16" y="3" rx="1"></rect>
+                                        <rect width="5" height="5" x="3" y="16" rx="1"></rect>
+                                        <path d="M21 16h-3a2 2 0 0 0-2 2v3"></path>
+                                        <path d="M21 21v.01"></path>
+                                        <path d="M12 7v3a2 2 0 0 1-2 2H7"></path>
+                                        <path d="M3 12h.01"></path>
+                                        <path d="M12 3h.01"></path>
+                                        <path d="M12 16v.01"></path>
+                                        <path d="M16 12h1"></path>
+                                        <path d="M21 12v.01"></path>
+                                        <path d="M12 21v-1"></path>
+                                    </svg>
+                                    باركود
+                                </button>
 
-                    return '<div class="flex ltr:justify-end rtl:justify-start gap-1">'.$actions.'</div>';
+                            </div>
+                        </div>
+                    </div>';
+                    return $actions;
                 })
-                ->rawColumns(['action', 'status', 'name', 'number', 'purchase_date'])
+                ->rawColumns(['action', 'status', 'name', 'number', 'purchase_date', 'employee_id'])
                 ->with('ids', $ids)
                 ->make(true);
         }
@@ -343,15 +357,6 @@ class DataTabelController extends Controller {
     public function types(Request $request) {
         $query = Type::query()->select(['id', 'name', 'created_at']);
 
-        // Handle search
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                ->orWhere('id', 'like', "%{$search}%");
-            });
-        }
-
         if ($request->ajax()) {
             return DataTables::of($query)
                 ->addIndexColumn()
@@ -362,37 +367,47 @@ class DataTabelController extends Controller {
                     return $type->assets->count();
                 })
                 ->addColumn('action', function($type){
-                    $actions = '';
-                    $actions .= '<div class="relative group inline-block">
-                        <button type="button"
-                            data-id="'.$type->id.'"
-                            data-name="'.$type->name.'"
-                            class="edit-type-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit w-4 h-4">
-                                    <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
-                                    <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
-                                    <path d="m16 5 3 3"></path>
-                                </svg>
-                        </button>
-                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">تعديل</div>
-                    </div>';
-                    $actions .= '<div class="relative group inline-block">
-                        <button type="button"
-                            class="delete-type-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                            data-id="'.$type->id.'"
-                            data-name="'.$type->name.'"
-                            data-url="'.route('types.delete', $type->id).'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2 w-4 h-4">
-                                <path d="M3 6h18"></path>
-                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                                <line x1="10" x2="10" y1="11" y2="17"></line>
-                                <line x1="14" x2="14" y1="11" y2="17"></line>
+                    $actions = '<div class="relative inline-block text-left">
+                        <div>
+                            <button type="button" class="actions-dropdown-btn inline-flex justify-center w-full rounded-md border border-slate-300 shadow-sm px-2 py-1 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700" id="options-menu-'.$type->id.'" aria-expanded="false" aria-haspopup="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                    <circle cx="19" cy="12" r="1"></circle>
+                                    <circle cx="5" cy="12" r="1"></circle>
                                 </svg>
                             </button>
-                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">حذف</div>
+                        </div>
+                        <div class="actions-dropdown hidden absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 dark:bg-slate-800 dark:ring-slate-700" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-'.$type->id.'" tabindex="-1">
+                            <div class="py-1" role="none">
+                                <button type="button"
+                                    data-id="'.$type->id.'"
+                                    data-name="'.$type->name.'"
+                                    class="edit-type-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
+                                        <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
+                                        <path d="m16 5 3 3"></path>
+                                    </svg>
+                                    تعديل
+                                </button>
+                                <button type="button"
+                                    class="delete-type-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+                                    data-id="'.$type->id.'"
+                                    data-name="'.$type->name.'"
+                                    data-url="'.route('types.delete', $type->id).'" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                        <line x1="10" x2="10" y1="11" y2="17"></line>
+                                        <line x1="14" x2="14" y1="11" y2="17"></line>
+                                    </svg>
+                                    حذف
+                                </button>
+                            </div>
+                        </div>
                     </div>';
-                    return '<div class="flex ltr:justify-end rtl:justify-start gap-1">'.$actions.'</div>';
+                    return $actions;
                 })
                 ->rawColumns(['action', 'name'])
                 ->make(true);
@@ -402,16 +417,7 @@ class DataTabelController extends Controller {
     }
 
     public function locations(Request  $request) {
-        $query = Location::query()->select(['id', 'name', 'created_at']);
-
-        // Handle search
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                ->orWhere('id', 'like', "%{$search}%");
-            });
-        }
+        $query = Location::query();
 
         if ($request->ajax()) {
             return DataTables::of($query)
@@ -420,37 +426,47 @@ class DataTabelController extends Controller {
                     return '<strong class="text-slate-900 dark:text-slate-300">'.$location->name.'</strong>';
                 })
                 ->addColumn('action', function($location){
-                    $actions = '';
-                    $actions .= '<div class="relative group inline-block">
-                        <button type="button"
-                            data-id="'.$location->id.'"
-                            data-name="'.$location->name.'"
-                            class="edit-location-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit w-4 h-4">
-                                    <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
-                                    <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
-                                    <path d="m16 5 3 3"></path>
-                                </svg>
-                        </button>
-                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">تعديل</div>
-                    </div>';
-                    $actions .= '<div class="relative group inline-block">
-                        <button type="button"
-                            class="delete-location-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                            data-id="'.$location->id.'"
-                            data-name="'.$location->name.'"
-                            data-url="'.route('locations.delete', $location->id).'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2 w-4 h-4">
-                                <path d="M3 6h18"></path>
-                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                                <line x1="10" x2="10" y1="11" y2="17"></line>
-                                <line x1="14" x2="14" y1="11" y2="17"></line>
+                    $actions = '<div class="relative inline-block text-left">
+                        <div>
+                            <button type="button" class="actions-dropdown-btn inline-flex justify-center w-full rounded-md border border-slate-300 shadow-sm px-2 py-1 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700" id="options-menu-'.$location->id.'" aria-expanded="false" aria-haspopup="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                    <circle cx="19" cy="12" r="1"></circle>
+                                    <circle cx="5" cy="12" r="1"></circle>
                                 </svg>
                             </button>
-                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">حذف</div>
+                        </div>
+                        <div class="actions-dropdown hidden absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 dark:bg-slate-800 dark:ring-slate-700" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-'.$location->id.'" tabindex="-1">
+                            <div class="py-1" role="none">
+                                <button type="button"
+                                    data-id="'.$location->id.'"
+                                    data-name="'.$location->name.'"
+                                    class="edit-location-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
+                                        <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
+                                        <path d="m16 5 3 3"></path>
+                                    </svg>
+                                    تعديل
+                                </button>
+                                <button type="button"
+                                    class="delete-location-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+                                    data-id="'.$location->id.'"
+                                    data-full_name="'.$location->name.'"
+                                    data-url="'.route('locations.delete', $location->id).'" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                        <line x1="10" x2="10" y1="11" y2="17"></line>
+                                        <line x1="14" x2="14" y1="11" y2="17"></line>
+                                    </svg>
+                                    حذف
+                                </button>
+                            </div>
+                        </div>
                     </div>';
-                    return '<div class="flex ltr:justify-end rtl:justify-start gap-1">'.$actions.'</div>';
+                    return $actions;
                 })
                 ->rawColumns(['action', 'name'])
                 ->make(true);
@@ -460,61 +476,82 @@ class DataTabelController extends Controller {
     }
 
     public function employees(Request  $request) {
-        $query = Employee::query()->select(['id', 'full_name', 'created_at']);
+        $query = Employee::query();
 
-        // Handle search
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('full_name', 'like', "%{$search}%")
-                ->orWhere('id', 'like', "%{$search}%");
-            });
+        // Handle filters
+        if ($request->has('location_id') && $request->location_id != '') {
+            $query->where('location_id', $request->location_id);
         }
 
         if ($request->ajax()) {
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->editColumn('full_name', function ($employee) {
-                    return '<strong class="text-slate-900 dark:text-slate-300">'.$employee->full_name.'</strong>';
+                    return '<strong class="text-slate-900 dark:text-slate-300">'. $employee->full_name .'</strong>';
+                })
+                ->editColumn('location_id', function ($employee) {
+                    return '<strong class="text-slate-900 dark:text-slate-300">'. ($employee->location->name ?? 'غير مخصص') .'</strong>';
+                })
+                ->editColumn('job_title', function ($employee) {
+                    return '<strong class="text-slate-900 dark:text-slate-300">'. $employee->job_title ?? '-' .'</strong>';
+                })
+                ->editColumn('email', function ($employee) {
+                    return '<strong class="text-slate-900 dark:text-slate-300">'. $employee->email ?? '-' .'</strong>';
                 })
                 ->addColumn('action', function($employee){
-                    $actions = '';
-                    $actions .= '<div class="relative group inline-block">
-                        <button type="button"
-                            data-id="'.$employee->id.'"
-                            data-full_name="'.$employee->full_name.'"
-                            class="edit-employee-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit w-4 h-4">
-                                    <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
-                                    <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
-                                    <path d="m16 5 3 3"></path>
-                                </svg>
-                        </button>
-                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">تعديل</div>
-                    </div>';
-                    $actions .= '<div class="relative group inline-block">
-                        <button type="button"
-                            class="delete-employee-btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent h-8 px-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                            data-id="'.$employee->id.'"
-                            data-full_name="'.$employee->full_name.'"
-                            data-url="'.route('employees.delete', $employee->id).'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2 w-4 h-4">
-                                <path d="M3 6h18"></path>
-                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                                <line x1="10" x2="10" y1="11" y2="17"></line>
-                                <line x1="14" x2="14" y1="11" y2="17"></line>
+                    $actions = '<div class="relative inline-block text-left">
+                        <div>
+                            <button type="button" class="actions-dropdown-btn inline-flex justify-center w-full rounded-md border border-slate-300 shadow-sm px-2 py-1 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700" id="options-menu-'.$employee->id.'" aria-expanded="false" aria-haspopup="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                    <circle cx="19" cy="12" r="1"></circle>
+                                    <circle cx="5" cy="12" r="1"></circle>
                                 </svg>
                             </button>
-                        <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">حذف</div>
+                        </div>
+                        <div class="actions-dropdown hidden absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 dark:bg-slate-800 dark:ring-slate-700" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-'.$employee->id.'" tabindex="-1">
+                            <div class="py-1" role="none">
+                                <button type="button"
+                                    data-id="'.$employee->id.'"
+                                    data-full_name="'.$employee->full_name.'"
+                                    data-job_title="'.$employee->job_title.'"
+                                    data-email="'.$employee->email.'"
+                                    data-location_id="'.$employee->location_id.'"
+                                    class="edit-employee-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
+                                        <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
+                                        <path d="m16 5 3 3"></path>
+                                    </svg>
+                                    تعديل
+                                </button>
+                                <button type="button"
+                                    class="delete-employee-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+                                    data-id="'.$employee->id.'"
+                                    data-full_name="'.$employee->full_name.'"
+                                    data-url="'.route('employees.delete', $employee->id).'" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                        <line x1="10" x2="10" y1="11" y2="17"></line>
+                                        <line x1="14" x2="14" y1="11" y2="17"></line>
+                                    </svg>
+                                    حذف
+                                </button>
+                            </div>
+                        </div>
                     </div>';
-                    return '<div class="flex ltr:justify-end rtl:justify-start gap-1">'.$actions.'</div>';
+                    return $actions;
                 })
-                ->rawColumns(['action', 'full_name'])
+                ->rawColumns(['action', 'job_title', 'email', 'full_name', 'location_id'])
                 ->make(true);
         }
 
-        return view('content.employees.list');
+        $locations = Location::all();
+
+        return view('content.employees.list')
+        ->with('locations',$locations);
     }
 
     public function depreciationEntries(Request $request) {
@@ -523,26 +560,12 @@ class DataTabelController extends Controller {
         // Handle year filter
         $selectedYear = $request->get('year', date('Y'));
         if ($selectedYear) {
-            $query->where('depreciation_year', $selectedYear);
+            $query->whereYear('depreciation_year', $selectedYear);
         }
 
         // Handle asset filter
         if ($request->has('asset_id') && $request->asset_id != '') {
             $query->where('asset_id', $request->asset_id);
-        }
-
-        // Handle search
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('entry_number', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%")
-                ->orWhere('classification', 'like', "%{$search}%")
-                ->orWhereHas('asset', function($assetQuery) use ($search) {
-                    $assetQuery->where('name', 'like', "%{$search}%")
-                                ->orWhere('number', 'like', "%{$search}%");
-                });
-            });
         }
 
         $entries = $query->orderBy('entry_number', 'asc')->get();
@@ -570,7 +593,7 @@ class DataTabelController extends Controller {
                         '<span class="text-slate-400 dark:text-slate-500 text-sm">-</span>';
                 })
                 ->editColumn('depreciation_year', function ($entry) {
-                    return '<span class="font-mono text-slate-800 dark:text-slate-300">'.$entry->depreciation_year.'</span>';
+                    return '<span class="font-mono text-slate-800 dark:text-slate-300">'.date('d/m/Y', strtotime($entry->depreciation_year)).'</span>';
                 })
                 ->editColumn('days_count', function ($entry) {
                     return '<span class="font-mono text-slate-800 dark:text-slate-300">'.$entry->days_count.'</span>';

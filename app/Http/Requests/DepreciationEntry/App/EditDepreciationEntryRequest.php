@@ -13,7 +13,8 @@ class EditDepreciationEntryRequest extends FormRequest {
             'asset_id' => 'required|exists:assets,id',
             'depreciation_rate' => 'nullable|numeric|min:0|max:100',
             'depreciation_start_date' => 'nullable|date',
-            'depreciation_year' => 'nullable|integer|min:2000|max:2100',
+            'depreciation_year' => 'nullable|date',
+            // 'depreciation_year' => 'nullable|integer|min:2000|max:2100',
             'days_count' => 'nullable|integer|min:0',
             'purchase_cost' => 'nullable|numeric|min:0',
             'additions' => 'nullable|numeric|min:0',
@@ -47,9 +48,10 @@ class EditDepreciationEntryRequest extends FormRequest {
             'depreciation_rate.min' => 'حقل نسبة الاستحقاق يجب ان يكون اكبر من 0',
             'depreciation_rate.max' => 'حقل نسبة الاستحقاق يجب ان يكون اقل من 100',
             'depreciation_start_date.date' => 'حقل تاريخ بدء الاستحقاق يجب ان يكون تاريخا',
-            'depreciation_year.integer' => 'حقل سنة الاستحقاق يجب ان يكون رقما',
-            'depreciation_year.min' => 'حقل سنة الاستحقاق يجب ان يكون اكبر من 2000',
-            'depreciation_year.max' => 'حقل سنة الاستحقاق يجب ان يكون اقل من 2100',
+            'depreciation_year.date' => 'حقل سنة الاستحقاق يجب ان يكون تاريخا',
+            // 'depreciation_year.integer' => 'حقل سنة الاستحقاق يجب ان يكون رقما',
+            // 'depreciation_year.min' => 'حقل سنة الاستحقاق يجب ان يكون اكبر من 2000',
+            // 'depreciation_year.max' => 'حقل سنة الاستحقاق يجب ان يكون اقل من 2100',
             'days_count.integer' => 'حقل عدد الايام يجب ان يكون رقما',
             'days_count.min' => 'حقل عدد الايام يجب ان يكون اكبر من 0',
             'purchase_cost.numeric' => 'حقل تكلفة الاصل يجب ان يكون رقما',
@@ -59,7 +61,7 @@ class EditDepreciationEntryRequest extends FormRequest {
             'exclusions.numeric' => 'حقل الاستبعادات يجب ان يكون رقما',
             'exclusions.min' => 'حقل الاستبعادات يجب ان يكون اكبر من 0',
             'current_year_depreciation.numeric' => 'حقل استحقاق السنة الحالية يجب ان يكون رقما',
-            'current_year_depreciation.min' => 'حقل استحقاق السنة الحالية يجب ان يكون اكبر من 0',        
+            'current_year_depreciation.min' => 'حقل استحقاق السنة الحالية يجب ان يكون اكبر من 0',
         ];
     }
 }

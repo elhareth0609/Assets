@@ -14,6 +14,15 @@ return new class extends Migration
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->string('full_name');
+            $table->string('email')->nullable();
+            $table->string('job_title')->nullable();
+            $table->foreignId('location_id')
+                ->nullable()
+                ->constrained('locations')
+                ->onDelete('set null')
+                ->onUpdate('cascade')
+                ->comment('الموظف المستخدم للأصل حالياً');
+
             $table->timestamps();
         });
     }

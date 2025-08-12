@@ -272,11 +272,12 @@
                     </div>
                     <div>
                         <label for="depreciationYear" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">سنة احتساب الاهلاك</label>
-                        <input type="number" id="depreciationYear" name="depreciation_year" min="2000" max="2100" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل سنة احتساب الاهلاك">
+                        <input type="date" id="depreciationYear" name="depreciation_year" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" >
+                        {{-- <input type="number" id="depreciationYear" name="depreciation_year" min="2000" max="2100" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل سنة احتساب الاهلاك"> --}}
                     </div>
                     <div>
                         <label for="daysCount" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">عدد الأيام</label>
-                        <input type="number" disabled id="daysCount" name="days_count" min="0" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل عدد الأيام">
+                        <input type="number" readonly id="daysCount" name="days_count" min="0" class="flex h-10 rounded-md border border-slate-300 bg-slate-100 cursor-not-allowed px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل عدد الأيام">
                     </div>
                     <div>
                         <label for="purchaseCost" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">تكلفة الشراء</label>
@@ -292,7 +293,7 @@
                     </div>
                     <div>
                         <label for="assetCostAtEnd" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">تكلفة الأصل في 31/12/س</label>
-                        <input type="number" disabled id="assetCostAtEnd" name="asset_cost_at_end" step="0.01" min="0" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل تكلفة الأصل في نهاية الفترة">
+                        <input type="number" readonly id="assetCostAtEnd" name="asset_cost_at_end" step="0.01" min="0" class="flex h-10 rounded-md border border-slate-300 bg-slate-100 cursor-not-allowed px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل تكلفة الأصل في نهاية الفترة">
                     </div>
                     <div>
                         <label for="accumulatedDepreciationAtStart" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">مجمع الاهلاك في 01/01/س</label>
@@ -300,7 +301,7 @@
                     </div>
                     <div>
                         <label for="currentYearDepreciation" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">اهلاك السنة س</label>
-                        <input type="number" disabled id="currentYearDepreciation" name="current_year_depreciation" step="0.01" min="0" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اهلاك السنة">
+                        <input type="number" readonly id="currentYearDepreciation" name="current_year_depreciation" step="0.01" min="0" class="flex h-10 rounded-md border border-slate-300 bg-slate-100 cursor-not-allowed px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اهلاك السنة">
                     </div>
                     <div>
                         <label for="excludedDepreciation" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">الاهلاك المستبعد س</label>
@@ -308,11 +309,11 @@
                     </div>
                     <div>
                         <label for="accumulatedDepreciationAtEnd" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">مجمع الاهلاك في س</label>
-                        <input type="number" disabled id="accumulatedDepreciationAtEnd" name="accumulated_depreciation_at_end" step="0.01" min="0" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل مجمع الاهلاك في نهاية الفترة">
+                        <input type="number" readonly id="accumulatedDepreciationAtEnd" name="accumulated_depreciation_at_end" step="0.01" min="0" class="flex h-10 rounded-md border border-slate-300 bg-slate-100 cursor-not-allowed px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل مجمع الاهلاك في نهاية الفترة">
                     </div>
                     <div>
                         <label for="netBookValue" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">صافي القيمة الدفترية</label>
-                        <input type="number" disabled id="netBookValue" name="net_book_value" step="0.01" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل صافي القيمة الدفترية">
+                        <input type="number" readonly id="netBookValue" name="net_book_value" step="0.01" class="flex h-10 rounded-md border border-slate-300 bg-slate-100 cursor-not-allowed px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل صافي القيمة الدفترية">
                     </div>
                     <div>
                         <label for="classification" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">التصنيف</label>
@@ -462,6 +463,41 @@
   html.dark #depreciation-entries-table tfoot td {
     color: rgb(203 213 225); /* dark:text-slate-300 */
   }
+
+
+
+
+
+      /* Ensure table container doesn't clip dropdowns */
+    .dataTables_wrapper {
+        overflow: visible !important;
+    }
+
+    .dataTables_scrollBody {
+        overflow: visible !important;
+    }
+
+    /* Ensure table cells don't clip content */
+    #locations-table tbody td {
+        overflow: visible !important;
+    }
+
+    /* Style for dropdown menus */
+    .actions-dropdown {
+        min-width: 160px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Ensure dropdown appears above other content */
+    .actions-dropdown:not(.hidden) {
+        z-index: 9999 !important;
+    }
+
+    /* Fix for RTL layout if needed */
+    html[dir="rtl"] .actions-dropdown {
+        right: auto;
+        left: 0;
+    }
 </style>
 @endsection
 
@@ -645,6 +681,8 @@ $(document).ready(function() {
 
     // Edit Entry Modal
     $(document).on('click', '.edit-entry-btn', function() {
+        $('.actions-dropdown').addClass('hidden');
+
         var entryId = $(this).data('id');
 
         // Get entry details via AJAX
@@ -724,6 +762,8 @@ $(document).ready(function() {
 
     // Delete Entry Modal
     $(document).on('click', '.delete-entry-btn', function() {
+        $('.actions-dropdown').addClass('hidden');
+
         var entryId = $(this).data('id');
         var entryNumber = $(this).closest('tr').find('td:eq(1)').text();
         var deleteUrl = $(this).data('url');
@@ -813,10 +853,13 @@ $(document).ready(function() {
 // Function to calculate days count
 function calculateDaysCount() {
     const startDate = new Date($('#depreciationStartDate').val());
-    const year = parseInt($('#depreciationYear').val());
+    const endDate = new Date($('#depreciationYear').val()); // +
+    console.log(startDate,endDate);
+    // const year = parseInt($('#depreciationYear').val()); / -
 
-    if (startDate && year) {
-        const endDate = new Date(year, 11, 31); // December 31 of the selected year
+    if (startDate && endDate) { // +
+    // if (startDate && year) { // -
+        // const endDate = new Date(year, 11, 31); // December 31 of the selected year // -
         const diffTime = Math.abs(endDate - startDate);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         $('#daysCount').val(diffDays);
@@ -875,5 +918,26 @@ function calculateNetBookValue() {
     const netBookValue = assetCostAtEnd - accumulatedDepreciationAtEnd;
     $('#netBookValue').val(netBookValue.toFixed(2));
 }
+
+
+
+    $(document).on('click', '.actions-dropdown-btn', function (e) {
+        e.stopPropagation(); // prevent document click from immediately closing
+
+        let relativeParent = $(this).closest('.relative');
+        let dropdown = relativeParent.find('.actions-dropdown');
+
+        // Close other dropdowns
+        $('.actions-dropdown').not(dropdown).addClass('hidden');
+
+        // Toggle current dropdown
+        dropdown.toggleClass('hidden');
+    });
+
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.actions-dropdown-btn, .actions-dropdown').length) {
+            $('.actions-dropdown').addClass('hidden');
+        }
+    });
 </script>
 @endsection

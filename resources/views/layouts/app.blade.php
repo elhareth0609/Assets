@@ -314,7 +314,7 @@
 
                     if (isCollapsed) {
                         // Expand the submenu
-                        submenu.style.maxHeight = submenu.scrollHeight + 'px';
+                        submenu.style.maxHeight = submenu.scrollHeight + 10 + 'px';
                         if (chevron) chevron.style.transform = 'rotate(180deg)';
                         button.setAttribute('aria-expanded', 'true');
                         submenu.classList.add('py-2');

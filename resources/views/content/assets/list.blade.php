@@ -162,13 +162,13 @@
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
         <div class="p-0 m-0">
             <div class="space-y-4">
-                <div class="w-full overflow-auto rounded-lg">
+                <div class="w-full overflow-auto md:overflow-visible rounded-lg">
                     <table id="assets-table" class="table table-hover mb-0">
                         <thead>
                             <tr>
-                                <th>#</th>
                                 <th>رقم الأصل</th>
                                 <th>اسم الأصل</th>
+                                <th>الموظف</th>
                                 <th>الحالة</th>
                                 <th>تاريخ الشراء</th>
                                 <th>الإجراءات</th>
@@ -355,6 +355,39 @@
   html.dark #assets-table thead th {
     color: rgb(148 163 184); /* dark:text-slate-400 */
   }
+
+
+
+      /* Ensure table container doesn't clip dropdowns */
+    .dataTables_wrapper {
+        overflow: visible !important;
+    }
+
+    .dataTables_scrollBody {
+        overflow: visible !important;
+    }
+
+    /* Ensure table cells don't clip content */
+    #locations-table tbody td {
+        overflow: visible !important;
+    }
+
+    /* Style for dropdown menus */
+    .actions-dropdown {
+        min-width: 160px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Ensure dropdown appears above other content */
+    .actions-dropdown:not(.hidden) {
+        z-index: 9999 !important;
+    }
+
+    /* Fix for RTL layout if needed */
+    html[dir="rtl"] .actions-dropdown {
+        right: auto;
+        left: 0;
+    }
 </style>
 
 @endsection
@@ -401,14 +434,14 @@ $(document).ready(function() {
             }
         },
         columns: [
-            { data: 'id', name: 'id', title: 'المعرف' },
             { data: 'number', name: 'number', title: 'رقم الأصل' },
             { data: 'name', name: 'name', title: 'اسم الأصل' },
+            { data: 'employee_id', name: 'employee_id', title: 'الموظف' },
             { data: 'status', name: 'status', title: 'الحالة' },
             { data: 'purchase_date', name: 'purchase_date', title: 'تاريخ الشراء' },
             { data: 'action', name: 'action', title: 'الإجراءات', orderable: false,searchable: false }
         ],
-        order: [[5, 'desc']],
+        order: [[4, 'desc']],
         initComplete: function(settings, json) {
             applyTailwindStyles();
         },
@@ -524,7 +557,9 @@ $(document).ready(function() {
     });
 
     // Delete button functionality
-    $(document).on('click', '.delete-btn', function() {
+    $(document).on('click', '.delete-asset-btn', function() {
+        $('.actions-dropdown').addClass('hidden');
+
         var assetId = $(this).data('id');
         var assetName = $(this).data('name');
         var deleteUrl = $(this).data('url');
@@ -571,6 +606,8 @@ $(document).ready(function() {
 
     // QR Code button functionality
     $(document).on('click', '.qr-btn', function() {
+        $('.actions-dropdown').addClass('hidden');
+
         var assetId = $(this).data('id');
         var assetName = $(this).data('name');
         var assetNumber = $(this).data('number');
@@ -749,12 +786,12 @@ $(document).ready(function() {
     }
 
     // Double-click to edit functionality
-    $(document).on('dblclick', '#assets-table tbody tr', function() {
-        var rowData = table.row(this).data();
-        if (rowData) {
-            window.location.href = `/assets-list/${rowData.id}/edit`;
-        }
-    });
+    // $(document).on('dblclick', '#assets-table tbody tr', function() {
+    //     var rowData = table.row(this).data();
+    //     if (rowData) {
+    //         window.location.href = `/assets-list/${rowData.id}/edit`;
+    //     }
+    // });
 
     // Keyboard shortcuts
     $(document).on('keydown', function(e) {
@@ -779,353 +816,27 @@ $(document).ready(function() {
     });
 
 });
-});
-</script>
-@endsection
 
 
-{{-- @extends('layouts.app')
-@section('content')
-<div class="mx-auto p-6 space-y-6">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-            <h1 class="text-3xl font-display font-bold text-slate-900 dark:text-slate-100">سجل الأصول</h1>
-            <p class="text-slate-600 dark:text-slate-400 mt-1">تتبع وإدارة أصول المؤسسة</p>
-        </div>
-        <div class="flex gap-2">
-            <button id="export-csv-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800 h-8 px-3 text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4 ltr:mr-2 rtl:ml-2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" x2="12" y1="15" y2="3"></line>
-                </svg>
-                تصدير CSV
-            </button>
-            <a href="{{ route('assets.create') }}" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-8 px-3 text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus w-4 h-4 ltr:mr-2 rtl:ml-2">
-                    <path d="M5 12h14"></path>
-                    <path d="M12 5v14"></path>
-                </svg>
-                إضافة أصل جديد
-            </a>
-        </div>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">
-            <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex flex-row items-center justify-between space-y-0 pb-2">
-                <h3 class="tracking-tight text-sm font-medium text-blue-700 dark:text-blue-300">إجمالي الأصول</h3>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package h-5 w-5 text-blue-600 dark:text-blue-400">
-                    <path d="m7.5 4.27 9 5.15"></path>
-                    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
-                    <path d="m3.3 7 8.7 5 8.7-5"></path>
-                    <path d="M12 22V12"></path>
-                </svg>
-            </div>
-            <div class="p-6">
-                <div class="text-2xl font-bold text-blue-900 dark:text-blue-100">{{ $data->total }}</div>
-                <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">إجمالي الأصول المسجلة</p>
-            </div>
-        </div>
+    $(document).on('click', '.actions-dropdown-btn', function (e) {
+        e.stopPropagation(); // prevent document click from immediately closing
 
-        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-800">
-            <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex flex-row items-center justify-between space-y-0 pb-2">
-                <h3 class="tracking-tight text-sm font-medium text-green-700 dark:text-green-300">قيد الاستخدام</h3>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle h-5 w-5 text-green-600 dark:text-green-400">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-            </div>
-            <div class="p-6">
-                <div class="text-2xl font-bold text-green-900 dark:text-green-100">{{ $data->in_use }}</div>
-                <p class="text-xs text-green-600 dark:text-green-400 mt-1">أصول نشطة</p>
-            </div>
-        </div>
+        let relativeParent = $(this).closest('.relative');
+        let dropdown = relativeParent.find('.actions-dropdown');
 
-        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border-yellow-200 dark:border-yellow-800">
-            <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex flex-row items-center justify-between space-y-0 pb-2">
-                <h3 class="tracking-tight text-sm font-medium text-yellow-700 dark:text-yellow-300">في الصيانة</h3>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tool h-5 w-5 text-yellow-600 dark:text-yellow-400">
-                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-                </svg>
-            </div>
-            <div class="p-6">
-                <div class="text-2xl font-bold text-yellow-900 dark:text-yellow-100">{{ $data->maintenance }}</div>
-                <p class="text-xs text-yellow-600 dark:text-yellow-400 mt-1">تحت الصيانة</p>
-            </div>
-        </div>
+        // Close other dropdowns
+        $('.actions-dropdown').not(dropdown).addClass('hidden');
 
-        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border-red-200 dark:border-red-800">
-            <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex flex-row items-center justify-between space-y-0 pb-2">
-                <h3 class="tracking-tight text-sm font-medium text-red-700 dark:text-red-300">خارج الخدمة</h3>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle h-5 w-5 text-red-600 dark:text-red-400">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" x2="12" y1="8" y2="12"></line>
-                    <line x1="12" x2="12.01" y1="16" y2="16"></line>
-                </svg>
-            </div>
-            <div class="p-6">
-                <div class="text-2xl font-bold text-red-900 dark:text-red-100">{{ $data->damaged }}</div>
-                <p class="text-xs text-red-600 dark:text-red-400 mt-1">أصول معطلة</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Filters Section -->
-    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
-        <div class="p-6 border-b border-slate-200 dark:border-slate-700">
-            <h3 class="text-lg font-semibold text-slate-900 dark:text-white leading-none tracking-tight flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-filter w-5 h-5">
-                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                </svg>
-                الفلاتر والبحث
-            </h3>
-        </div>
-        <div class="p-6">
-            <form id="custom-filters-form">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-2 dark:text-slate-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-activity w-4 h-4 inline ltr:mr-1 rtl:ml-1">
-                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                            </svg>
-                            الحالة
-                        </label>
-                        <div class="w-full">
-                            <select id="status" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" name="status">
-                                <option value="">جميع الحالات</option>
-                                <option value="in_use">قيد الاستخدام</option>
-                                <option value="maintenance">في الصيانة</option>
-                                <option value="in_storage">في المستودع</option>
-                                <option value="damaged">تالف</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-1">
-                        <label class="block text-sm font-medium mb-2 dark:text-slate-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-4 h-4 inline ltr:mr-1 rtl:ml-1">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <path d="m21 21-4.3-4.3"></path>
-                            </svg>
-                            بحث
-                        </label>
-                        <div class="w-full">
-                            <input id="dataTables_my_filter" type="text" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="ابحث بالرقم، الاسم، أو المستخدم...">
-                        </div>
-                    </div>
-                    <div class="flex items-end">
-                        <button type="button" id="apply-filters-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-10 px-4 text-sm w-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-filter w-4 h-4 ltr:mr-2 rtl:ml-2">
-                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                            </svg>
-                            تطبيق الفلتر
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Table Section -->
-    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
-        <!-- DataTable Container -->
-        <div class="p-0 m-0">
-            <div class="space-y-4">
-                <div class="w-full overflow-auto rounded-lg">
-                    {{ $dataTable->table() }}
-                </div>
-                <div class="flex flex-col sm:flex-row items-center justify-between p-4">
-                    <div class="text-sm text-slate-600 dark:text-slate-400" id="custom-pagination-info">
-
-                    </div>
-
-                    <select id="custom-length" class="flex h-8 rounded-md border border-slate-300 bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50">
-                        <option value="1">1</option>
-                        <option value="10">10</option>
-                        <option value="25" selected>25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-
-                    <div class="flex items-center gap-1 rtl:flex-row-reverse" id="custom-pagination">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</div>
-@endsection
-
-@section('styles')
-    <style>
-        .dt-search,
-        .dt-paging,
-        .dt-length,
-        .dt-info,
-        .dt-buttons {
-            display: none !important;
-        }
-
-        /* Hide default DataTables controls */
-        .dataTables_wrapper .dataTables_filter,
-        .dataTables_wrapper .dataTables_length,
-        .dataTables_wrapper .dataTables_info,
-        .dataTables_wrapper .dataTables_paginate {
-            display: none !important;
-        }
-
-        /* Ensure only one thead is visible */
-        .dt-scroll-head {
-            display: none !important;
-        }
-    </style>
-@endsection
-
-@section('scripts')
-{{ $dataTable->scripts() }}
-
-<script>
-$(document).ready(function() {
-    let table = window.LaravelDataTables['assets-table'];
-
-    // Custom filter functionality
-    $('#apply-filters-btn').on('click', function() {
-        let assetType = $('#assetType').val();
-        let status = $('#status').val();
-        let searchi = $('#dataTables_my_filter').val();
-
-        // Add parameters to the DataTable request
-        table.ajax.url(table.ajax.url() + '?' + $.param({
-            assetType: assetType,
-            status: status,
-            searchi: searchi
-        })).load();
+        // Toggle current dropdown
+        dropdown.toggleClass('hidden');
     });
 
-    var searchInput = $('#dataTables_my_filter');
-
-    // Remove default event handlers
-    searchInput.off();
-
-    // Add custom event handler with debounce
-    var searchTimeout;
-    searchInput.on('keyup', function() {
-        let searchi = $(this).val();
-        let assetType = $('#assetType').val();
-        let status = $('#status').val();
-
-        // Clear the previous timeout
-        clearTimeout(searchTimeout);
-
-        // Set a new timeout for 500ms
-        searchTimeout = setTimeout(function() {
-            try {
-                table.ajax.url(table.ajax.url().split('?')[0] + '?' + $.param({
-                    assetType: assetType,
-                    status: status,
-                    searchi: searchi
-                })).load();
-            } catch (e) {
-                console.error("Search error:", e);
-            }
-        }, 500);
-    });
-
-    // Custom length change
-    $('#custom-length').on('change', function() {
-        let length = $(this).val();
-        table.page.len(length).draw();
-    });
-
-    // Export CSV functionality
-    $('#export-csv-btn').on('click', function() {
-        let assetType = $('#assetType').val();
-        let status = $('#status').val();
-        let searchi = $('#dataTables_my_filter').val();
-
-        let exportUrl = '{{ route("assets.export") }}?' + $.param({
-            assetType: assetType,
-            status: status,
-            searchi: searchi,
-            format: 'csv'
-        });
-
-        window.location.href = exportUrl;
-    });
-
-    // Update custom info and pagination
-    function updateCustomInfo(settings) {
-        let api = new $.fn.dataTable.Api(settings);
-        let info = api.page.info();
-
-        // Update info text
-        $('#custom-pagination-info').text(`عرض ${info.start + 1} إلى ${info.end} من إجمالي ${info.recordsTotal} مُدخلًا`);
-
-        // Update pagination
-        updateCustomPagination(info, api);
-    }
-
-    function updateCustomPagination(info, api) {
-        let pagination = $('#custom-pagination');
-        pagination.empty();
-
-        if (info.pages <= 1) return;
-
-        // First button
-        let firstBtn = $(`
-            <div class="relative group inline-block">
-                <button class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 h-8 text-sm p-2 ${info.page === 0 ? 'opacity-50 cursor-not-allowed' : ''}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left ">
-                        <path d="m15 18-6-6 6-6"></path>
-                    </svg>
-                </button>
-                <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">الصفحة السابقة</div>
-            </div>
-        `);
-        if (info.page !== 0) {
-            firstBtn.on('click', function() { api.page('first').draw('page'); });
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.actions-dropdown-btn, .actions-dropdown').length) {
+            $('.actions-dropdown').addClass('hidden');
         }
-        pagination.append(firstBtn);
-
-        // Page numbers
-        let startPage = Math.max(0, info.page - 2);
-        let endPage = Math.min(info.pages - 1, info.page + 2);
-
-        for (let i = startPage; i <= endPage; i++) {
-            let pageBtn = $(`
-                <button class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none h-8 px-3 text-sm ${i === info.page ? 'bg-primary-600 text-white border-primary-600' : 'bg-transparent border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 hidden'}">${i + 1}</button>
-            `);
-            if (i !== info.page) {
-                pageBtn.on('click', function() { api.page(i).draw('page'); });
-            }
-            pagination.append(pageBtn);
-        }
-
-        // Next button
-        let nextBtn = $(`
-            <div class="relative group inline-block">
-                <button class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 h-8 text-sm p-2 ${info.page === info.pages - 1 ? 'opacity-50 cursor-not-allowed' : ''}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right ">
-                        <path d="m9 18 6-6-6-6"></path>
-                    </svg>
-                </button>
-                <div class="absolute z-10 whitespace-nowrap px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bottom-full mb-1 left-1/2 transform -translate-x-1/2">الصفحة التالية</div>
-            </div>
-        `);
-        if (info.page !== info.pages - 1) {
-            nextBtn.on('click', function() { api.page('next').draw('page'); });
-        }
-        pagination.append(nextBtn);
-    }
-
-    // Make updateCustomInfo globally available
-    window.updateCustomInfo = updateCustomInfo;
-
-    // Initial info update
-    table.on('draw', function(e, settings) {
-        updateCustomInfo(settings);
     });
 });
 </script>
-@endsection --}}
+@endsection

@@ -30,6 +30,7 @@ class DepreciationEntry extends Model
     protected $casts = [
         'date' => 'date',
         'depreciation_start_date' => 'date',
+        'depreciation_year' => 'date',
         'depreciation_rate' => 'decimal:2',
         'days_count' => 'integer',
         'purchase_cost' => 'decimal:2',

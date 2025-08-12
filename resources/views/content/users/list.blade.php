@@ -50,7 +50,7 @@
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
         <div class="p-0 m-0">
             <div class="space-y-4">
-                <div class="w-full overflow-auto rounded-lg">
+                <div class="w-full overflow-auto md:overflow-visible rounded-lg">
                     <table id="users-table" class="table table-hover mb-0">
                         <thead>
                             <tr>
@@ -242,6 +242,39 @@
   html.dark #users-table thead th {
     color: rgb(148 163 184); /* dark:text-slate-400 */
   }
+
+
+
+      /* Ensure table container doesn't clip dropdowns */
+    .dataTables_wrapper {
+        overflow: visible !important;
+    }
+
+    .dataTables_scrollBody {
+        overflow: visible !important;
+    }
+
+    /* Ensure table cells don't clip content */
+    #locations-table tbody td {
+        overflow: visible !important;
+    }
+
+    /* Style for dropdown menus */
+    .actions-dropdown {
+        min-width: 160px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Ensure dropdown appears above other content */
+    .actions-dropdown:not(.hidden) {
+        z-index: 9999 !important;
+    }
+
+    /* Fix for RTL layout if needed */
+    html[dir="rtl"] .actions-dropdown {
+        right: auto;
+        left: 0;
+    }
 </style>
 @endsection
 
@@ -400,29 +433,33 @@ $(document).ready(function() {
 
     // Edit User Modal
     $(document).on('click', '.edit-user-btn', function() {
+        $('.actions-dropdown').addClass('hidden');
+
         var userId = $(this).data('id');
+        var fullName = $(this).data('full_name');
+        var username = $(this).data('username');
 
         // Get user details via AJAX
-        $.ajax({
-            url: '/users/' + userId,
-            type: 'GET',
-            success: function(response) {
-                $('#userModalTitle').text('تعديل المستخدم');
-                $('#userId').val(response.id);
-                $('#fullName').val(response.full_name);
-                $('#username').val(response.username);
-                $('#email').val(response.email);
-                $('#password').removeAttr('required');
-                $('#password_confirmation').removeAttr('required');
-                $('#password').val('');
-                $('#password_confirmation').val('');
+        $('#userModalTitle').text('تعديل المستخدم');
+        $('#userId').val(userId);
+        $('#fullName').val(fullName);
+        $('#username').val(username);
+        // $('#email').val(response.email);
+        $('#password').removeAttr('required');
+        $('#password_confirmation').removeAttr('required');
+        $('#password').val('');
+        $('#password_confirmation').val('');
 
-                $('#userModal').removeClass('hidden').addClass('flex');
-            },
-            error: function(xhr) {
-                showNotification('حدث خطأ أثناء جلب بيانات المستخدم', 'error');
-            }
-        });
+        $('#userModal').removeClass('hidden').addClass('flex');
+        // $.ajax({
+        //     url: '/users/' + userId,
+        //     type: 'GET',
+        //     success: function(response) {
+        //     },
+        //     error: function(xhr) {
+        //         showNotification('حدث خطأ أثناء جلب بيانات المستخدم', 'error');
+        //     }
+        // });
     });
 
     // User Form Submit
@@ -480,6 +517,8 @@ $(document).ready(function() {
 
     // Delete User Modal
     $(document).on('click', '.delete-user-btn', function() {
+        $('.actions-dropdown').addClass('hidden');
+
         var userId = $(this).data('id');
         var userName = $(this).data('full_name');
         var deleteUrl = $(this).data('url');
@@ -554,6 +593,28 @@ $(document).ready(function() {
             });
         }, 3000);
     }
+
+
+
+
+        $(document).on('click', '.actions-dropdown-btn', function (e) {
+        e.stopPropagation(); // prevent document click from immediately closing
+
+        let relativeParent = $(this).closest('.relative');
+        let dropdown = relativeParent.find('.actions-dropdown');
+
+        // Close other dropdowns
+        $('.actions-dropdown').not(dropdown).addClass('hidden');
+
+        // Toggle current dropdown
+        dropdown.toggleClass('hidden');
+    });
+
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.actions-dropdown-btn, .actions-dropdown').length) {
+            $('.actions-dropdown').addClass('hidden');
+        }
+    });
 });
 </script>
 @endsection
