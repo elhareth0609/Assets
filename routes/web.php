@@ -87,7 +87,8 @@ use Illuminate\Support\Facades\Route;
         Route::delete('/depreciation-entries/{id}', [DepreciationEntryController::class, 'delete'])->name('depreciation-entries.delete');
         Route::put('/depreciation-entries/{id}', [DepreciationEntryController::class, 'update'])->name('depreciation-entries.update');
         Route::get('/depreciation-entries/export', [DepreciationEntryController::class, 'export'])->name('depreciation-entries.export');
-
+        Route::post('/depreciation-entries/import', [DepreciationEntryController::class, 'import'])->name('depreciation-entries.import');
+        Route::get('/depreciation-entries/import-template', [DepreciationEntryController::class, 'downloadTemplate'])->name('depreciation-entries.import-template');
 
         // Employees
         // Dashboard
