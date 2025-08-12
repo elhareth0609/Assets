@@ -398,8 +398,6 @@
 
 <script>
 $(document).ready(function() {
-
-$(document).ready(function() {
     // Initialize DataTable
     var table = $('#assets-table').DataTable({
         language: {
@@ -809,7 +807,7 @@ $(document).ready(function() {
         }
     });
 
-});
+
 
 
 
