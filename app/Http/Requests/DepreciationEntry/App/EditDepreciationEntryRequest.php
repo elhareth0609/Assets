@@ -10,7 +10,7 @@ class EditDepreciationEntryRequest extends FormRequest {
             'entry_number' => 'required|string|max:255|unique:depreciation_entries,entry_number,' . $this->route('id'),
             'date' => 'required|date',
             'description' => 'required|string',
-            'asset_id' => 'required|exists:assets,id',
+            'asset_id' => 'nullable|exists:assets,id',
             'depreciation_rate' => 'nullable|numeric|min:0|max:100',
             'depreciation_start_date' => 'nullable|date',
             'depreciation_year' => 'nullable|date',
