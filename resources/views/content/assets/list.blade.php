@@ -13,7 +13,7 @@
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" x2="12" y1="15" y2="3"></line>
                 </svg>
-                تصدير CSV
+                تصدير Excel
             </button>
             <a href="{{ route('assets.create') }}" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-8 px-3 text-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus w-4 h-4 ltr:mr-2 rtl:ml-2">
@@ -547,13 +547,7 @@ $(document).ready(function() {
 
     // Export CSV functionality
     $('#export-csv-btn').on('click', function() {
-        var params = new URLSearchParams({
-            type_id: $('#type_id').val() || '',
-            status: $('#status').val() || '',
-            searchi: $('#dataTables_my_filter').val() || '',
-            format: 'csv'
-        });
-        window.location.href = '/assets-list/export?' + params.toString();
+        window.location.href = '/assets-list/export';
     });
 
     // Delete button functionality

@@ -80,7 +80,7 @@ class AssetRequest extends FormRequest
             'notes.string' => 'حقل الملاحظات يجب أن يكون نصاً',
             'type_id.exists' => 'النوع المحدد غير موجود',
             'emplyee_id.exists' => 'الموظف المحدد غير موجود',
-            'location_id.exists' => 'الموقع المحدد غير موجود'
+            'location_id.exists' => 'الإدارة المحدد غير موجود'
         ];
     }
 

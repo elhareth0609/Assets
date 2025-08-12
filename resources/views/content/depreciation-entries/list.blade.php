@@ -7,7 +7,21 @@
             <p class="text-slate-600 dark:text-slate-400 mt-1">إدارة قيود الإهلاك للأصول الثابتة</p>
         </div>
         <div class="flex gap-2">
-            <button id="export-excel-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800 h-8 px-3 text-sm">
+            <button id="/**
+ * Helper methods
+ */
+private function getStatusLabel($status): string
+{
+    $statusLabels = [
+        'in_use' => 'قيد الاستخدام',
+        'in_storage' => 'في المخزن',
+        'maintenance' => 'تحت الصيانة',
+        'damaged' => 'تالف'
+    ];
+
+    return $statusLabels[$status] ?? $status;
+}
+" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800 h-8 px-3 text-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4 ltr:mr-2 rtl:ml-2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
