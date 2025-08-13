@@ -899,9 +899,7 @@ $(document).ready(function() {
         }
     });
 
-
-
-        // Import Employee Form Submit
+    // Import Employee Form Submit
     $('#importAssetsForm').on('submit', function(e) {
         e.preventDefault();
         var formData = new FormData(this);
