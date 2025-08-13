@@ -290,15 +290,14 @@ $(document).ready(function() {
             },
             success: function(response) {
                 $('#importAssetsModal').addClass('hidden').removeClass('flex');
-                showNotification('تم استيراد الملف بنجاح', 'success');
-                table.ajax.reload();
+                showNotification('success' , 'تم استيراد الملف بنجاح');
             },
             error: function(xhr) {
                 var errorMessage = 'حدث خطأ أثناء استيراد الملف';
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     errorMessage = xhr.responseJSON.message;
                 }
-                showNotification(errorMessage, 'error');
+                showNotification('error' , errorMessage);
             },
             complete: function() {
                 submitButton.prop('disabled', false);
