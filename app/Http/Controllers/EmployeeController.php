@@ -9,6 +9,7 @@ use App\Models\Location;
 use App\Services\EmployeeService;
 use App\Traits\ApiResponder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class EmployeeController extends Controller {
@@ -73,19 +74,27 @@ class EmployeeController extends Controller {
                 $locationModel = Location::firstOrCreate(['name' => $location]);
             }
 
-            if (!empty($id)) {
+            if ($id) {
                 // Update existing or create with specific ID
-                Employee::updateOrCreate(
-                    [
-                        'id' => $id
-                    ],
-                    [
+                $employee = Employee::find($id);
+                if ($employee) {
+                    $employee->update([
                         'location_id' => $locationModel?->id,
                         'full_name'   => $fullName,
                         'email'       => $email,
-                        'job_title'   => $jobTitle,
-                    ]
-                );
+                        'job_title'   => $jobTitle
+                    ]);
+                } else {
+                    Log::info($id . ' - ' . $fullName . ' - ' . $jobTitle . ' - ' . $location . ' - ' . $email);
+                    // Create new employee with specific ID
+                    Employee::create([
+                        'id'          => $id,
+                        'location_id' => $locationModel?->id,
+                        'full_name'   => $fullName,
+                        'email'       => $email,
+                        'job_title'   => $jobTitle
+                    ]);
+                }
             } else {
                 // Just create a new employee without forcing the ID
                 Employee::create([
