@@ -57,6 +57,7 @@ class EmployeeController extends Controller {
             if ($index === 0) continue; // skip header
 
             // Columns: م | اسم الموظف | المسمى الوظيفي | الإدارة | الايميل
+            $id  = trim($row[0] ?? ''); // معرف الموظف
             $fullName  = trim($row[1] ?? ''); // اسم الموظف
             $jobTitle  = trim($row[2] ?? ''); // المسمى الوظيفي
             $location  = trim($row[3] ?? ''); // الإدارة
@@ -72,16 +73,26 @@ class EmployeeController extends Controller {
                 $locationModel = Location::firstOrCreate(['name' => $location]);
             }
 
-            Employee::updateOrCreate(
-                [
+            if (!empty($id)) {
+                // Update existing or create with specific ID
+                Employee::updateOrCreate(
+                    ['id' => $id],
+                    [
+                        'location_id' => $locationModel?->id,
+                        'full_name'   => $fullName,
+                        'email'       => $email,
+                        'job_title'   => $jobTitle,
+                    ]
+                );
+            } else {
+                // Just create a new employee without forcing the ID
+                Employee::create([
+                    'location_id' => $locationModel?->id,
                     'full_name'   => $fullName,
-                    'location_id' => $locationModel ? $locationModel->id : null
-                ],
-                [
-                    'email'     => $email,
-                    'job_title' => $jobTitle,
-                ]
-            );
+                    'email'       => $email,
+                    'job_title'   => $jobTitle,
+                ]);
+            }
 
         }
 
