@@ -43,6 +43,7 @@
                     <div>
                         <label for="type_id" class="block text-sm font-medium mb-2 dark:text-slate-400">نوع الأصل</label>
                         <select id="type_id" name="type_id" class="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50">
+                            <option value="">غير مخصص</option>
                             @foreach($types as $type)
                                 <option value="{{ $type->id }}" {{ $asset->type_id == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
                             @endforeach
