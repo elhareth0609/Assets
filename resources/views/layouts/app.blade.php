@@ -9,11 +9,11 @@
 <html lang="ar" dir="rtl" class="dark">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/svg+xml" href="/vite.svg">
+    <link rel="icon" type="image/png" href="{{ asset('assets/img/icon.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Perfume Store Inventory</title>
+    <title>نظام الأصول - @yield('title')</title>
 
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
