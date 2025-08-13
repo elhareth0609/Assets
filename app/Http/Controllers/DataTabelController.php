@@ -258,7 +258,7 @@ class DataTabelController extends Controller {
                     return '<span class="font-mono bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 px-2 py-1 rounded text-sm">'.$asset->number.'</span>';
                 })
                 ->editColumn('employee_id', function ($asset) {
-                    return '<span class="text-slate-900 dark:text-slate-300">'. $asset->employee && !empty($asset->employee->full_name) ? $asset->employee->full_name : '-' .'</span>';
+                    return '<span class="text-slate-900 dark:text-slate-300">'. ($asset->employee->full_name ?? '-') .'</span>';
                 })
                 ->addColumn('action', function($asset){
                     $actions = '<div class="relative inline-block text-left">
@@ -490,7 +490,7 @@ class DataTabelController extends Controller {
                     return '<strong class="text-slate-900 dark:text-slate-300">'. $employee->full_name .'</strong>';
                 })
                 ->editColumn('location_id', function ($employee) {
-                    return '<strong class="text-slate-900 dark:text-slate-300">'. ($employee->location->name ?? 'غير مخصص') .'</strong>';
+                    return '<strong class="text-slate-900 dark:text-slate-300">'. ($employee->location->name ?? '-') .'</strong>';
                 })
                 ->editColumn('job_title', function ($employee) {
                     return '<strong class="text-slate-900 dark:text-slate-300">'. $employee->job_title ?? '-' .'</strong>';
