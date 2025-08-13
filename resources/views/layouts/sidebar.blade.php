@@ -17,36 +17,18 @@
                 <!-- Asset Management Icon -->
                 <img src="{{ asset('assets/img/icon1.png') }}" alt="Asset Management Icon" class="avatar-big size-full text-[#0783a1] dark:text-[#0783a1] flex-shrink-0">
                 <img src="{{ asset('assets/img/icon.png') }}" alt="Asset Management Icon" class="avatar-small size-full text-[#0783a1] dark:text-[#0783a1] flex-shrink-0">
-                {{-- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive h-7 w-7 text-primary-800 dark:text-primary-400 flex-shrink-0">
-                    <rect x="2" y="3" width="20" height="5" rx="1"/>
-                    <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/>
-                    <path d="M10 12h4"/>
-                </svg> --}}
-                {{-- <span class="sidebar-text text-xl font-display font-semibold text-primary-800 dark:text-primary-400 rtl:ms-2">إدارة الأصول</span> --}}
             </a>
 
             <!-- Main Navigation -->
             <ul class="space-y-2 font-medium mb-2">
-                <!-- Dashboard Link -->
-                {{-- <li>
-                    <a href="{{ route('dashboard') }}" class="flex w-full items-center px-2 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 sidebar-item-container dark:text-white {{ Route::currentRouteName() == 'dashboard' ? 'bg-primary-50 text-primary-700 dark:bg-slate-800 dark:text-primary-400' : '' }}">
-                        <!-- Home Icon -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard w-5 h-5 flex-shrink-0">
-                            <rect width="7" height="9" x="3" y="3" rx="1" />
-                            <rect width="7" height="5" x="14" y="3" rx="1" />
-                            <rect width="7" height="9" x="14" y="12" rx="1" />
-                            <rect width="7" height="5" x="3" y="16" rx="1" />
-                        </svg>
-                        <span class="sidebar-text rtl:ms-2">لوحة التحكم الرئيسية</span>
-                    </a>
-                </li> --}}
-
-                <li>
-                    <a href="{{ route('users') }}" class="flex w-full items-center px-2 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 sidebar-item-container {{ Route::currentRouteName() == 'users' ? 'bg-primary-50 text-primary-700 dark:bg-slate-800 dark:text-primary-400' : 'text-slate-900 dark:text-white'}}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 flex-shrink-0" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list-icon lucide-list"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/></svg>
-                        <span class="sidebar-text rtl:ms-2">المستخدمين</span>
-                    </a>
-                </li>
+                @if (Auth::user()->id == 1)
+                    <li>
+                        <a href="{{ route('users') }}" class="flex w-full items-center px-2 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 sidebar-item-container {{ Route::currentRouteName() == 'users' ? 'bg-primary-50 text-primary-700 dark:bg-slate-800 dark:text-primary-400' : 'text-slate-900 dark:text-white'}}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 flex-shrink-0" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list-icon lucide-list"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/></svg>
+                            <span class="sidebar-text rtl:ms-2">المستخدمين</span>
+                        </a>
+                    </li>
+                @endif
 
                 <li class="pt-4 pb-2 mb-2 border-b border-slate-200 dark:border-slate-700">
                     <div class="sidebar-text px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">إدارة الأصول</div>

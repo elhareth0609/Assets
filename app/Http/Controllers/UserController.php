@@ -7,6 +7,7 @@ use App\Http\Resources\User\App\UserResource;
 use App\Services\UserService;
 use App\Traits\ApiResponder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller {
         use ApiResponder;
@@ -14,6 +15,9 @@ class UserController extends Controller {
     private $UserService;
 
     public function __construct(UserService $UserService) {
+        if (Auth::user()->id != 1) {
+            return redirect()->route('assets');
+        }
         $this->UserService = $UserService;
     }
 
@@ -34,7 +38,10 @@ class UserController extends Controller {
     }
 
     public function delete($id) {
-        $this->UserService->deleteUser($id);
-        return $this->success(null, 'تم الحذف بنجاح');
+        if(!($id == 1)) {
+            $this->UserService->deleteUser($id);
+            return $this->success(null, 'تم الحذف بنجاح');
+        }
+        return $this->success(null, 'غير مصرح لك');
     }
 }

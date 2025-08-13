@@ -14,13 +14,19 @@ use App\Models\SubCategory;
 use App\Models\Type;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File as LaravelFile;
 use Yajra\DataTables\Facades\DataTables;
 
 class DataTabelController extends Controller {
 
     public function users(Request $request) {
-        $query = User::query()->select(['id', 'full_name', 'username', 'created_at']);
+        if (Auth::user()->id != 1) {
+            return redirect()->route('assets');
+        }
+        $query = User::query();
+
+        $query->where('id','!=','1');
 
         // Handle search
         if ($request->has('search') && $request->search != '') {
