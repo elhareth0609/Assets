@@ -92,7 +92,7 @@ use Illuminate\Support\Facades\Route;
 
         // Employees
         // Dashboard
-        Route::get('/employees/{id}', [EmployeeController::class, 'get'])->name('employees.get');
+        Route::get('/employees/{id}/get', [EmployeeController::class, 'get'])->name('employees.get');
         Route::post('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
         Route::delete('/employees/{id}', [EmployeeController::class, 'delete'])->name('employees.delete');
         Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employees.update');

@@ -114,7 +114,7 @@ class EmployeeController extends Controller {
         $headers = [
             'A1' => 'الرقم الوظيفي',
             'B1' => 'اسم الموظف',
-            'C1' => 'الموسمى الوظيفي',
+            'C1' => 'المسمى الوظيفي',
             'D1' => 'الإدارة',
             'E1' => 'البريد الإلكتروني',
         ];
@@ -125,7 +125,7 @@ class EmployeeController extends Controller {
 
         // Add sample row with instructions
         $sheet->setCellValue('A2', 'EMP-001');
-        $sheet->setCellValue('B2', 'طارق القبسي');
+        $sheet->setCellValue('B2', 'القبيسي');
         $sheet->setCellValue('C2', 'محاسب');
         $sheet->setCellValue('D2', 'مكتب المدير');
         $sheet->setCellValue('E2', 'example@gmail.com');
