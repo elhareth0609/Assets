@@ -55,17 +55,6 @@
                 extend: {
                     colors: {
                         primary: {
-                            // 50:  '#e1f4f8',
-                            // 100: '#b4e3eb',
-                            // 200: '#83d0de',
-                            // 300: '#51bccf',
-                            // 400: '#2ca9bf',
-                            // 500: '#0783a1', // your main color
-                            // 600: '#066e89',
-                            // 700: '#04586f',
-                            // 800: '#034155',
-                            // 900: '#022c3c',
-                            // 950: '#011821',
                             50:  '#f2f5f9',
                             100: '#d9e1eb',
                             200: '#b4c3d7',
@@ -77,7 +66,6 @@
                             800: '#0d1b2c',
                             900: '#08121e',
                             950: '#040a12',
-
                         },
                         secondary: {
                             50: '#fdf8e9',
@@ -130,6 +118,16 @@
             body.sidebar-collapsed #main-content {
                 margin-right: 5rem; /* 80px */
             }
+            body.sidebar-collapsed .avatar-big {
+                display: none;
+            }
+            body .avatar-small {
+                display: none;
+            }
+            body.sidebar-collapsed .avatar-small {
+                display: flex;
+            }
+            
             body.sidebar-collapsed .sidebar-text {
                 display: none;
             }
