@@ -1,4 +1,7 @@
 @extends('layouts.app')
+
+@section('title', __('الموظفين'))
+
 @section('content')
 <div class="mx-auto p-6 space-y-6">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -7,7 +10,7 @@
             <p class="text-slate-600 dark:text-slate-400 mt-1">إدارة الموظفين</p>
         </div>
         <div class="flex gap-2">
-            <button id="import-employee-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none border border-primary-600 text-primary-600 hover:border-primary-700 hover:text-primary-700 h-8 px-3 text-sm">
+            <button id="import-employee-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800 h-8 px-3 text-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload w-4 h-4 ltr:mr-2 rtl:ml-2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="17 8 12 3 7 8"></polyline>

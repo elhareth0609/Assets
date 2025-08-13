@@ -65,6 +65,8 @@ use Illuminate\Support\Facades\Route;
         Route::get('/assets-list/{id}/qr', [AssetController::class, 'qr'])->name('assets.qr');
         // Route::get('/assets/{id}/generate', [AssetController::class, 'generate'])->name('assets.generate');
         Route::get('/assets-list/export', [AssetController::class, 'export'])->name('assets.export');
+        Route::post('/assets-list/import', [AssetController::class, 'import'])->name('assets.import');
+        Route::get('/assets-list/import-template', [AssetController::class, 'downloadTemplate'])->name('assets.import-template');
 
         // Types
         // Dashboard

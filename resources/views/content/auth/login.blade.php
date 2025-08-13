@@ -7,7 +7,7 @@
     $isContainer = false;
 @endphp
 
-@section('title', __('Login'))
+@section('title', __('تسجيل الدخول'))
 
 @section('content')
 {{-- <body class="font-sans text-slate-900 bg-slate-100 dark:bg-slate-900 dark:text-slate-200 antialiased"> --}}
@@ -15,7 +15,8 @@
         <div>
             <a href="/">
                 {{-- You can place your logo here --}}
-                <h1 class="text-4xl font-bold text-primary-600">نظام الأصول</h1>
+                <img src="{{ asset('assets/img/icon1.png') }}" alt="Asset Management Icon" class="size-full text-[#0783a1] dark:text-[#0783a1] flex-shrink-0">
+                {{-- <h1 class="text-4xl font-bold text-primary-600">نظام الأصول</h1> --}}
             </a>
         </div>
 

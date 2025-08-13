@@ -1,4 +1,8 @@
 @extends('layouts.app')
+
+@section('title', __('الإدارات'))
+
+
 @section('content')
 <div class="mx-auto p-6 space-y-6">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

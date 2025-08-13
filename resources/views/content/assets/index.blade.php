@@ -7,7 +7,7 @@
     $isContainer = false;
 @endphp
 
-@section('title', __(''))
+@section('title', __('تفاصيل الأصل'))
 
 @section('content')
 <div class="mx-auto p-6 space-y-6">
