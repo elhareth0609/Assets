@@ -57,7 +57,7 @@ class EmployeeController extends Controller {
             if ($index === 0) continue; // skip header
 
             // Columns: م | اسم الموظف | المسمى الوظيفي | الإدارة | الايميل
-            $id  = trim($row[0] ?? ''); // معرف الموظف
+            $id  = $row[0]; // معرف الموظف
             $fullName  = trim($row[1] ?? ''); // اسم الموظف
             $jobTitle  = trim($row[2] ?? ''); // المسمى الوظيفي
             $location  = trim($row[3] ?? ''); // الإدارة
@@ -76,7 +76,9 @@ class EmployeeController extends Controller {
             if (!empty($id)) {
                 // Update existing or create with specific ID
                 Employee::updateOrCreate(
-                    ['id' => $id],
+                    [
+                        'id' => $id
+                    ],
                     [
                         'location_id' => $locationModel?->id,
                         'full_name'   => $fullName,
