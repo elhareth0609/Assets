@@ -258,7 +258,7 @@ class DataTabelController extends Controller {
                     return '<span class="font-mono bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 px-2 py-1 rounded text-sm">'.$asset->number.'</span>';
                 })
                 ->editColumn('employee_id', function ($asset) {
-                    return '<span class="text-slate-900 dark:text-slate-300">'.$asset->employee->full_name ?? 'غير مخصص' .'</span>';
+                    return '<span class="text-slate-900 dark:text-slate-300">'.$asset->employee? $asset->employee->full_name : 'غير مخصص' .'</span>';
                 })
                 ->addColumn('action', function($asset){
                     $actions = '<div class="relative inline-block text-left">
