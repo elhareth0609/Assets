@@ -85,7 +85,6 @@ class EmployeeController extends Controller {
                         'job_title'   => $jobTitle
                     ]);
                 } else {
-                    Log::info($id . ' - ' . $fullName . ' - ' . $jobTitle . ' - ' . $location . ' - ' . $email);
                     // Create new employee with specific ID
                     Employee::create([
                         'id'          => $id,
