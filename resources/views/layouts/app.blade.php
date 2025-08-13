@@ -19,8 +19,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="{{ asset('assets/js/jquery.min.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('assets/js/jquery.dataTables.min.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>
 
     {{-- Scripts (Tailwind is loaded first) --}}
     <script src="https://cdn.tailwindcss.com"></script>
