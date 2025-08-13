@@ -292,7 +292,7 @@
                     <button type="button" id="cancelImportBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
                         إلغاء
                     </button>
-                    <button type="submit" class="flex items-center px-4 py-2 border border-primary-600 text-primary-600 hover:border-primary-700 hover:text-primary-700 rounded-md transition-colors">
+                    <button type="submit" class="flex items-center px-4 py-2 border border-primary-600 hover:border-primary-700 bg-primary-600 text-white hover:bg-primary-700 rounded-md transition-colors">
                         استيراد
                     </button>
                 </div>
