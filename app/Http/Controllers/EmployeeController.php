@@ -11,6 +11,9 @@ use App\Traits\ApiResponder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class EmployeeController extends Controller {
     use ApiResponder;
@@ -58,13 +61,13 @@ class EmployeeController extends Controller {
             if ($index === 0) continue; // skip header
 
             // Columns: م | اسم الموظف | المسمى الوظيفي | الإدارة | الايميل
-            $id  = $row[0]; // معرف الموظف
+            $number  = $row[0]; // معرف الموظف
             $fullName  = trim($row[1] ?? ''); // اسم الموظف
             $jobTitle  = trim($row[2] ?? ''); // المسمى الوظيفي
             $location  = trim($row[3] ?? ''); // الإدارة
             $email     = trim($row[4] ?? ''); // الايميل
 
-            if (empty($fullName) || empty($email)) {
+            if (empty($fullName) || empty($number) || empty($email)) {
                 continue; // skip invalid rows
             }
 
@@ -74,33 +77,22 @@ class EmployeeController extends Controller {
                 $locationModel = Location::firstOrCreate(['name' => $location]);
             }
 
-            if ($id) {
-                // Update existing or create with specific ID
-                $employee = Employee::find($id);
-                if ($employee) {
-                    $employee->update([
-                        'location_id' => $locationModel?->id,
-                        'full_name'   => $fullName,
-                        'email'       => $email,
-                        'job_title'   => $jobTitle
-                    ]);
-                } else {
-                    // Create new employee with specific ID
-                    Employee::create([
-                        'id'          => $id,
-                        'location_id' => $locationModel?->id,
-                        'full_name'   => $fullName,
-                        'email'       => $email,
-                        'job_title'   => $jobTitle
-                    ]);
-                }
-            } else {
-                // Just create a new employee without forcing the ID
-                Employee::create([
+            $employee = Employee::where('number',$number)->first();
+            if ($employee) {
+                $employee->update([
                     'location_id' => $locationModel?->id,
                     'full_name'   => $fullName,
                     'email'       => $email,
-                    'job_title'   => $jobTitle,
+                    'job_title'   => $jobTitle
+                ]);
+            } else {
+                // Create new employee with specific ID
+                Employee::create([
+                    'number'      => $number,
+                    'location_id' => $locationModel?->id,
+                    'full_name'   => $fullName,
+                    'email'       => $email,
+                    'job_title'   => $jobTitle
                 ]);
             }
 
@@ -109,4 +101,49 @@ class EmployeeController extends Controller {
         return $this->success(null, 'تم الاستيراد بنجاح');
     }
 
+    /**
+     * Download import template
+     */
+    public function downloadTemplate(): BinaryFileResponse
+    {
+        // Create spreadsheet with headers only
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set headers (same as export)
+        $headers = [
+            'A1' => 'الرقم الوظيفي',
+            'B1' => 'اسم الموظف',
+            'C1' => 'الموسمى الوظيفي',
+            'D1' => 'الإدارة',
+            'E1' => 'البريد الإلكتروني',
+        ];
+
+        foreach ($headers as $cell => $value) {
+            $sheet->setCellValue($cell, $value);
+        }
+
+        // Add sample row with instructions
+        $sheet->setCellValue('A2', 'EMP-001');
+        $sheet->setCellValue('B2', 'طارق القبسي');
+        $sheet->setCellValue('C2', 'محاسب');
+        $sheet->setCellValue('D2', 'مكتب المدير');
+        $sheet->setCellValue('E2', 'example@gmail.com');
+
+        // Style headers
+        $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+
+        // Auto-size columns
+        foreach (range('A', 'E') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Create writer and return file
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'employees_template.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $filename);
+        $writer->save($temp_file);
+
+        return response()->download($temp_file, $filename)->deleteFileAfterSend(true);
+    }
 }

@@ -97,7 +97,8 @@ use Illuminate\Support\Facades\Route;
         Route::delete('/employees/{id}', [EmployeeController::class, 'delete'])->name('employees.delete');
         Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employees.update');
         Route::post('/employees/import', [EmployeeController::class, 'import'])->name('employees.import');
-        
+        Route::get('/employees/import-template', [EmployeeController::class, 'downloadTemplate'])->name('employees.import-template');
+
         // Users
         // Dashboard
         Route::get('/users/{id}', [UserController::class, 'get'])->name('users.get');

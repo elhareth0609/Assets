@@ -17,11 +17,11 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         DB::statement("INSERT INTO `users` (`id`, `username`, `full_name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES (1, 'admin', 'admin', 'admin@gmail.com', NULL, '\$2y\$12\$91inUhz7mO71MiPP0WcLy.HiOmXUV6LnXYgzlZVdMMiV8stzpW5KS', 'v1GUzjpcz5yJK4bOIKCQflXGPzgvM9zTbYn3ukIRf15Gbo8EFkUUgCraP5VW', '2025-08-01 08:50:16', '2025-08-03 19:24:07');");
-        
+
         DB::statement("INSERT INTO `types` (`id`, `name`, `created_at`, `updated_at`) VALUES (1, 'أجهزة لابتوب', '2025-08-01 08:21:57', '2025-08-01 08:21:58');");
         DB::statement("INSERT INTO `types` (`id`, `name`, `created_at`, `updated_at`) VALUES (2, 'أثاث مكتبي', '2025-08-01 08:21:57', '2025-08-01 08:21:58');");
         DB::statement("INSERT INTO `locations` (`id`, `name`, `created_at`, `updated_at`) VALUES (1, 'مكتب المدير', '2025-08-01 08:21:57', '2025-08-01 08:21:58');");
-        DB::statement("INSERT INTO `employees` (`id`, `full_name`, `created_at`, `updated_at`) VALUES (1, 'أحمد محمد علي', '2025-08-01 08:21:57', '2025-08-01 08:21:58');");
+        DB::statement("INSERT INTO `employees` (`id`, `number`, `full_name`, `created_at`, `updated_at`) VALUES (1, '1234','أحمد محمد علي', '2025-08-01 08:21:57', '2025-08-01 08:21:58');");
 
         DB::statement("INSERT INTO `assets` (`id`, `name`, `number`, `purchase_date`, `status`, `notes`, `type_id`, `employee_id`, `location_id`, `created_at`, `updated_at`) VALUES (1, 'لابتوب Dell Latitude 5420', 'AS-001', '2025-01-11', 'in_storage', 'تم تسليمه للموظف مع شاحن وحقيبة. البطارية بحالة ممتازة.', 1, 1, 1, '2025-08-01 08:21:57', '2025-08-01 08:21:58');");
         DB::statement("INSERT INTO `assets` (`id`, `name`, `number`, `purchase_date`, `status`, `notes`, `type_id`, `employee_id`, `location_id`, `created_at`, `updated_at`) VALUES (2, 'طاولة مكتب خشبية	', 'AS-002', '2025-08-01', 'damaged', 'تم تسليمه للموظف بحالة ممتازة.', 2, 1, 1, '2025-08-01 08:26:43', '2025-08-01 08:26:43');");

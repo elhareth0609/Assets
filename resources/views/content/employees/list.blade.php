@@ -15,6 +15,14 @@
                 </svg>
                 استيراد Excel
             </button>
+            <a href="{{ route('employees.import-template') }}" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-transparent border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800 h-8 px-3 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4 ltr:mr-2 rtl:ml-2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" x2="12" y1="15" y2="3"></line>
+                </svg>
+                قالب Excel
+            </a>
             <button id="create-employee-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-8 px-3 text-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus w-4 h-4 ltr:mr-2 rtl:ml-2">
                     <path d="M5 12h14"></path>
@@ -79,7 +87,7 @@
                     <table id="employees-table" class="table table-hover mb-0">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>الرقم الوظيفي</th>
                                 <th>اسم الموظف</th>
                                 <th>المسمى الوظيفي</th>
                                 <th>الإدارة</th>
@@ -124,6 +132,10 @@
                 <div class="mb-4">
                     <label for="full_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم الموظف</label>
                     <input type="text" id="full_name" name="full_name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
+                </div>
+                <div class="mb-4">
+                    <label for="number" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">الرقم الوظيفي</label>
+                    <input type="text" id="number" name="number" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
                 </div>
                 <div class="mb-4">
                     <label for="location_id" class="block text-sm font-medium mb-2 dark:text-slate-400">الإدارة</label>
@@ -175,6 +187,10 @@
                 <div class="mb-4">
                     <label for="edit_full_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">اسم الموظف</label>
                     <input type="text" id="edit_full_name" name="full_name" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
+                </div>
+                <div class="mb-4">
+                    <label for="edit_number" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">الرقم الوظيفي</label>
+                    <input type="text" id="edit_number" name="number" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم الموظف">
                 </div>
                 <div class="mb-4">
                     <label for="edit_location_id" class="block text-sm font-medium mb-2 dark:text-slate-400">الإدارة</label>
@@ -439,7 +455,7 @@ $(document).ready(function() {
             }
         },
         columns: [
-            { data: 'id', name: 'id', title: 'المعرف' },
+            { data: 'number', name: 'number', title: 'الرقم الوظيفي' },
             { data: 'full_name', name: 'full_name', title: 'اسم الموظف' },
             { data: 'job_title', name: 'job_title', title: 'المسمى الوظيفي' },
             { data: 'location_id', name: 'location_id', title: 'الإدارة' },
@@ -661,12 +677,14 @@ $(document).ready(function() {
         $('.actions-dropdown').addClass('hidden');
 
         var id = $(this).data('id');
+        var number = $(this).data('number');
         var full_name = $(this).data('full_name');
         var location_id = $(this).data('location_id');
         var job_title = $(this).data('job_title');
         var email = $(this).data('email');
 
         $('#edit_id').val(id);
+        $('#edit_number').val(number);
         $('#edit_full_name').val(full_name);
         $('#edit_location_id').val(location_id);
         $('#edit_job_title').val(job_title);

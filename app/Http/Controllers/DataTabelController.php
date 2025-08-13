@@ -486,6 +486,9 @@ class DataTabelController extends Controller {
         if ($request->ajax()) {
             return DataTables::of($query)
                 ->addIndexColumn()
+                ->editColumn('number', function ($employee) {
+                    return '<strong class="text-slate-900 dark:text-slate-300">'. $employee->number .'</strong>';
+                })
                 ->editColumn('full_name', function ($employee) {
                     return '<strong class="text-slate-900 dark:text-slate-300">'. $employee->full_name .'</strong>';
                 })
@@ -513,6 +516,7 @@ class DataTabelController extends Controller {
                             <div class="py-1" role="none">
                                 <button type="button"
                                     data-id="'.$employee->id.'"
+                                    data-number="'.$employee->number.'"
                                     data-full_name="'.$employee->full_name.'"
                                     data-job_title="'.$employee->job_title.'"
                                     data-email="'.$employee->email.'"
@@ -544,7 +548,7 @@ class DataTabelController extends Controller {
                     </div>';
                     return $actions;
                 })
-                ->rawColumns(['action', 'job_title', 'email', 'full_name', 'location_id'])
+                ->rawColumns(['action','number', 'job_title', 'email', 'full_name', 'location_id'])
                 ->make(true);
         }
 

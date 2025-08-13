@@ -65,12 +65,12 @@ class DepreciationEntryController extends Controller {
             }
 
             $excel_file = $request->file('excel_file');
-            
+
             // Load the spreadsheet
             $spreadsheet = IOFactory::load($excel_file->getPathname());
             $worksheet = $spreadsheet->getActiveSheet();
             $highestRow = $worksheet->getHighestRow();
-            
+
             // Validate minimum rows (header + at least one data row)
             if ($highestRow < 2) {
                 return $this->error('الملف فارغ أو لا يحتوي على بيانات صالحة.', 400);
@@ -97,7 +97,7 @@ class DepreciationEntryController extends Controller {
                     try {
                         // Extract data from Excel row
                         $rowData = $this->extractRowData($worksheet, $row);
-                        
+
                         // Validate the row data
                         $validationResult = $this->validateImportRow($rowData, $row);
                         if (!$validationResult['valid']) {
@@ -107,7 +107,7 @@ class DepreciationEntryController extends Controller {
 
                         // Check if entry already exists
                         $existingEntry = DepreciationEntry::where('entry_number', $rowData['entry_number'])->first();
-                        
+
                         if ($existingEntry) {
                             // Update existing entry
                             $existingEntry->update($rowData);
@@ -125,9 +125,9 @@ class DepreciationEntryController extends Controller {
                                 'action' => 'created'
                             ];
                         }
-                        
+
                         $successCount++;
-                        
+
                     } catch (Exception $e) {
                         $errors[] = "الصف {$row}: خطأ في المعالجة - " . $e->getMessage();
                     }
@@ -216,7 +216,7 @@ class DepreciationEntryController extends Controller {
 
             // Try to parse as string date
             return Carbon::parse($value)->format('Y-m-d');
-            
+
         } catch (Exception $e) {
             return null;
         }
@@ -252,7 +252,7 @@ class DepreciationEntryController extends Controller {
             try {
                 $startDate = Carbon::parse($data['depreciation_start_date']);
                 $yearDate = Carbon::parse($data['depreciation_year']);
-                
+
                 if ($yearDate->lt($startDate)) {
                     $errors[] = 'سنة احتساب الاهلاك يجب أن تكون بعد بداية الاهلاك';
                 }
@@ -319,7 +319,7 @@ class DepreciationEntryController extends Controller {
 
         // Style headers
         $sheet->getStyle('A1:R1')->getFont()->setBold(true);
-        
+
         // Auto-size columns
         foreach (range('A', 'R') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
@@ -333,6 +333,7 @@ class DepreciationEntryController extends Controller {
 
         return response()->download($temp_file, $filename)->deleteFileAfterSend(true);
     }
+
     public function export(Request $request) {
         $query = DepreciationEntry::with('asset');
         // Apply filters
