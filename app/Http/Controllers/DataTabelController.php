@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\DataTables\AssetsDataTable;
 use App\Models\Asset;
-use App\Models\Category;
 use App\Models\DepreciationEntry;
 use App\Models\Employee;
 use App\Models\Location;
 use App\Models\Permission;
 use App\Models\Role;
-use App\Models\SubCategory;
 use App\Models\Type;
+use App\Models\Institution;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,16 +25,6 @@ class DataTabelController extends Controller {
         $query = User::query();
 
         $query->where('id','!=','1');
-
-        // Handle search
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('full_name', 'like', "%{$search}%")
-                ->orWhere('username', 'like', "%{$search}%")
-                ->orWhere('id', 'like', "%{$search}%");
-            });
-        }
 
         $users = $query->orderBy('created_at', 'desc')->get();
 
@@ -56,9 +44,9 @@ class DataTabelController extends Controller {
                         </div>
                     </div>';
                 })
-                // ->editColumn('email', function ($user) {
-                //     return '<span class="text-slate-600 dark:text-slate-400 text-sm">' . $user->email . '</span>';
-                // })
+                ->editColumn('email', function ($user) {
+                    return '<span class="text-slate-600 dark:text-slate-400 text-sm">' . $user->email . '</span>';
+                })
                 ->editColumn('created_at', function ($user) {
                     return '<span class="text-slate-600 dark:text-slate-400 text-sm">' . date('d/m/Y', strtotime($user->created_at)) . '</span>';
                 })
@@ -79,6 +67,7 @@ class DataTabelController extends Controller {
                                     data-id="'.$user->id.'"
                                     data-full_name="'.$user->full_name.'"
                                     data-username="'.$user->username.'"
+                                    data-email="'.$user->email.'"
                                     class="edit-user-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white" role="menuitem">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
                                         <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
@@ -111,6 +100,104 @@ class DataTabelController extends Controller {
         }
 
         return view('content.users.list');
+    }
+
+    public function institutions(Request $request) {
+        if (Auth::user()->id != 1) {
+            return redirect()->route('assets');
+        }
+        $query = Institution::query();
+
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+
+        $institutions = $query->orderBy('created_at', 'desc')->get();
+
+        if ($request->ajax()) {
+            return DataTables::of($institutions)
+                ->addIndexColumn()
+                ->editColumn('full_name', function ($institution) {
+                    return '<span class="text-slate-600 dark:text-slate-400 text-sm">' . $institution->full_name . '</span>';
+                })
+                ->editColumn('user_id', function ($institution) {
+                    return '<div class="flex items-center">
+                        <div class="h-10 w-10 flex-shrink-0">
+                            <div class="flex items-center justify-center w-10 h-10 ' . $institution->user->avatar_background_class . ' ' . $institution->user->avatar_text_color_class . ' rounded-full text-md font-bold focus:outline-none">
+                            '. $institution->user->avatar_initial .'
+                            </div>
+                        </div>
+                        <div class="mr-4">
+                            <div class="text-sm font-medium text-slate-900 dark:text-slate-100">' . $institution->user->full_name . '</div>
+                            <div class="text-sm text-slate-500 dark:text-slate-400">' . $institution->user->username . '</div>
+                        </div>
+                    </div>';
+                })
+                // ->editColumn('email', function ($institution) {
+                //     return '<span class="text-slate-600 dark:text-slate-400 text-sm">' . $institution->email . '</span>';
+                // })
+                ->editColumn('status', function ($institution) {
+                    $statusConfig = [
+                        'active' => ['label' => 'نشط', 'class' => 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'],
+                        'inactive' => ['label' => 'غير نشط', 'class' => 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400']
+                    ];
+                    $config = $statusConfig[$institution->status->value] ?? ['label' => $institution->status->value, 'class' => 'bg-slate-100 text-slate-800 dark:bg-slate-900/20 dark:text-slate-400'];
+                    return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium '.$config['class'].'">'.$config['label'].'</span>';
+                })
+                ->editColumn('created_at', function ($institution) {
+                    return '<span class="text-slate-600 dark:text-slate-400 text-sm">' . date('d/m/Y', strtotime($institution->created_at)) . '</span>';
+                })
+                ->addColumn('action', function($institution){
+                    $actions = '<div class="relative inline-block text-left">
+                        <div>
+                            <button type="button" class="actions-dropdown-btn inline-flex justify-center w-full rounded-md border border-slate-300 shadow-sm px-2 py-1 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700" id="options-menu-'.$institution->id.'" aria-expanded="false" aria-haspopup="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                    <circle cx="19" cy="12" r="1"></circle>
+                                    <circle cx="5" cy="12" r="1"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="actions-dropdown hidden absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 dark:bg-slate-800 dark:ring-slate-700" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-'.$institution->id.'" tabindex="-1">
+                            <div class="py-1" role="none">
+                                <button type="button"
+                                    data-id="'.$institution->id.'"
+                                    data-full_name="'.$institution->user->full_name.'"
+                                    data-username="'.$institution->user->username.'"
+                                    data-name="'.$institution->name.'"
+                                    data-status="'.$institution->status.'"
+                                    class="edit-institution-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"></path>
+                                        <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"></path>
+                                        <path d="m16 5 3 3"></path>
+                                    </svg>
+                                    تعديل
+                                </button>
+                                <button type="button"
+                                    class="delete-institution-btn block w-full text-right px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+                                    data-id="'.$institution->id.'"
+                                    data-name="'.$institution->name.'"
+                                    data-url="'.route('institutions.delete', $institution->id).'" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline ml-2">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                        <line x1="10" x2="10" y1="11" y2="17"></line>
+                                        <line x1="14" x2="14" y1="11" y2="17"></line>
+                                    </svg>
+                                    حذف
+                                </button>
+                            </div>
+                        </div>
+                    </div>';
+                    return $actions;
+                })
+                ->rawColumns(['action', 'name', 'full_name', 'status', 'created_at'])
+                ->make(true);
+        }
+
+        return view('content.institutions.list');
     }
 
     public function languages(Request $request) {

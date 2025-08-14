@@ -23,7 +23,7 @@ class User extends Authenticatable
         'full_name',
         // 'phone',
         'username',
-        // 'email',
+        'email',
         // 'theme',
         // 'lang',
         // 'photo',
@@ -90,7 +90,7 @@ class User extends Authenticatable
             'bg-teal-300/50',
             'bg-orange-300/50',
         ];
-        
+
         $index = $this->id % count($colors);
         return $colors[$index];
     }
@@ -107,7 +107,7 @@ class User extends Authenticatable
             'text-teal-800',
             'text-orange-800',
         ];
-        
+
         $index = $this->id % count($colors);
         return $colors[$index];
     }

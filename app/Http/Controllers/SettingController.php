@@ -39,9 +39,9 @@ class SettingController extends Controller {
 
     public function update_account(Request $request) {
         $validator = Validator::make(request()->all(), [
-            'full_name' => 'required',
-            'username' => 'required',
-            'email' => 'required|email',
+            'full_name' => 'required|string',
+            'username' => 'required|string',
+            'email' => 'required|string|email',
             // 'phone' => 'required',
         ]);
 
@@ -55,7 +55,7 @@ class SettingController extends Controller {
 
         try {
             $user = User::find(Auth::user()->id);
-            $user->full_name = $request->name;
+            $user->full_name = $request->full_name;
             $user->username = $request->username;
             $user->email = $request->email;
             $user->save();

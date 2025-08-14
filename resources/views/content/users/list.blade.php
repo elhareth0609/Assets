@@ -107,6 +107,10 @@
                         <label for="username" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">اسم المستخدم</label>
                         <input type="text" id="username" name="username" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم المستخدم">
                     </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">اسم المستخدم</label>
+                        <input type="email" id="email" name="email" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم المستخدم">
+                    </div>
                     {{-- <div>
                         <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">البريد الإلكتروني</label>
                         <input type="email" id="email" name="email" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل البريد الإلكتروني">
@@ -441,12 +445,14 @@ $(document).ready(function() {
         var userId = $(this).data('id');
         var fullName = $(this).data('full_name');
         var username = $(this).data('username');
+        var email = $(this).data('email');
 
         // Get user details via AJAX
         $('#userModalTitle').text('تعديل المستخدم');
         $('#userId').val(userId);
         $('#fullName').val(fullName);
         $('#username').val(username);
+        $('#email').val(email);
         // $('#email').val(response.email);
         $('#password').removeAttr('required');
         $('#password_confirmation').removeAttr('required');

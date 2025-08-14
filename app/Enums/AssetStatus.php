@@ -19,11 +19,6 @@ enum AssetStatus: string
         };
     }
 
-/*************  ✨ Windsurf Command ⭐  *************/
-    /**
-     * Get the Arabic translation of the status.
-     *
-/*******  f8744fab-cac0-4dae-ac7e-ed256df7add4  *******/
     public function arabicLabel(): string
     {
         return match($this) {
@@ -33,4 +28,15 @@ enum AssetStatus: string
             self::IN_STORAGE => 'قيد الانتظار',
         };
     }
+
+    public function class(): string
+{
+        return match($this) {
+            self::IN_USE => '',
+            self::DAMAGED => '',
+            self::MAINTENANCE => '',
+            self::IN_STORAGE => '' ,
+        };
+    }
+
 }

@@ -23,12 +23,12 @@ class MakeSolidStructure extends Command {
         File::put($controllerPath, $this->getControllerContent($name));
 
         // Generate resource
-        $resourcePath = app_path("Http/Resources/{$name}/App/{$name}Resource.php");
+        $resourcePath = app_path("Http/Resources/{$name}/{$name}Resource.php");
         File::ensureDirectoryExists(dirname($resourcePath));
         File::put($resourcePath, $this->getResourceContent($name));
 
         // Generate request
-        $requestPath = app_path("Http/Requests/{$name}/App/{$name}Request.php");
+        $requestPath = app_path("Http/Requests/{$name}/{$name}Request.php");
         File::ensureDirectoryExists(dirname($requestPath));
         File::put($requestPath, $this->getRequestContent($name));
 
@@ -53,8 +53,8 @@ class MakeSolidStructure extends Command {
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\\{$name}\App\\{$name}Request;
-use App\Http\Resources\\{$name}\App\\{$name}Resource;
+use App\Http\Requests\\{$name}\\{$name}Request;
+use App\Http\Resources\\{$name}\\{$name}Resource;
 use App\Services\\{$name}Service;
 use App\Traits\ApiResponder;
 
@@ -95,7 +95,7 @@ PHP;
         return <<<PHP
 <?php
 
-namespace App\Http\Resources\\{$name}\App;
+namespace App\Http\Resources\\{$name};
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -115,7 +115,7 @@ PHP;
         return <<<PHP
 <?php
 
-namespace App\Http\Requests\\{$name}\App;
+namespace App\Http\Requests\\{$name};
 
 use Illuminate\Foundation\Http\FormRequest;
 
