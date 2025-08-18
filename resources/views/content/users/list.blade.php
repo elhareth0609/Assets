@@ -656,7 +656,7 @@ $(document).ready(function() {
             'assets': 'الأصول',
             'employees': 'الموظفين',
             'users': 'المستخدمين',
-            'locations': 'المواقع',
+            'locations': 'الإدارات',
             'types': 'الأنواع',
             'depreciation-entries': 'قيد الاستهلاك',
         };
