@@ -11,6 +11,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserPermissionController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -108,8 +109,11 @@ use Illuminate\Support\Facades\Route;
         Route::delete('/users/{id}', [UserController::class, 'delete'])->name('users.delete');
         Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
 
-
-
+        // User Permissions
+        // Route::get('/users/{userId}/permissions', [UserPermissionController::class, 'edit'])->name('users.permissions.edit');
+        Route::put('/users/{userId}/permissions', [UserPermissionController::class, 'update'])->name('users.permissions.update');
+        // Route::get('/users/{userId}/permissions/get', [UserPermissionController::class, 'getUserPermissions']);
+        // Route::post('/users/permissions/toggle', [UserPermissionController::class, 'togglePermission']);
 
         Route::post('/language', [LanguageController::class, 'create'])->name('language.create');
         Route::get('/language/{word}', [LanguageController::class, 'get'])->name('language.get');

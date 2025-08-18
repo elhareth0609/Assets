@@ -1,89 +1,110 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Http\Requests\DepreciationEntry\App\EditDepreciationEntryRequest;
 use App\Http\Requests\DepreciationEntry\App\StoreDepreciationEntryRequest;
 use App\Http\Resources\DepreciationEntry\App\DepreciationEntryResource;
 use App\Models\DepreciationEntry;
 use App\Services\DepreciationEntryService;
 use App\Traits\ApiResponder;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Carbon\Carbon;
-use Exception;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DepreciationEntryController extends Controller {
     use ApiResponder;
-
     private $DepreciationEntryService;
-
+    
     public function __construct(DepreciationEntryService $DepreciationEntryService) {
         $this->DepreciationEntryService = $DepreciationEntryService;
     }
-
+    
+    /**
+     * Helper method to check permissions and handle response
+     */
+    private function checkPermissionAndRespond($permission) {
+        $permissionCheck = $this->checkPermission($permission, true);
+        if ($permissionCheck) {
+            return $permissionCheck;
+        }
+        return null;
+    }
+    
     public function all() {
+        if ($response = $this->checkPermissionAndRespond('depreciation-entries.view')) {
+            return $response;
+        }
         return $this->success(DepreciationEntryResource::collection($this->DepreciationEntryService->allDepreciationEntrys()));
     }
-
+    
     public function get($id) {
+        if ($response = $this->checkPermissionAndRespond('depreciation-entries.view')) {
+            return $response;
+        }
         return $this->success(new DepreciationEntryResource($this->DepreciationEntryService->getDepreciationEntry($id)));
     }
-
+    
     public function create(StoreDepreciationEntryRequest $request) {
+        if ($response = $this->checkPermissionAndRespond('depreciation-entries.create')) {
+            return $response;
+        }
         return $this->success(new DepreciationEntryResource($this->DepreciationEntryService->createDepreciationEntry($request->validated())), 'تم الإنشاء بنجاح');
     }
-
+    
     public function update(EditDepreciationEntryRequest $request, $id) {
+        if ($response = $this->checkPermissionAndRespond('depreciation-entries.update')) {
+            return $response;
+        }
         return $this->success(new DepreciationEntryResource($this->DepreciationEntryService->updateDepreciationEntry($id, $request->validated())), 'تم التحديث بنجاح');
     }
-
+    
     public function delete($id) {
+        if ($response = $this->checkPermissionAndRespond('depreciation-entries.delete')) {
+            return $response;
+        }
         $this->DepreciationEntryService->deleteDepreciationEntry($id);
         return $this->success(null, 'تم الحذف بنجاح');
     }
-
+    
     /**
      * Import depreciation entries from Excel file
      */
     public function import(Request $request): JsonResponse
     {
+        if ($response = $this->checkPermissionAndRespond('depreciation-entries.create')) {
+            return $response;
+        }
+        
         try {
             // Validate the uploaded file
             $validator = Validator::make($request->all(), [
                 'excel_file' => 'required|file|mimes:xlsx,xls|max:10240', // Max 10MB
             ]);
-
             if ($validator->fails()) {
                 return $this->error('ملف غير صالح. يرجى رفع ملف Excel صالح.', 400);
             }
-
             $excel_file = $request->file('excel_file');
-
             // Load the spreadsheet
             $spreadsheet = IOFactory::load($excel_file->getPathname());
             $worksheet = $spreadsheet->getActiveSheet();
             $highestRow = $worksheet->getHighestRow();
-
             // Validate minimum rows (header + at least one data row)
             if ($highestRow < 2) {
                 return $this->error('الملف فارغ أو لا يحتوي على بيانات صالحة.', 400);
             }
-
             $importedData = [];
             $errors = [];
             $successCount = 0;
             $skipCount = 0;
-
             // Start database transaction
             DB::beginTransaction();
-
             try {
                 // Process each row (skip header row 1)
                 for ($row = 2; $row <= $highestRow; $row++) {
@@ -93,21 +114,17 @@ class DepreciationEntryController extends Controller {
                         $skipCount++;
                         continue;
                     }
-
                     try {
                         // Extract data from Excel row
                         $rowData = $this->extractRowData($worksheet, $row);
-
                         // Validate the row data
                         $validationResult = $this->validateImportRow($rowData, $row);
                         if (!$validationResult['valid']) {
                             $errors[] = "الصف {$row}: " . implode(', ', $validationResult['errors']);
                             continue;
                         }
-
                         // Check if entry already exists
                         $existingEntry = DepreciationEntry::where('entry_number', $rowData['entry_number'])->first();
-
                         if ($existingEntry) {
                             // Update existing entry
                             $existingEntry->update($rowData);
@@ -125,23 +142,18 @@ class DepreciationEntryController extends Controller {
                                 'action' => 'created'
                             ];
                         }
-
                         $successCount++;
-
                     } catch (Exception $e) {
                         $errors[] = "الصف {$row}: خطأ في المعالجة - " . $e->getMessage();
                     }
                 }
-
                 // If there are critical errors, rollback
                 if (!empty($errors) && $successCount === 0) {
                     DB::rollback();
                     return $this->error('فشل في استيراد البيانات: ' . implode(', ', $errors), 400);
                 }
-
                 // Commit transaction
                 DB::commit();
-
                 // Prepare response
                 $message = "تم الاستيراد بنجاح. تم إنشاء/تحديث {$successCount} سجل";
                 if ($skipCount > 0) {
@@ -150,7 +162,6 @@ class DepreciationEntryController extends Controller {
                 if (!empty($errors)) {
                     $message .= ". توجد أخطاء في بعض الصفوف.";
                 }
-
                 return $this->success([
                     'imported_count' => $successCount,
                     'skipped_count' => $skipCount,
@@ -158,17 +169,15 @@ class DepreciationEntryController extends Controller {
                     'imported_data' => $importedData,
                     'errors' => $errors
                 ], $message);
-
             } catch (Exception $e) {
                 DB::rollback();
                 return $this->error('خطأ في استيراد البيانات: ' . $e->getMessage(), 500);
             }
-
         } catch (Exception $e) {
             return $this->error('خطأ في قراءة الملف: ' . $e->getMessage(), 500);
         }
     }
-
+    
     /**
      * Extract data from Excel row
      */
@@ -192,7 +201,7 @@ class DepreciationEntryController extends Controller {
             'asset_id' => null,
         ];
     }
-
+    
     /**
      * Parse Excel date value
      */
@@ -201,58 +210,48 @@ class DepreciationEntryController extends Controller {
         if (empty($value)) {
             return null;
         }
-
         try {
             // If it's already a date object
             if ($value instanceof \DateTime) {
                 return Carbon::instance($value)->format('Y-m-d');
             }
-
             // If it's an Excel date serial number
             if (is_numeric($value)) {
                 $date = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value);
                 return Carbon::instance($date)->format('Y-m-d');
             }
-
             // Try to parse as string date
             return Carbon::parse($value)->format('Y-m-d');
-
         } catch (Exception $e) {
             return null;
         }
     }
-
+    
     /**
      * Validate import row data
      */
     private function validateImportRow(array $data, int $rowNumber): array
     {
         $errors = [];
-
         // Required fields validation
         if (empty($data['entry_number'])) {
             $errors[] = 'رقم القيد مطلوب';
         }
-
         if (empty($data['description'])) {
             $errors[] = 'الوصف مطلوب';
         }
-
         // Numeric validations
         if (!is_numeric($data['depreciation_rate']) || $data['depreciation_rate'] < 0 || $data['depreciation_rate'] > 100) {
             $errors[] = 'نسبة الاهلاك يجب أن تكون بين 0 و 100';
         }
-
         if (!is_numeric($data['purchase_cost']) || $data['purchase_cost'] < 0) {
             $errors[] = 'تكلفة الشراء يجب أن تكون رقم موجب';
         }
-
         // Date validations
         if ($data['depreciation_start_date'] && $data['depreciation_year']) {
             try {
                 $startDate = Carbon::parse($data['depreciation_start_date']);
                 $yearDate = Carbon::parse($data['depreciation_year']);
-
                 if ($yearDate->lt($startDate)) {
                     $errors[] = 'سنة احتساب الاهلاك يجب أن تكون بعد بداية الاهلاك';
                 }
@@ -260,22 +259,24 @@ class DepreciationEntryController extends Controller {
                 $errors[] = 'تواريخ غير صالحة';
             }
         }
-
         return [
             'valid' => empty($errors),
             'errors' => $errors
         ];
     }
-
+    
     /**
      * Download import template
      */
-    public function downloadTemplate(): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    public function downloadTemplate(): BinaryFileResponse
     {
+        if ($response = $this->checkPermissionAndRespond('depreciation-entries.view')) {
+            return $response;
+        }
+        
         // Create spreadsheet with headers only
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-
         // Set headers (same as export)
         $headers = [
             'A1' => 'م',
@@ -297,11 +298,9 @@ class DepreciationEntryController extends Controller {
             'Q1' => 'صافي القيمة الدفترية',
             'R1' => 'التصنيف'
         ];
-
         foreach ($headers as $cell => $value) {
             $sheet->setCellValue($cell, $value);
         }
-
         // Add sample row with instructions
         $sheet->setCellValue('A2', '1');
         $sheet->setCellValue('B2', 'DEP-001');
@@ -316,25 +315,25 @@ class DepreciationEntryController extends Controller {
         $sheet->setCellValue('M2', '0');
         $sheet->setCellValue('O2', '0');
         $sheet->setCellValue('R2', 'معدات');
-
         // Style headers
         $sheet->getStyle('A1:R1')->getFont()->setBold(true);
-
         // Auto-size columns
         foreach (range('A', 'R') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
-
         // Create writer and return file
         $writer = new Xlsx($spreadsheet);
         $filename = 'depreciation_entries_template.xlsx';
         $temp_file = tempnam(sys_get_temp_dir(), $filename);
         $writer->save($temp_file);
-
         return response()->download($temp_file, $filename)->deleteFileAfterSend(true);
     }
-
+    
     public function export(Request $request) {
+        if ($response = $this->checkPermissionAndRespond('depreciation-entries.view')) {
+            return $response;
+        }
+        
         $query = DepreciationEntry::with('asset');
         // Apply filters
         if ($request->has('year') && $request->year != '') {
@@ -356,11 +355,9 @@ class DepreciationEntryController extends Controller {
             });
         }
         $entries = $query->orderBy('entry_number', 'asc')->get();
-
         // Create spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-
         // Set headers
         $sheet->setCellValue('A1', 'م');
         $sheet->setCellValue('B1', 'رقم القيد');
@@ -380,7 +377,6 @@ class DepreciationEntryController extends Controller {
         $sheet->setCellValue('P1', 'مجمع الاهلاك في');
         $sheet->setCellValue('Q1', 'صافي القيمة الدفترية');
         $sheet->setCellValue('R1', 'التصنيف');
-
         // Add data
         $row = 2;
         foreach ($entries as $entry) {
@@ -392,43 +388,31 @@ class DepreciationEntryController extends Controller {
             $sheet->setCellValue('F' . $row, $entry->depreciation_start_date ? Date::PHPToExcel($entry->depreciation_start_date) : '');
             $sheet->setCellValue('G' . $row, $entry->depreciation_year ? Date::PHPToExcel($entry->depreciation_year) : '');
             // $sheet->setCellValue('G' . $row, $entry->depreciation_year);
-
             // Days Count Formula
             $daysCountFormula = '=G' . $row . '-F' . $row;
             $sheet->setCellValue('H' . $row, $daysCountFormula);
-
             $sheet->setCellValue('I' . $row, $entry->purchase_cost);
             $sheet->setCellValue('J' . $row, $entry->additions);
             $sheet->setCellValue('K' . $row, $entry->exclusions);
-
             // Asset Cost at End Formula
             $assetCostFormula = '=I' . $row . '+J' . $row . '+K' . $row;
             $sheet->setCellValue('L' . $row, $assetCostFormula);
-
             $sheet->setCellValue('M' . $row, $entry->accumulated_depreciation_at_start);
-
             // Current Year Depreciation Formula
             $depreciationFormula = '=L' . $row . '*E' . $row . '/365*H' . $row;
-
             $sheet->setCellValue('N' . $row, $depreciationFormula);
-
             $sheet->setCellValue('O' . $row, $entry->excluded_depreciation);
-
             // Accumulated Depreciation at End Formula
             $accumulatedFormula = '=M' . $row . '+N' . $row . '+O' . $row;
             $sheet->setCellValue('P' . $row, $accumulatedFormula);
-
             // Net Book Value Formula
             $netBookValueFormula = '=L' . $row . '-P' . $row;
             $sheet->setCellValue('Q' . $row, $netBookValueFormula);
-
             $sheet->setCellValue('R' . $row, $entry->classification);
             $row++;
         }
-
         // Add totals row
         $sheet->setCellValue('A' . $row, 'الإجمالي');
-
         // Totals formulas
         $sheet->setCellValue('I' . $row, '=SUM(I2:I' . ($row-1) . ')');
         $sheet->setCellValue('J' . $row, '=SUM(J2:J' . ($row-1) . ')');
@@ -439,25 +423,20 @@ class DepreciationEntryController extends Controller {
         $sheet->setCellValue('O' . $row, '=SUM(O2:O' . ($row-1) . ')');
         $sheet->setCellValue('P' . $row, '=SUM(P2:P' . ($row-1) . ')');
         $sheet->setCellValue('Q' . $row, '=SUM(Q2:Q' . ($row-1) . ')');
-
         // Style the totals row
         $sheet->getStyle('A' . $row . ':R' . $row)->getFont()->setBold(true);
-
         // Format date columns
         $sheet->getStyle('C2:C' . ($row-1))->getNumberFormat()->setFormatCode('dd/mm/yyyy');
         $sheet->getStyle('F2:F' . ($row-1))->getNumberFormat()->setFormatCode('dd/mm/yyyy');
         $sheet->getStyle('G2:G' . ($row-1))->getNumberFormat()->setFormatCode('dd/mm/yyyy');
-
         // Format numeric columns
         $sheet->getStyle('E2:E' . $row)->getNumberFormat()->setFormatCode('#,##0.00');
         $sheet->getStyle('H2:H' . $row)->getNumberFormat()->setFormatCode('#,##0');
         $sheet->getStyle('I2:Q' . $row)->getNumberFormat()->setFormatCode('#,##0.00');
-
         // Auto-size columns
         foreach (range('A', 'R') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
-
         // Create writer and output
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -466,5 +445,4 @@ class DepreciationEntryController extends Controller {
         $writer->save('php://output');
         exit;
     }
-
 }

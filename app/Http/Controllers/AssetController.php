@@ -25,6 +25,7 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AssetController extends Controller {
     use ApiResponder;
@@ -41,24 +42,27 @@ class AssetController extends Controller {
         $this->TypeService = $TypeService;
     }
 
-        public function index() {
+    public function index() {
+        $this->checkPermission('assets.view', false);
         return view('content.assets');
     }
 
     public function create() {
+        $this->checkPermission('assets.create', false);
         return view('content.assets.create')
             ->with('types', $this->TypeService->allTypes())
             ->with('locations', $this->LocationService->allLocations())
-            ->with('employees', $this->EmployeeService->allEmployees());        
+            ->with('employees', $this->EmployeeService->allEmployees());
     }
 
     public function show($id) {
+        $this->checkPermission('assets.view', false);
         return view('content.assets.show')
             ->with('asset', $this->AssetService->getAsset($id));
     }
 
     public function edit($id) {
-
+        $this->checkPermission('assets.view', false);
         return view('content.assets.edit')
             ->with('asset', $this->AssetService->getAsset($id))
             ->with('types', $this->TypeService->allTypes())
@@ -67,10 +71,12 @@ class AssetController extends Controller {
     }
 
     public function all() {
+        $this->checkPermission('assets.view', true);
         return $this->success(AssetResource::collection($this->AssetService->allAssets()));
     }
 
     public function get($id) {
+        $this->checkPermission('assets.view', false);
         return view('content.assets.index')
             ->with('asset', $this->AssetService->getAsset($id));
 
@@ -78,18 +84,22 @@ class AssetController extends Controller {
     }
 
     public function store(AssetRequest $request) {
+        $this->checkPermission('assets.create', true);
         return $this->success(new AssetResource($this->AssetService->createAsset($request->validated())), 'تم الإنشاء بنجاح');
     }
 
     public function update(AssetRequest $request, $id) {
+        $this->checkPermission('assets.update', true);
         return $this->success(new AssetResource($this->AssetService->updateAsset($id, $request->validated())), 'تم التحديث بنجاح');
     }
 
     public function delete($id) {
+        $this->checkPermission('assets.delete', true);
         $this->AssetService->deleteAsset($id);
         return $this->success(null, 'تم الحذف بنجاح');
     }
     public function qr($id) {
+        $this->checkPermission('assets.view', false);
         $url = route('assets.get', $id);
         return response(QrCode::size(160)
         ->color(0, 0, 0)
@@ -102,8 +112,9 @@ class AssetController extends Controller {
      * Export assets to Excel
      */
     public function export(Request $request) {
+        $this->checkPermission('assets.view', true);
         $assets = Asset::all();
-        
+
 
         // Create spreadsheet
         $spreadsheet = new Spreadsheet();
@@ -158,12 +169,12 @@ class AssetController extends Controller {
         // Create writer and output
         $writer = new Xlsx($spreadsheet);
         $filename = 'assets_' . date('Y-m-d_H-i-s') . '.xlsx';
-        
+
         // Set headers for file download
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
-        
+
         // IMPORTANT: These lines were missing in your code!
         $writer->save('php://output');
         exit; // This prevents any additional output (like debugbar) from being sent
@@ -189,23 +200,24 @@ class AssetController extends Controller {
      */
     public function import(Request $request): JsonResponse
     {
+        $this->checkPermission('assets.view', true);
         try {
             // Validate the uploaded file
             $validator = Validator::make($request->all(), [
                 'excel_file' => 'required|file|mimes:xlsx,xls|max:10240', // Max 10MB
             ]);
-            
+
             if ($validator->fails()) {
                 return $this->error('ملف غير صالح. يرجى رفع ملف Excel صالح.', 400);
             }
 
             $excel_file = $request->file('excel_file');
-            
+
             // Load the spreadsheet
             $spreadsheet = IOFactory::load($excel_file->getPathname());
             $worksheet = $spreadsheet->getActiveSheet();
             $highestRow = $worksheet->getHighestRow();
-            
+
             // Validate minimum rows (header + at least one data row)
             if ($highestRow < 2) {
                 return $this->error('الملف فارغ أو لا يحتوي على بيانات صالحة.', 400);
@@ -215,7 +227,7 @@ class AssetController extends Controller {
             $errors = [];
             $successCount = 0;
             $skipCount = 0;
-            
+
             // Start database transaction
             DB::beginTransaction();
             try {
@@ -227,18 +239,18 @@ class AssetController extends Controller {
                         $skipCount++;
                         continue;
                     }
-                    
+
                     try {
                         // Extract data from Excel row
                         $rowData = $this->extractRowData($worksheet, $row);
-                        
+
                         // Validate the row data
                         $validationResult = $this->validateImportRow($rowData, $row);
                         if (!$validationResult['valid']) {
                             $errors[] = "الصف {$row}: " . implode(', ', $validationResult['errors']);
                             continue;
                         }
-                        
+
                         // Check if asset already exists
                         $existingAsset = Asset::where('number', $rowData['number'])->first();
                         if ($existingAsset) {
@@ -263,16 +275,16 @@ class AssetController extends Controller {
                         $errors[] = "الصف {$row}: خطأ في المعالجة - " . $e->getMessage();
                     }
                 }
-                
+
                 // If there are critical errors, rollback
                 if (!empty($errors) && $successCount === 0) {
                     DB::rollback();
                     return $this->error('فشل في استيراد البيانات: ' . implode(', ', $errors), 400);
                 }
-                
+
                 // Commit transaction
                 DB::commit();
-                
+
                 // Prepare response
                 $message = "تم الاستيراد بنجاح. تم إنشاء/تحديث {$successCount} سجل";
                 if ($skipCount > 0) {
@@ -281,7 +293,7 @@ class AssetController extends Controller {
                 if (!empty($errors)) {
                     $message .= ". توجد أخطاء في بعض الصفوف.";
                 }
-                
+
                 return $this->success([
                     'imported_count' => $successCount,
                     'skipped_count' => $skipCount,
@@ -331,7 +343,7 @@ class AssetController extends Controller {
             }
             // If it's an Excel date serial number
             if (is_numeric($value)) {
-                $date = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value);
+                $date = Date::excelToDateTimeObject($value);
                 return Carbon::instance($date)->format('Y-m-d');
             }
             // Try to parse as string date
@@ -349,14 +361,14 @@ class AssetController extends Controller {
         if (empty($statusLabel)) {
             return null;
         }
-        
+
         $statusMap = [
             'قيد الاستخدام' => 'in_use',
             'في المخزن' => 'in_storage',
             'تحت الصيانة' => 'maintenance',
             'تالف' => 'damaged'
         ];
-        
+
         return $statusMap[$statusLabel] ?? null;
     }
 
@@ -368,7 +380,7 @@ class AssetController extends Controller {
         if (empty($typeName)) {
             return null;
         }
-        
+
         $type = Type::where('name', $typeName)->first();
         if ($type) {
             return $type->id;
@@ -377,7 +389,7 @@ class AssetController extends Controller {
             $newType->name = $typeName;
             $newType->save();
             return $newType->id;
-        }       
+        }
     }
 
     /**
@@ -388,7 +400,7 @@ class AssetController extends Controller {
         if (empty($employeeName)) {
             return null;
         }
-        
+
         $employee = Employee::where('full_name', $employeeName)->first();
         if ($employee) {
             return $employee->id;
@@ -398,7 +410,7 @@ class AssetController extends Controller {
             $newEmployee->full_name = $employeeName;
             $newEmployee->save();
             return $newEmployee->id;
-        }    
+        }
     }
 
     /**
@@ -409,7 +421,7 @@ class AssetController extends Controller {
         if (empty($locationName)) {
             return null;
         }
-        
+
         $location = Location::where('name', $locationName)->first();
         if ($location) {
             return $location->id;
@@ -427,7 +439,7 @@ class AssetController extends Controller {
     private function validateImportRow(array $data, int $rowNumber): array
     {
         $errors = [];
-        
+
         // Required fields validation
         if (empty($data['name'])) {
             $errors[] = 'الاسم مطلوب';
@@ -441,12 +453,12 @@ class AssetController extends Controller {
         if (empty($data['type_id'])) {
             $errors[] = 'نوع الأصل غير موجود';
         }
-        
+
         // Status validation
         if (!empty($data['status']) && !in_array($data['status'], ['in_use', 'in_storage', 'maintenance', 'damaged'])) {
             $errors[] = 'قيمة الحالة غير صالحة';
         }
-        
+
         // Date validation
         if (!empty($data['purchase_date'])) {
             try {
@@ -455,7 +467,7 @@ class AssetController extends Controller {
                 $errors[] = 'تاريخ الشراء غير صالح';
             }
         }
-        
+
         return [
             'valid' => empty($errors),
             'errors' => $errors
@@ -465,12 +477,13 @@ class AssetController extends Controller {
     /**
      * Download import template
      */
-    public function downloadTemplate(): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    public function downloadTemplate(): BinaryFileResponse
     {
+        $this->checkPermission('assets.view', true);
         // Create spreadsheet with headers only
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        
+
         // Set headers (same as export)
         $headers = [
             'A1' => 'م',
@@ -484,11 +497,11 @@ class AssetController extends Controller {
             'I1' => 'الإدارة',
             'J1' => 'الملاحظات'
         ];
-        
+
         foreach ($headers as $cell => $value) {
             $sheet->setCellValue($cell, $value);
         }
-        
+
         // Add sample row with instructions
         $sheet->setCellValue('A2', '1');
         $sheet->setCellValue('B2', 'حاسوب محمول');
@@ -500,24 +513,24 @@ class AssetController extends Controller {
         $sheet->setCellValue('H2', 'أحمد محمد');
         $sheet->setCellValue('I2', 'المقر الرئيسي');
         $sheet->setCellValue('J2', 'ملاحظات');
-        
+
         // Style headers
         $sheet->getStyle('A1:J1')->getFont()->setBold(true);
         $sheet->getStyle('A1:J1')->getFill()
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFCCCCCC');
-        
+
         // Auto-size columns
         foreach (range('A', 'J') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
-        
+
         // Create writer and return file
         $writer = new Xlsx($spreadsheet);
         $filename = 'assets_template.xlsx';
         $temp_file = tempnam(sys_get_temp_dir(), $filename);
         $writer->save($temp_file);
-        
+
         return response()->download($temp_file, $filename)->deleteFileAfterSend(true);
     }
 

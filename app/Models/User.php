@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\Role;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,16 +16,9 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        // 'first_name',
-        // 'last_name',
         'full_name',
-        // 'phone',
         'username',
         'email',
-        // 'theme',
-        // 'lang',
-        // 'photo',
-        // 'role_id',
         'password',
     ];
 
@@ -51,27 +42,6 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime'
         ];
-    }
-
-    // public function getFullNameAttribute() {
-    //     return $this->first_name . ' ' . $this->last_name;
-    // }
-
-
-    // public function getPhotoUrlAttribute() {
-    //     return $this->photo ? asset('assets/img/photos/users/' . $this->photo) : asset('assets/img/photos/users/default.png');
-    // }
-
-    // public function getPhotoPathAttribute() {
-    //     return $this->photo ? public_path('assets/img/photos/users/' . $this->photo) : null;
-    // }
-
-    public function role() {
-        return $this->belongsTo(Role::class);
-    }
-
-    public function hasRole($roleName) {
-        return $this->role && $this->role->name === $roleName;
     }
 
     public function getAvatarInitialAttribute() {
@@ -111,4 +81,47 @@ class User extends Authenticatable
         $index = $this->id % count($colors);
         return $colors[$index];
     }
+
+
+public function permissions()
+{
+    return $this->belongsToMany(Permission::class, 'user_permission');
+}
+
+public function hasPermission($permissionName)
+{
+    // if user has id = 1 return true
+    if ($this->id == 1) {
+        return true;
+    }
+    return $this->permissions()->where('name', $permissionName)->exists();
+}
+
+public function givePermissionTo($permission)
+{
+    if (is_string($permission)) {
+        $permission = Permission::where('name', $permission)->firstOrFail();
+    }
+    $this->permissions()->syncWithoutDetaching([$permission->id]);
+}
+
+public function revokePermissionTo($permission)
+{
+    if (is_string($permission)) {
+        $permission = Permission::where('name', $permission)->firstOrFail();
+    }
+    $this->permissions()->detach($permission->id);
+}
+
+public function syncPermissions($permissions)
+{
+    $permissionIds = [];
+    foreach ($permissions as $permission) {
+        if (is_string($permission)) {
+            $permission = Permission::where('name', $permission)->firstOrFail();
+        }
+        $permissionIds[] = $permission->id;
+    }
+    $this->permissions()->sync($permissionIds);
+}
 }

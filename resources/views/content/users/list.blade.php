@@ -9,21 +9,23 @@
             <h1 class="text-3xl font-display font-bold text-slate-900 dark:text-slate-100">المستخدمين</h1>
             <p class="text-slate-600 dark:text-slate-400 mt-1">إدارة حسابات المستخدمين في النظام</p>
         </div>
-        <div class="flex gap-2">
-            <button id="create-user-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-8 px-3 text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus w-4 h-4 ltr:mr-2 rtl:ml-2">
-                    <path d="M5 12h14"></path>
-                    <path d="M12 5v14"></path>
-                </svg>
-                إضافة مستخدم جديد
-            </button>
-        </div>
+        @if (Auth::user()->hasPermission('users.create'))
+            <div class="flex gap-2">
+                <button id="create-user-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-8 px-3 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus w-4 h-4 ltr:mr-2 rtl:ml-2">
+                        <path d="M5 12h14"></path>
+                        <path d="M12 5v14"></path>
+                    </svg>
+                    إضافة مستخدم جديد
+                </button>
+            </div>
+        @endif
     </div>
 
     <!-- Search Section -->
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mt-4">
         <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 gap-4">
                 <div class="md:col-span-1">
                     <label class="block text-sm font-medium mb-2 dark:text-slate-400">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-4 h-4 inline ltr:mr-1 rtl:ml-1">
@@ -35,15 +37,6 @@
                     <div class="w-full">
                         <input id="dataTables_my_filter" type="text" class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="ابحث بالاسم، اسم المستخدم، أو البريد الإلكتروني...">
                     </div>
-                </div>
-                <div class="flex items-end">
-                    <button type="button" id="apply-search-btn" class="inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-primary-600 text-white hover:bg-primary-700 h-10 px-4 text-sm w-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-4 h-4 ltr:mr-2 rtl:ml-2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.3-4.3"></path>
-                        </svg>
-                        بحث
-                    </button>
                 </div>
             </div>
         </div>
@@ -108,7 +101,7 @@
                         <input type="text" id="username" name="username" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم المستخدم">
                     </div>
                     <div>
-                        <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">اسم المستخدم</label>
+                        <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">البريد الإلكتروني</label>
                         <input type="email" id="email" name="email" required class="flex h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 w-full" placeholder="أدخل اسم المستخدم">
                     </div>
                     {{-- <div>
@@ -156,6 +149,34 @@
                 </button>
                 <button id="confirmDeleteUserBtn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
                     حذف
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Permissions Modal -->
+<div id="permissionsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-slate-900 dark:text-white">صلاحيات المستخدم: <span id="permissionsUserName"></span></h3>
+                <button id="closePermissionsModalBtn" class="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x w-6 h-6">
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="permissionsContent">
+                <!-- Permissions will be loaded here via AJAX -->
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button id="cancelPermissionsBtn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors ml-2">
+                    إلغاء
+                </button>
+                <button id="savePermissionsBtn" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors">
+                    حفظ الصلاحيات
                 </button>
             </div>
         </div>
@@ -411,11 +432,6 @@ $(document).ready(function() {
         pagination.append(nextBtn);
     }
 
-    // Event Handlers
-    $('#apply-search-btn').on('click', function() {
-        table.ajax.reload();
-    });
-
     // Custom search
     $('#dataTables_my_filter').on('input', function () {
         var query = $(this).val();
@@ -603,9 +619,6 @@ $(document).ready(function() {
         }, 3000);
     }
 
-
-
-
         $(document).on('click', '.actions-dropdown-btn', function (e) {
         e.stopPropagation(); // prevent document click from immediately closing
 
@@ -624,6 +637,158 @@ $(document).ready(function() {
             $('.actions-dropdown').addClass('hidden');
         }
     });
+
+
+    // Permissions Modal
+    $(document).on('click', '.permissions-user-btn', function() {
+        $('.actions-dropdown').addClass('hidden');
+        var userId = $(this).data('id');
+        var userName = $(this).data('full_name');
+        var userPermissions = $(this).data('permissions');
+        // put userId in save permissions button as data
+        $('#savePermissionsBtn').data('user-id', userId);
+
+        $('#permissionsUserName').text(userName);
+        $('#permissionsModal').removeClass('hidden').addClass('flex');
+
+        // Generate permissions HTML
+        var modules = {
+            'assets': 'الأصول',
+            'employees': 'الموظفين',
+            'users': 'المستخدمين',
+            'locations': 'المواقع',
+            'types': 'الأنواع',
+            'depreciation-entries': 'قيد الاستهلاك',
+        };
+
+        var actions = {
+            'create': 'إنشاء',
+            'view': 'عرض',
+            'update': 'تعديل',
+            'delete': 'حذف',
+        };
+
+        var html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">';
+
+        $.each(modules, function(module, displayName) {
+            html += '<div class="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-300">';
+            html += '<div class="p-4 border-b border-gray-200 dark:border-gray-600">';
+            html += '<div class="flex items-center justify-between">';
+            html += '<div class="flex items-center gap-3">';
+
+            var icon = '';
+            switch(module) {
+                case 'assets':
+                    icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package text-gray-600 dark:text-gray-300"><path d="m7.5 4.27 9 5.15"></path><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="M3.3 7 12 12l8.7-5"></path><path d="M12 22V12"></path></svg>';
+                    break;
+                case 'employees':
+                    icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lucide lucide-package text-gray-600 dark:text-gray-300" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h.01"></path><path d="M3 18h.01"></path><path d="M3 6h.01"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M8 6h13"></path></svg>';
+                    break;
+                case 'users':
+                    icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lucide lucide-package text-gray-600 dark:text-gray-300" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h.01"></path><path d="M3 18h.01"></path><path d="M3 6h.01"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M8 6h13"></path></svg>';
+                    break;
+                case 'locations':
+                    icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lucide lucide-package text-gray-600 dark:text-gray-300" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22a1 1 0 0 1-1-1v-4a1 1 0 0 1 .445-.832l3-2a1 1 0 0 1 1.11 0l3 2A1 1 0 0 1 22 17v4a1 1 0 0 1-1 1z"></path><path d="M18 10a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 .601.2"></path><path d="M18 22v-3"></path><circle cx="10" cy="10" r="3"></circle></svg>';
+                    break;
+                case 'types':
+                    icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag text-gray-600 dark:text-gray-300"><path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.42 0l6.58-6.58a1 1 0 0 0 0-1.42L12 2Z"></path><circle cx="7" cy="7" r="2"></circle></svg>';
+                    break;
+                case 'depreciation-entries':
+                    icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lucide lucide-package text-gray-600 dark:text-gray-300" stroke-linecap="round" stroke-linejoin="round"><path d="M10 22v-5"></path><path d="M14 19v-2"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M18 20v-3"></path><path d="M2 13h20"></path><path d="M20 13V7l-5-5H6a2 2 0 0 0-2 2v9"></path><path d="M6 20v-3"></path></svg>';
+                    break;
+            }
+
+            html += '<div class="p-2 rounded-md bg-gray-100 dark:bg-gray-600">' + icon + '</div>';
+            html += '<div><h3 class="text-lg font-medium text-gray-900 dark:text-white">' + displayName + '</h3></div>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="mt-4 grid grid-cols-2 gap-3 transition-all duration-300 max-h-96 opacity-100">';
+
+            $.each(actions, function(action, actionName) {
+                var permissionName = module + '.' + action;
+                var isChecked = userPermissions.includes(permissionName);
+                console.log(permissionName, isChecked);
+                html += '<div class="flex items-center justify-between p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-600 col-1">';
+                html += '<span class="text-sm text-gray-700 dark:text-gray-300">' + actionName + '</span>';
+                html += '<label class="relative inline-flex items-center cursor-pointer">';
+                html += '<input type="checkbox" name="permissions[]" value="' + permissionName + '" class="sr-only peer permission-checkbox" ' + (isChecked ? 'checked' : '') + ' data-user-id="' + userId + '" data-permission="' + permissionName + '" />';
+                html += "<div class='w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\"\"] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 dark:bg-gray-600 dark:peer-checked:bg-blue-600'></div>";
+                html += '</label>';
+                html += '</div>';
+            });
+
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+        });
+
+        html += '</div>';
+        $('#permissionsContent').html(html);
+    });
+
+    // Close Permissions Modal
+    $('#closePermissionsModalBtn, #cancelPermissionsBtn').on('click', function() {
+        $('#permissionsModal').addClass('hidden').removeClass('flex');
+    });
+
+    // Save Permissions
+    $('#savePermissionsBtn').on('click', function() {
+        var userId = $(this).data('user-id');
+        var permissions = [];
+
+        // Collect all checked permissions
+        $('#permissionsContent input[type="checkbox"]:checked').each(function() {
+            permissions.push($(this).val());
+        });
+
+        $.ajax({
+            url: `/users/${userId}/permissions`,
+            type: 'PUT',
+            data: {
+                permissions: permissions,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#permissionsModal').addClass('hidden').removeClass('flex');
+                showNotification('تم تحديث صلاحيات المستخدم بنجاح', 'success');
+                table.ajax.reload();
+            },
+            error: function(xhr) {
+                showNotification('حدث خطأ أثناء تحديث الصلاحيات', 'error');
+            }
+        });
+    });
+
+    // Handle permission checkbox changes
+    // $(document).on('change', '.permission-checkbox', function() {
+    //     var $checkbox = $(this);
+    //     var userId = $checkbox.data('user-id');
+    //     var permissionId = $checkbox.data('permission-id');
+    //     var state = $checkbox.is(':checked');
+
+    //     $.ajax({
+    //         url: '/users/permissions/toggle',
+    //         type: 'POST',
+    //         data: {
+    //             user_id: userId,
+    //             permission_id: permissionId,
+    //             state: state,
+    //             _token: $('meta[name="csrf-token"]').attr('content')
+    //         },
+    //         success: function(response) {
+    //             showNotification(state ? 'تمت إضافة الصلاحية بنجاح' : 'تمت إزالة الصلاحية بنجاح', 'success');
+    //         },
+    //         error: function(xhr) {
+    //             // Revert the checkbox state on error
+    //             $checkbox.prop('checked', !state);
+    //             showNotification('حدث خطأ أثناء تحديث الصلاحية', 'error');
+    //         }
+    //     });
+    // });
+
+
+
 });
 </script>
+
 @endsection
