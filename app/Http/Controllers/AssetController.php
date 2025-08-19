@@ -56,7 +56,7 @@ class AssetController extends Controller {
     }
 
     public function show($id) {
-        // $this->checkPermission('assets.view', false);
+        $this->checkPermission('assets.view', false);
         return view('content.assets.show')
             ->with('asset', $this->AssetService->getAsset($id));
     }
@@ -76,7 +76,7 @@ class AssetController extends Controller {
     }
 
     public function get($id) {
-        $this->checkPermission('assets.view', false);
+        // $this->checkPermission('assets.view', false);
         return view('content.assets.index')
             ->with('asset', $this->AssetService->getAsset($id));
 

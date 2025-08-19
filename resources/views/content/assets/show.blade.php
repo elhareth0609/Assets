@@ -11,7 +11,7 @@
         </div>
         <div class="flex gap-2">
             <a href="{{ route('assets') }}" class="inline-flex items-center justify-center rounded-md font-medium h-8 px-3 text-sm bg-transparent border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800">
-                 العودة للسجل
+                العودة للسجل
             </a>
             <a href="{{ route('assets.edit', $asset->id) }}" class="inline-flex items-center justify-center rounded-md font-medium bg-orange-500 text-white hover:bg-orange-600 h-8 px-3 text-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit w-4 h-4 rtl:ml-2 ltr:mr-2"><path d="M7 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"/><path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415Z"/><path d="m16 5 3 3"/></svg>
